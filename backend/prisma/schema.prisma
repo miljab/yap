@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  username      String         @unique @db.VarChar(32)
+  email         String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
+  avatar        String?
+  bio           String?
+  posts         Post[]
+  comments      Comment[]
+  notifications Notification[]
+  postLikes     PostLike[]
+  commentLikes  CommentLike[]
+}
+
+model Post {
+  id            String         @id @default(uuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  content       String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  likes         PostLike[]
+  comments      Comment[]
+  images        Image[]
+  history       PostHistory[]
+  notifications Notification[]
+}
+
+model Comment {
+  id            String         @id @default(uuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId        String
+  post          Post           @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  content       String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  likes         CommentLike[]
+  parentId      String?
+  parent        Comment?       @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies       Comment[]      @relation("CommentReplies")
+  images        Image[]
+  notifications Notification[]
+}
+
+model PostLike {
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([userId, postId])
+}
+
+model CommentLike {
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  commentId String
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([userId, commentId])
+}
+
+enum NotificationType {
+  LIKE_POST
+  LIKE_COMMENT
+  COMMENT_ON_POST
+  REPLY_TO_COMMENT
+}
+
+model Notification {
+  id         String           @id @default(uuid())
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId     String?
+  post       Post?            @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  commentId  String?
+  comment    Comment?         @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  type       NotificationType
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  isRead     Boolean          @default(false)
+  lastActor  String?
+  actorCount Int              @default(0)
+}
+
+model Image {
+  id         String   @id @default(uuid())
+  url        String
+  orderIndex Int
+  postId     String?
+  post       Post?    @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  commentId  String?
+  comment    Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model PostHistory {
+  id        String   @id @default(uuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+}
