@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "./generated/prisma"
@@ -22,6 +16,8 @@ model User {
   createdAt     DateTime       @default(now())
   avatar        String?
   bio           String?
+  following     User[]         @relation("UserFollowing")
+  followers     User[]         @relation("UserFollowing")
   posts         Post[]
   comments      Comment[]
   notifications Notification[]
@@ -84,6 +80,7 @@ enum NotificationType {
   LIKE_COMMENT
   COMMENT_ON_POST
   REPLY_TO_COMMENT
+  FOLLOW
 }
 
 model Notification {
