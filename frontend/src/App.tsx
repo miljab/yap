@@ -1,5 +1,12 @@
+import LandingPage from "./components/LandingPage";
+import { ThemeProvider } from "./context/ThemeProvider";
+
 function App() {
-  return <h1>test</h1>;
+  return (
+    <ThemeProvider defaultTheme="light" storageKey="uiTheme">
+      <LandingPage />
+    </ThemeProvider>
+  );
 }
 
 export default App;
