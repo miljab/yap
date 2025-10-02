@@ -1,10 +1,11 @@
-import LandingPage from "./pages/LandingPage";
 import { ThemeProvider } from "./context/ThemeProvider";
+import { Routes } from "react-router";
+import publicRoutes from "./routes/publicRoutes";
 
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="uiTheme">
-      <LandingPage />
+      <Routes>{publicRoutes()}</Routes>
     </ThemeProvider>
   );
 }
