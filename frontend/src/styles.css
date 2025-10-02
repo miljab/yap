@@ -6,6 +6,10 @@ body {
   box-sizing: border-box;
 }
 
+@theme {
+  --breakpoint-xs: 30rem;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

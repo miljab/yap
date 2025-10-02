@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 
-const words = ["desired", "needed", "the goal", "appreciated"];
+const words = [
+  "liked.",
+  "desired.",
+  "needed.",
+  "the goal.",
+  "heard.",
+  "loved.",
+  "limitless.",
+];
 
 function TypewriterText() {
   const [wordIndex, setWordIndex] = useState(0);
@@ -48,19 +56,28 @@ function TypewriterText() {
   }, []);
 
   return (
-    <span className="text-primary font-semibold">
+    <span className="inline-block text-left text-primary font-bold min-w-[11ch]">
       {words[wordIndex].substring(0, subIndex)}
-      <span className={blink ? "opacity-100" : "opacity-0"}>|</span>
+      <span
+        className={`relative sm:bottom-0.5 bottom-[1px] ${
+          blink ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        |
+      </span>
     </span>
   );
 }
 
-function LandingPageSentence() {
+function HeroSentence() {
   return (
-    <div>
-      The only place where your yapping is <TypewriterText />
+    <div className="w-fit m-auto flex flex-col items-start xs:items-center xs:flex-row text-sm sm:text-[1rem] md:text-lg lg:text-xl font-[Roboto_Mono]">
+      <span>The only place where your&nbsp;</span>
+      <span className="inline-block whitespace-nowrap">
+        yapping is <TypewriterText />
+      </span>
     </div>
   );
 }
 
-export default LandingPageSentence;
+export default HeroSentence;
