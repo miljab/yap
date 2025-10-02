@@ -1,4 +1,4 @@
-import LandingPage from "./components/LandingPage";
+import LandingPage from "./pages/LandingPage";
 import { ThemeProvider } from "./context/ThemeProvider";
 
 function App() {
