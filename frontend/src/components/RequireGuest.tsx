@@ -1,10 +1,10 @@
 import useAuth from "@/hooks/useAuth";
 import { Navigate, Outlet } from "react-router";
 
-function RequireAuth() {
+function RequireGuest() {
   const { auth } = useAuth();
 
-  return auth.accessToken ? <Outlet /> : <Navigate to="/" />;
+  return auth.accessToken ? <Navigate to="/home" /> : <Outlet />;
 }
 
-export default RequireAuth;
+export default RequireGuest;
