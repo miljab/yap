@@ -19,10 +19,16 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import axios from "@/api/axios";
+import { isAxiosError } from "axios";
+import { useNavigate } from "react-router";
+import { useState } from "react";
 
 type SignupFormData = z.infer<typeof signupSchema>;
 
 function SignupCard() {
+  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+  const navigate = useNavigate();
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     mode: "onTouched",
@@ -34,16 +40,53 @@ function SignupCard() {
     },
   });
 
-  async function onSubmit(data: SignupFormData) {}
+  async function onSubmit(data: SignupFormData) {
+    try {
+      await axios.post("/auth/signup", data);
+
+      navigate("/");
+    } catch (error) {
+      if (isAxiosError(error) && error.response) {
+        const responseData = error.response.data;
+        if (responseData.errors && Array.isArray(responseData.errors)) {
+          responseData.errors.forEach(
+            (err: { path: keyof SignupFormData | "root"; error: string }) => {
+              form.setError(err.path, {
+                type: "server",
+                message: err.error,
+              });
+            },
+          );
+        } else if (responseData.error) {
+          form.setError("root", {
+            type: "server",
+            message: responseData.error,
+          });
+        } else {
+          form.setError("root", {
+            type: "unknown",
+            message: "An unknown error occurred during signup.",
+          });
+        }
+      } else {
+        form.setError("root", {
+          type: "unknown",
+          message: "An unexpected error occurred.",
+        });
+      }
+    }
+  }
+
+  const usernameLength = form.watch("username").length;
 
   return (
-    <Card className="w-5/6 m-auto mt-12">
+    <Card className="m-auto mt-12 w-5/6">
       <CardHeader>
         <CardTitle>Sign up</CardTitle>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent className="flex flex-col gap-8">
             {form.formState.errors.root && (
               <div className="text-destructive">
                 {form.formState.errors.root.message}
@@ -67,9 +110,25 @@ function SignupCard() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <div className="flex justify-between">
+                    <FormLabel>Username</FormLabel>
+                    <div
+                      className={`text-muted-foreground text-sm transition-opacity duration-300 ${
+                        isUsernameFocused ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
+                      {usernameLength}/32
+                    </div>
+                  </div>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      onFocus={() => setIsUsernameFocused(true)}
+                      onBlur={() => {
+                        field.onBlur();
+                        setIsUsernameFocused(false);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
