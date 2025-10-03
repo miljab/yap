@@ -9,7 +9,9 @@ export const signup = async (req: Request, res: Response) => {
     res.status(201).json({ userId: user.id });
   } catch (error: any) {
     console.error(error);
-    res.status(400).json({ error: error.message });
+    res
+      .status(500)
+      .json({ error: "An internal server error occurred during signup." });
   }
 };
 
@@ -30,7 +32,12 @@ export const login = async (req: Request, res: Response) => {
     res.json({ userId: user.id, accessToken });
   } catch (error: any) {
     console.error(error);
-    res.status(400).json({ error: error.message });
+    if (error.message === "Invalid credentials") {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+    res
+      .status(500)
+      .json({ error: "An internal server error occurred during login." });
   }
 };
 
@@ -43,8 +50,11 @@ export const refresh = async (req: Request, res: Response) => {
     const accessToken = await authService.refresh(refreshToken);
 
     res.status(200).json({ accessToken });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
+    if (error.message === "Invalid refresh token") {
+      return res.status(403).json({ error: "Invalid refresh token" });
+    }
     res.status(500).json({ error: "Error refreshing access token" });
   }
 };

@@ -16,7 +16,7 @@ export const authService = {
     username: string;
     password: string;
   }) => {
-    const hashed = bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: {
         email: email.toLowerCase(),
@@ -34,7 +34,7 @@ export const authService = {
     identifier: string;
     password: string;
   }) => {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
         OR: [{ email: identifier.toLowerCase() }, { username: identifier }],
       },
@@ -56,7 +56,7 @@ export const authService = {
       expiresIn: "7d",
     });
 
-    await prisma.create({
+    await prisma.refreshToken.create({
       data: {
         token: refreshToken,
         userId: user.id,
