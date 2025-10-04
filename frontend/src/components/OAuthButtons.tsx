@@ -7,14 +7,20 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import useTheme from "@/hooks/useTheme";
 
 function OAuthButtons() {
+  const { theme } = useTheme();
+
   return (
     <div className="flex gap-2">
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button className="grow">
-            <GoogleLogo className="w-4 h-4" />
+          <Button
+            className="grow"
+            variant={theme === "dark" ? "default" : "outline"}
+          >
+            <GoogleLogo className="h-4 w-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -24,8 +30,11 @@ function OAuthButtons() {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button className="grow">
-            <GithubLogo className="w-4 h-4" />
+          <Button
+            className="grow"
+            variant={theme === "dark" ? "default" : "outline"}
+          >
+            <GithubLogo className="h-4 w-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
@@ -35,8 +44,11 @@ function OAuthButtons() {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button className="grow">
-            <XLogo className="w-4 h-4" />
+          <Button
+            className="grow"
+            variant={theme === "dark" ? "default" : "outline"}
+          >
+            <XLogo className="h-4 w-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
