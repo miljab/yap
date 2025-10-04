@@ -80,9 +80,9 @@ function SignupCard() {
   const usernameLength = form.watch("username").length;
 
   return (
-    <Card className="m-auto mt-12 w-5/6">
+    <Card className="w-full px-4 py-8">
       <CardHeader>
-        <CardTitle>Sign up</CardTitle>
+        <CardTitle className="text-center text-2xl">Sign up</CardTitle>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>

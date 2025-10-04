@@ -1,13 +1,9 @@
 import AuthOptions from "@/components/AuthOptions";
-import ToggleTheme from "../components/ui/ToggleTheme";
 import Hero from "@/components/Hero";
 
 function LandingPage() {
   return (
-    <div className="w-[93%] md:w-5/6 flex items-center flex-col gap-8 m-auto">
-      <div className="w-full flex justify-end">
-        <ToggleTheme />
-      </div>
+    <div className="m-auto flex w-[93%] flex-col items-center gap-8 md:w-5/6">
       <Hero />
       <div>
         <AuthOptions />
