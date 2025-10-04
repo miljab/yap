@@ -2,8 +2,10 @@ import HeroSentence from "./HeroSentence";
 
 function Hero() {
   return (
-    <div className="w-full">
-      <h1 className="text-4xl tracking-wider mb-4 text-center">yap</h1>
+    <div>
+      <h1 className="mb-4 text-left text-4xl tracking-wider md:text-5xl">
+        yap.
+      </h1>
       <div className="w-full text-center">
         <HeroSentence />
       </div>

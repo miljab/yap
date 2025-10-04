@@ -41,7 +41,7 @@ function TypewriterText() {
       () => {
         setSubIndex((prev) => prev + (deleting ? -1 : 1));
       },
-      deleting ? 50 : 150 // deleting time : typing time
+      deleting ? 50 : 150, // deleting time : typing time
     );
 
     return () => clearTimeout(timeout);
@@ -56,10 +56,10 @@ function TypewriterText() {
   }, []);
 
   return (
-    <span className="inline-block text-left text-primary font-bold min-w-[11ch]">
+    <span className="text-primary inline-block min-w-[11ch] text-left font-bold">
       {words[wordIndex].substring(0, subIndex)}
       <span
-        className={`relative sm:bottom-0.5 bottom-[1px] ${
+        className={`relative bottom-[1px] sm:bottom-0.5 ${
           blink ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -71,7 +71,7 @@ function TypewriterText() {
 
 function HeroSentence() {
   return (
-    <div className="w-fit m-auto flex flex-col items-start xs:items-center xs:flex-row text-sm sm:text-[1rem] md:text-lg lg:text-xl font-[Roboto_Mono]">
+    <div className="m-auto flex w-fit flex-col items-start font-[Roboto_Mono] text-sm md:text-lg lg:text-xl">
       <span>The only place where your&nbsp;</span>
       <span className="inline-block whitespace-nowrap">
         yapping is <TypewriterText />
