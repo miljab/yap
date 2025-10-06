@@ -162,7 +162,7 @@ function SignupCard() {
             />
           </CardContent>
 
-          <CardFooter className="mt-4">
+          <CardFooter className="mt-12">
             <Button type="submit" className="ml-auto">
               Create account
             </Button>
