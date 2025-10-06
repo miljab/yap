@@ -64,7 +64,9 @@ export const authService = {
       },
     });
 
-    return { user, accessToken, refreshToken };
+    const { password: _, ...userWithoutPassword } = user;
+
+    return { user: userWithoutPassword, accessToken, refreshToken };
   },
   refresh: async (refreshToken: string) => {
     const token = await prisma.refreshToken.findUnique({
