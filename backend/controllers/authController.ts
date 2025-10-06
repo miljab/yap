@@ -29,11 +29,13 @@ export const login = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.json({ userId: user.id, accessToken });
+    res.json({ user: user, accessToken: accessToken });
   } catch (error: any) {
     console.error(error);
     if (error.message === "Invalid credentials") {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ error: "Wrong email/username or password" });
     }
     res
       .status(500)

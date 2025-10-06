@@ -1,8 +1,10 @@
 import { createContext, useState, useEffect, type ReactNode } from "react";
 import axios from "../api/axios";
+import type { User } from "@/types/user";
 
 type AuthState = {
   accessToken?: string;
+  user?: User;
 };
 
 type AuthContextType = {
