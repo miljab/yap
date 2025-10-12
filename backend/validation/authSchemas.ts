@@ -44,3 +44,19 @@ export const loginSchema = z.object({
   identifier: z.string().min(1, "Email or username is required"),
   password: z.string().min(1, "Password is required"),
 });
+
+export const usernameSchema = z
+  .object({
+    username: z.string().min(5).max(32).regex(usernamePattern),
+  })
+  .refine(
+    async (data) => {
+      const usernameExists = await prisma.user.findUnique({
+        where: {
+          username: data.username.toLowerCase(),
+        },
+      });
+      return !usernameExists;
+    },
+    { error: "Username already in use", path: ["username"] }
+  );

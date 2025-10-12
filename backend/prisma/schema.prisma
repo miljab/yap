@@ -9,9 +9,9 @@ datasource db {
 
 model User {
   id            String         @id @default(uuid())
-  username      String         @unique @db.VarChar(32)
+  username      String?        @unique @db.VarChar(32)
   email         String         @unique
-  password      String
+  password      String?
   createdAt     DateTime       @default(now())
   avatar        String?
   bio           String?
@@ -23,6 +23,24 @@ model User {
   postLikes     PostLike[]
   commentLikes  CommentLike[]
   refreshToken  RefreshToken[]
+  account       Account[]
+}
+
+enum Provider {
+  GOOGLE
+  X
+  GITHUB
+}
+
+model Account {
+  id                String   @id @default(uuid())
+  provider          Provider
+  providerAccountId String
+  isPending         Boolean  @default(true)
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model Post {

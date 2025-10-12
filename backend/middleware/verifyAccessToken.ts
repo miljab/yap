@@ -3,11 +3,11 @@ import jwt from "jsonwebtoken";
 import { type Request, type Response, type NextFunction } from "express";
 import { prisma } from "../prisma/prismaClient.js";
 
-interface JwtPayload {
+export interface JwtPayload {
   userId: string;
 }
 
-export const verifyToken = (
+export const verifyAccessToken = (
   req: Request,
   res: Response,
   next: NextFunction

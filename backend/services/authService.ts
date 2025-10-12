@@ -1,10 +1,10 @@
 import "dotenv/config";
 import { prisma } from "../prisma/prismaClient.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/generateTokens.js";
 
 export const authService = {
   signup: async ({
@@ -27,6 +27,7 @@ export const authService = {
 
     return user;
   },
+
   login: async ({
     identifier,
     password,
@@ -43,18 +44,14 @@ export const authService = {
       },
     });
 
-    if (!user) throw new Error("Invalid credentials");
+    if (!user || !user.password) throw new Error("Invalid credentials");
 
     const isValid = bcrypt.compare(password, user.password);
     if (!isValid) throw new Error("Invalid credentials");
 
-    const accessToken = jwt.sign({ userId: user.id }, ACCESS_TOKEN_SECRET, {
-      expiresIn: "15m",
-    });
+    const accessToken = generateAccessToken(user.id);
 
-    const refreshToken = jwt.sign({ userId: user.id }, REFRESH_TOKEN_SECRET, {
-      expiresIn: "7d",
-    });
+    const refreshToken = generateRefreshToken(user.id);
 
     await prisma.refreshToken.create({
       data: {
@@ -68,6 +65,7 @@ export const authService = {
 
     return { user: userWithoutPassword, accessToken, refreshToken };
   },
+
   refresh: async (refreshToken: string) => {
     const token = await prisma.refreshToken.findUnique({
       where: {
@@ -79,14 +77,10 @@ export const authService = {
 
     if (!token) throw new Error("Invalid refresh token");
 
-    const accessToken = jwt.sign(
-      { userId: token.userId },
-      ACCESS_TOKEN_SECRET,
-      { expiresIn: "15m" }
-    );
-
+    const accessToken = generateAccessToken(token.userId);
     return accessToken;
   },
+
   logout: async (refreshToken: string) => {
     await prisma.refreshToken.update({
       where: { token: refreshToken },
