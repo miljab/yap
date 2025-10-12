@@ -29,7 +29,7 @@ export const login = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.json({ user: user, accessToken: accessToken });
+    res.status(200).json({ user: user, accessToken: accessToken });
   } catch (error: any) {
     console.error(error);
     if (error.message === "Invalid credentials") {
