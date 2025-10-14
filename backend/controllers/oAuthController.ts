@@ -14,7 +14,7 @@ export async function oAuthLogin(req: Request, res: Response) {
     if (!user)
       return res
         .status(401)
-        .redirect(process.env.CLIENT_URL + "?error=auth-error");
+        .redirect(process.env.CLIENT_URL + "/?error=auth-error");
 
     const isPending = oAuthService.isPending(user.id);
 
@@ -41,7 +41,7 @@ export async function oAuthLogin(req: Request, res: Response) {
     res.redirect(process.env.CLIENT_URL + "/onboarding");
   } catch (error) {
     console.error(error);
-    res.status(500).redirect(process.env.CLIENT_URL + "?error=auth-error");
+    res.status(500).redirect(process.env.CLIENT_URL + "/?error=auth-error");
   }
 }
 

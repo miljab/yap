@@ -1,9 +1,11 @@
+import { Toaster } from "@/components/ui/sonner";
 import ToggleTheme from "@/components/ui/ToggleTheme";
 import { Outlet } from "react-router";
 
 function PublicLayout() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center">
+      <Toaster />
       <div className="absolute top-4 right-4">
         <ToggleTheme />
       </div>
