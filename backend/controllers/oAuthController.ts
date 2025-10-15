@@ -16,7 +16,7 @@ export async function oAuthLogin(req: Request, res: Response) {
         .status(401)
         .redirect(process.env.CLIENT_URL + "/?error=auth-error");
 
-    const isPending = oAuthService.isPending(user.id);
+    const isPending = await oAuthService.isPending(user.id);
 
     if (!isPending) {
       const refreshToken = await oAuthService.createRefreshToken(user.id);

@@ -49,9 +49,9 @@ export const refresh = async (req: Request, res: Response) => {
   if (!refreshToken) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const accessToken = await authService.refresh(refreshToken);
+    const { user, accessToken } = await authService.refresh(refreshToken);
 
-    res.status(200).json({ accessToken });
+    res.status(200).json({ user, accessToken });
   } catch (error: any) {
     console.error(error);
     if (error.message === "Invalid refresh token") {

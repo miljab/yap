@@ -12,6 +12,10 @@ import useTheme from "@/hooks/useTheme";
 function OAuthButtons() {
   const { theme } = useTheme();
 
+  function handleClick(provider: string) {
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/${provider}`;
+  }
+
   return (
     <div className="flex gap-2">
       <Tooltip>
@@ -19,6 +23,7 @@ function OAuthButtons() {
           <Button
             className="grow"
             variant={theme === "dark" ? "default" : "outline"}
+            onClick={() => handleClick("google")}
           >
             <GoogleLogo className="h-4 w-4" />
           </Button>

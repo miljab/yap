@@ -2,12 +2,15 @@ import { ThemeProvider } from "./context/ThemeProvider";
 import { Routes } from "react-router";
 import publicRoutes from "./routes/publicRoutes";
 import authRoutes from "./routes/authRoutes";
+import { AuthProvider } from "./context/AuthProvider";
 
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="uiTheme">
       <Routes>{publicRoutes()}</Routes>
-      <Routes>{authRoutes()}</Routes>
+      <AuthProvider>
+        <Routes>{authRoutes()}</Routes>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
