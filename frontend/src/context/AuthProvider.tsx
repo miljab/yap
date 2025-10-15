@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           withCredentials: true,
         });
 
-        const { accessToken } = response.data;
-        setAuth({ accessToken });
+        const { user, accessToken } = response.data;
+        setAuth({ user, accessToken });
       } catch (error) {
         console.error("Session validation failed: ", error);
         setAuth({});

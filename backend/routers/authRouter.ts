@@ -53,6 +53,6 @@ router.post(
   onboarding
 );
 
-router.get("/auth/processing", verifyRefreshToken, authProcessing);
+router.get("/processing", verifyRefreshToken, authProcessing);
 
 export default router;

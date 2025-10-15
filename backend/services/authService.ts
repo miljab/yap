@@ -73,12 +73,15 @@ export const authService = {
         expiresAt: { gt: new Date() },
         revoked: false,
       },
+      include: {
+        user: true,
+      },
     });
 
     if (!token) throw new Error("Invalid refresh token");
 
     const accessToken = generateAccessToken(token.userId);
-    return accessToken;
+    return { user: token.user, accessToken };
   },
 
   logout: async (refreshToken: string) => {

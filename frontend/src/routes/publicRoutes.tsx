@@ -5,6 +5,7 @@ import LoginPage from "@/pages/LoginPage";
 import SignupPage from "@/pages/SignupPage";
 import { Route } from "react-router";
 import OnboardingPage from "@/pages/OnboardingPage";
+import AuthProcessingPage from "@/pages/AuthProcessingPage";
 
 const publicRoutes = () => {
   return (
@@ -14,6 +15,7 @@ const publicRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/auth/processing" element={<AuthProcessingPage />} />
       </Route>
     </Route>
   );

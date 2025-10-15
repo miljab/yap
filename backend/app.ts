@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRouter from "./routers/authRouter.js";
 import passport from "passport";
+import "./passport/googlePassport.js";
 
 const app = express();
 
