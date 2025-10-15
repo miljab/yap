@@ -14,11 +14,13 @@ import {
 } from "../controllers/authController.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 import passport from "passport";
-import { oAuthLogin, onboarding } from "../controllers/oAuthController.js";
-import { verifyOnboardingToken } from "../middleware/verifyOboardingToken.js";
-
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
+import {
+  authProcessing,
+  oAuthLogin,
+  onboarding,
+} from "../controllers/oAuthController.js";
+import { verifyOnboardingToken } from "../middleware/verifyOnboardingToken.js";
+import { verifyRefreshToken } from "../middleware/verifyRefreshToken.js";
 
 const router = express.Router();
 
@@ -38,7 +40,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: process.env.CLIENT_URL + "?error=auth-error",
+    failureRedirect: process.env.CLIENT_URL + "/?error=auth-error",
     session: false,
   }),
   oAuthLogin
@@ -50,5 +52,7 @@ router.post(
   validate(usernameSchema),
   onboarding
 );
+
+router.get("/auth/processing", verifyRefreshToken, authProcessing);
 
 export default router;
