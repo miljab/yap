@@ -19,7 +19,7 @@ export async function oAuthLogin(req: Request, res: Response) {
     const isPending = oAuthService.isPending(user.id);
 
     if (!isPending) {
-      const { accessToken, refreshToken } = await oAuthService.login(user.id);
+      const refreshToken = await oAuthService.createRefreshToken(user.id);
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,

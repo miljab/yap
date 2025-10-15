@@ -3,7 +3,7 @@ import { prisma } from "../prisma/prismaClient.js";
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 
-async function verifyRefreshToken(
+export async function verifyRefreshToken(
   req: Request,
   res: Response,
   next: NextFunction

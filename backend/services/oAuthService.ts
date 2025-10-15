@@ -17,9 +17,7 @@ export const oAuthService = {
     return account.isPending;
   },
 
-  login: async (userId: string) => {
-    const accessToken = generateAccessToken(userId);
-
+  createRefreshToken: async (userId: string) => {
     const refreshToken = generateRefreshToken(userId);
 
     await prisma.refreshToken.create({
@@ -30,7 +28,7 @@ export const oAuthService = {
       },
     });
 
-    return { accessToken, refreshToken };
+    return refreshToken;
   },
 
   onboard: async (userId: string, username: string) => {
