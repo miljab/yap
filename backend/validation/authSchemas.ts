@@ -45,8 +45,9 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export const usernameSchema = z
+export const onboardingSchema = z
   .object({
+    email: z.email(),
     username: z.string().min(5).max(32).regex(usernamePattern),
   })
   .refine(

@@ -4,6 +4,7 @@ import cors from "cors";
 import authRouter from "./routers/authRouter.js";
 import passport from "passport";
 import "./passport/googlePassport.js";
+import "./passport/githubPassport.js";
 
 const app = express();
 

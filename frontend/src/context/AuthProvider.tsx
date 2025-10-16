@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, type ReactNode } from "react";
 import axios from "../api/axios";
 import type { User } from "@/types/user";
+import { Spinner } from "@/components/ui/spinner";
 
 type AuthState = {
   accessToken?: string;
@@ -46,7 +47,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2">
+        Loading... <Spinner />
+      </div>
+    );
   }
 
   return (

@@ -63,12 +63,10 @@ export async function authProcessing(req: Request, res: Response) {
 export async function onboarding(req: Request, res: Response) {
   try {
     const user = req.user as User;
-    const username = req.body.username;
+    const { email, username } = req.body;
 
-    const { accessToken, refreshToken } = await oAuthService.onboard(
-      user.id,
-      username
-    );
+    const { updatedUser, accessToken, refreshToken } =
+      await oAuthService.onboard(user.id, username, email);
 
     res.clearCookie("onboardingToken");
 
@@ -78,7 +76,20 @@ export async function onboarding(req: Request, res: Response) {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ user, accessToken });
+    res.status(200).json({ user: updatedUser, accessToken });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+export async function onboardingUserData(req: Request, res: Response) {
+  try {
+    const user = req.user as User;
+
+    if (!user) return res.status(401).json({ error: "User not found" });
+
+    res.status(200).json({ user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });

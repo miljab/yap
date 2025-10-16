@@ -7,8 +7,8 @@ import { AuthProvider } from "./context/AuthProvider";
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="uiTheme">
-      <Routes>{publicRoutes()}</Routes>
       <AuthProvider>
+        <Routes>{publicRoutes()}</Routes>
         <Routes>{authRoutes()}</Routes>
       </AuthProvider>
     </ThemeProvider>

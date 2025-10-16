@@ -1,21 +1,27 @@
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import passport from "passport";
 import "dotenv/config";
+import passport from "passport";
+import { Strategy as GithubStrategy, type Profile } from "passport-github2";
 import { prisma } from "../prisma/prismaClient.js";
+import type { VerifyCallback } from "passport-google-oauth20";
 
-const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL } =
+const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL } =
   process.env;
 
 passport.use(
-  new GoogleStrategy(
+  new GithubStrategy(
     {
-      clientID: GOOGLE_CLIENT_ID!,
-      clientSecret: GOOGLE_CLIENT_SECRET!,
-      callbackURL: GOOGLE_CALLBACK_URL!,
+      clientID: GITHUB_CLIENT_ID!,
+      clientSecret: GITHUB_CLIENT_SECRET!,
+      callbackURL: GITHUB_CALLBACK_URL!,
     },
-    async (_accessToken, _refreshToken, profile, done) => {
+    async (
+      _accessToken: string,
+      _refreshToken: string,
+      profile: Profile,
+      done: VerifyCallback
+    ) => {
       try {
-        const provider = "GOOGLE";
+        const provider = "GITHUB";
         const providerAccountId = profile.id;
         const email = profile.emails?.[0]?.value;
 
@@ -28,19 +34,18 @@ passport.use(
           });
 
           if (user) {
-            if (!user.account)
+            if (!user.account) {
               return done(
                 new Error(
                   "Email not linked to any provider. Try logging in with email."
                 )
               );
+            }
 
             const linkedProvider = user.account[0]?.provider;
 
             if (linkedProvider && linkedProvider !== provider) {
-              return done(
-                new Error("Email already linked to another provider")
-              );
+              return done(new Error("Email already liked to another provider"));
             }
 
             return done(null, user);

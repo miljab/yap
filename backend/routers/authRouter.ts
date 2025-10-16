@@ -4,7 +4,7 @@ import { validate } from "../middleware/validate.js";
 import {
   signupSchemaWithDb,
   loginSchema,
-  usernameSchema,
+  onboardingSchema,
 } from "../validation/authSchemas.js";
 import {
   signup,
@@ -18,6 +18,7 @@ import {
   authProcessing,
   oAuthLogin,
   onboarding,
+  onboardingUserData,
 } from "../controllers/oAuthController.js";
 import { verifyOnboardingToken } from "../middleware/verifyOnboardingToken.js";
 import { verifyRefreshToken } from "../middleware/verifyRefreshToken.js";
@@ -46,10 +47,29 @@ router.get(
   oAuthLogin
 );
 
+router.get(
+  "/github",
+  passport.authenticate("github", {
+    scope: ["profile", "email"],
+    session: false,
+  })
+);
+
+router.get(
+  "/github/callback",
+  passport.authenticate("github", {
+    failureRedirect: process.env.CLIENT_URL + "/?error=auth-error",
+    session: false,
+  }),
+  oAuthLogin
+);
+
+router.get("/onboarding/user", verifyOnboardingToken, onboardingUserData);
+
 router.post(
   "/onboarding",
   verifyOnboardingToken,
-  validate(usernameSchema),
+  validate(onboardingSchema),
   onboarding
 );
 

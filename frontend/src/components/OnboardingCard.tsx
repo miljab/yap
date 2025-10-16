@@ -1,4 +1,4 @@
-import { usernameSchema } from "@/schemas/usernameSchema";
+import { onboardingSchema } from "@/schemas/onboardingSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type z from "zod";
@@ -24,22 +24,28 @@ import axios from "@/api/axios";
 import useAuth from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
 import { isAxiosError } from "axios";
+import type { User } from "@/types/user";
 
-type UsernameFormData = z.infer<typeof usernameSchema>;
+type OnboardingFormData = z.infer<typeof onboardingSchema>;
 
-function OnboardingCard() {
+type OnboardingUserData = {
+  onboardingUser: User;
+};
+
+function OnboardingCard({ onboardingUser }: OnboardingUserData) {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
 
-  const form = useForm<UsernameFormData>({
-    resolver: zodResolver(usernameSchema),
+  const form = useForm<OnboardingFormData>({
+    resolver: zodResolver(onboardingSchema),
     mode: "onTouched",
     defaultValues: {
+      email: onboardingUser.email || "",
       username: "",
     },
   });
 
-  async function onSubmit(data: UsernameFormData) {
+  async function onSubmit(data: OnboardingFormData) {
     try {
       const response = await axios.post("/auth/onboarding", data, {
         headers: { "Content-Type": "application/json" },
@@ -57,7 +63,10 @@ function OnboardingCard() {
 
         if (responseData.errors && Array.isArray(responseData.errors)) {
           responseData.errors.forEach(
-            (err: { path: keyof UsernameFormData | "root"; error: string }) => {
+            (err: {
+              path: keyof OnboardingFormData | "root";
+              error: string;
+            }) => {
               form.setError(err.path, {
                 type: "server",
                 message: err.error,
@@ -96,12 +105,30 @@ function OnboardingCard() {
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent>
+          <CardContent className="flex flex-col gap-4">
             {form.formState.errors.root && (
               <div className="text-destructive">
                 {form.formState.errors.root.message}
               </div>
             )}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      {...field}
+                      required
+                      disabled={onboardingUser.email ? true : false}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="username"
@@ -114,7 +141,7 @@ function OnboardingCard() {
                     </div>
                   </div>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} required minLength={5} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
