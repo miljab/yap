@@ -38,6 +38,7 @@ function OAuthButtons() {
           <Button
             className="grow"
             variant={theme === "dark" ? "default" : "outline"}
+            onClick={() => handleClick("github")}
           >
             <GithubLogo className="h-4 w-4" />
           </Button>
@@ -52,6 +53,7 @@ function OAuthButtons() {
           <Button
             className="grow"
             variant={theme === "dark" ? "default" : "outline"}
+            onClick={() => handleClick("twitter")}
           >
             <XLogo className="h-4 w-4" />
           </Button>

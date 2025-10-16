@@ -31,41 +31,48 @@ export const oAuthService = {
     return refreshToken;
   },
 
-  onboard: async (userId: string, username: string) => {
-    const user = await prisma.user.update({
+  onboard: async (userId: string, username: string, email: string) => {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    const userUpdate = await prisma.user.update({
       where: {
         id: userId,
       },
       data: {
         username: username,
+        email: user?.email || email,
       },
       include: {
         account: true,
       },
     });
 
-    if (!user.account[0]) throw new Error("Account not found");
+    if (!userUpdate.account[0]) throw new Error("Account not found");
 
     await prisma.account.update({
       where: {
-        id: user.account[0].id,
+        id: userUpdate.account[0].id,
       },
       data: {
         isPending: false,
       },
     });
 
-    const accessToken = generateAccessToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
+    const accessToken = generateAccessToken(userUpdate.id);
+    const refreshToken = generateRefreshToken(userUpdate.id);
 
     await prisma.refreshToken.create({
       data: {
         token: refreshToken,
-        userId: user.id,
+        userId: userUpdate.id,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });
 
-    return { accessToken, refreshToken };
+    return { updatedUser: userUpdate, accessToken, refreshToken };
   },
 };
