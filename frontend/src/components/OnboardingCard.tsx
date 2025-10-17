@@ -25,6 +25,7 @@ import useAuth from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
 import { isAxiosError } from "axios";
 import type { User } from "@/types/user";
+import CancelOnboardingDialog from "./CancelOnboardingDialog";
 
 type OnboardingFormData = z.infer<typeof onboardingSchema>;
 
@@ -93,19 +94,6 @@ function OnboardingCard({ onboardingUser }: OnboardingUserData) {
     }
   }
 
-  const handleCancel = async () => {
-    try {
-      await axios.delete("/auth/onboarding/cancel", {
-        withCredentials: true,
-      });
-
-      navigate("/");
-    } catch (error) {
-      console.error(error);
-      // error page redirect
-    }
-  };
-
   const usernameLength = form.watch("username").length;
 
   return (
@@ -163,14 +151,7 @@ function OnboardingCard({ onboardingUser }: OnboardingUserData) {
           </CardContent>
 
           <CardFooter className="mt-8 flex justify-between gap-4">
-            <Button
-              className="grow"
-              type="button"
-              variant="destructive"
-              onClick={handleCancel}
-            >
-              Cancel
-            </Button>
+            <CancelOnboardingDialog />
             <Button type="submit" className="grow">
               Confirm
             </Button>
