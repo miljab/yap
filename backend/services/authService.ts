@@ -90,4 +90,28 @@ export const authService = {
       data: { revoked: true },
     });
   },
+
+  loginDemoUser: async () => {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: process.env.DEMO_USER_ID!,
+      },
+    });
+
+    if (!user) throw new Error("Demo user not found");
+
+    const accessToken = generateAccessToken(user.id);
+
+    const refreshToken = generateRefreshToken(user.id);
+
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    return { user, accessToken, refreshToken };
+  },
 };

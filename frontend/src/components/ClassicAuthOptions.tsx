@@ -1,9 +1,30 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Button } from "./ui/button";
 import useTheme from "@/hooks/useTheme";
+import useAuth from "@/hooks/useAuth";
+import axios from "@/api/axios";
 
 function ClassicAuthOptions() {
   const { theme } = useTheme();
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
+
+  const handleDemoUserLogin = async () => {
+    try {
+      const response = await axios.get("/auth/demo", {
+        withCredentials: true,
+      });
+
+      const user = response.data.user;
+      const accessToken = response.data.accessToken;
+
+      setAuth({ user, accessToken });
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      // redirect to error page
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2 font-[Roboto_Mono]">
@@ -24,6 +45,7 @@ function ClassicAuthOptions() {
       <Button
         className="px-8"
         variant={theme === "dark" ? "default" : "outline"}
+        onClick={handleDemoUserLogin}
       >
         Demo user
       </Button>

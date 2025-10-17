@@ -1,6 +1,5 @@
 import { Button } from "./ui/button";
 import GoogleLogo from "../assets/google-logo.svg?react";
-import XLogo from "../assets/x-logo.svg?react";
 import GithubLogo from "../assets/github-logo.svg?react";
 import {
   Tooltip,
@@ -45,21 +44,6 @@ function OAuthButtons() {
         </TooltipTrigger>
         <TooltipContent>
           <p>Continue with Github</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            className="grow"
-            variant={theme === "dark" ? "default" : "outline"}
-            onClick={() => handleClick("twitter")}
-          >
-            <XLogo className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Continue with X</p>
         </TooltipContent>
       </Tooltip>
     </div>
