@@ -28,10 +28,9 @@ function AuthProcessingPage() {
         }, 1000);
       } catch (error) {
         console.error(error);
-        setStatus("Login failed. Redirecting to login page...");
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
+        navigate("/error", {
+          state: { error: "Login failed. Please try again." },
+        });
       }
     }
     fetchData();
