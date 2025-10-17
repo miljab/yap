@@ -95,3 +95,20 @@ export async function onboardingUserData(req: Request, res: Response) {
     res.status(500).json({ error: "Internal server error" });
   }
 }
+
+export async function cancelOnboarding(req: Request, res: Response) {
+  try {
+    const user = req.user as User;
+
+    if (!user) return res.status(401).json({ error: "User not found" });
+
+    await oAuthService.cancelOnboarding(user.id);
+
+    res.clearCookie("onboardingToken");
+
+    res.status(200).json({ message: "Onboarding cancelled" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}

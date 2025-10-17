@@ -20,6 +20,7 @@ import {
   oAuthLogin,
   onboarding,
   onboardingUserData,
+  cancelOnboarding,
 } from "../controllers/oAuthController.js";
 import { verifyOnboardingToken } from "../middleware/verifyOnboardingToken.js";
 import { verifyRefreshToken } from "../middleware/verifyRefreshToken.js";
@@ -73,6 +74,8 @@ router.post(
   validate(onboardingSchema),
   onboarding
 );
+
+router.delete("/onboarding/cancel", verifyOnboardingToken, cancelOnboarding);
 
 router.get("/processing", verifyRefreshToken, authProcessing);
 

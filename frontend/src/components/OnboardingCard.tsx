@@ -93,6 +93,19 @@ function OnboardingCard({ onboardingUser }: OnboardingUserData) {
     }
   }
 
+  const handleCancel = async () => {
+    try {
+      await axios.delete("/auth/onboarding/cancel", {
+        withCredentials: true,
+      });
+
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      // error page redirect
+    }
+  };
+
   const usernameLength = form.watch("username").length;
 
   return (
@@ -150,7 +163,12 @@ function OnboardingCard({ onboardingUser }: OnboardingUserData) {
           </CardContent>
 
           <CardFooter className="mt-8 flex justify-between gap-4">
-            <Button className="grow" type="button" variant="destructive">
+            <Button
+              className="grow"
+              type="button"
+              variant="destructive"
+              onClick={handleCancel}
+            >
               Cancel
             </Button>
             <Button type="submit" className="grow">
