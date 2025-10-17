@@ -23,7 +23,9 @@ function CancelOnboardingDialog() {
       navigate("/");
     } catch (error) {
       console.error(error);
-      // error page redirect
+      navigate("/error", {
+        state: { error: "Failed to cancel onboarding." },
+      });
     }
   };
 

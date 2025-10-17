@@ -22,7 +22,9 @@ function ClassicAuthOptions() {
       navigate("/");
     } catch (error) {
       console.error(error);
-      // redirect to error page
+      navigate("/error", {
+        state: { error: "Failed to log in with demo user. Please try again." },
+      });
     }
   };
 

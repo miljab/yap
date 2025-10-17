@@ -27,8 +27,9 @@ function OnboardingPage() {
         }
       } catch (error) {
         console.error(error);
-        navigate("/");
-        // Handle error - redirect to error page
+        navigate("/error", {
+          state: { error: "Failed to fetch onboarding user data." },
+        });
       }
     }
     fetchData();
