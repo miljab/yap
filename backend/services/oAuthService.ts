@@ -75,4 +75,12 @@ export const oAuthService = {
 
     return { updatedUser: userUpdate, accessToken, refreshToken };
   },
+
+  cancelOnboarding: async (userId: string) => {
+    await prisma.user.delete({
+      where: {
+        id: userId,
+      },
+    });
+  },
 };
