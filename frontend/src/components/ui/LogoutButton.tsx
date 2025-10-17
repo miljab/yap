@@ -14,7 +14,11 @@ function LogoutButton() {
     setAuth({});
     navigate("/");
   }
-  return <Button onClick={handleLogout}>Log out</Button>;
+  return (
+    <Button onClick={handleLogout} variant={"outline"} className="px-2 md:px-4">
+      Log out
+    </Button>
+  );
 }
 
 export default LogoutButton;

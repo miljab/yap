@@ -1,4 +1,3 @@
-import LogoutButton from "@/components/ui/LogoutButton";
 import useAuth from "@/hooks/useAuth";
 
 function HomePage() {
@@ -6,7 +5,10 @@ function HomePage() {
   console.log(auth);
   return (
     <div>
-      <LogoutButton />
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Saepe aut quas
+      cumque explicabo, esse molestias commodi ab asperiores quod nihil
+      provident, quidem cupiditate dolores eaque? Incidunt voluptas
+      necessitatibus laborum deleniti.
     </div>
   );
 }
