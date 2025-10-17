@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex min-h-screen items-center justify-center gap-2">
         Loading... <Spinner />
       </div>
     );
