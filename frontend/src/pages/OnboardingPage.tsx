@@ -19,8 +19,6 @@ function OnboardingPage() {
           withCredentials: true,
         });
 
-        console.log(response);
-
         if (response.data.user) {
           setOnboardingUserData(response.data.user);
           setLoading(false);

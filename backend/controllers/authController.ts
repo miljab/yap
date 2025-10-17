@@ -76,3 +76,23 @@ export const logout = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error logging out" });
   }
 };
+
+export const demoUserLogin = async (req: Request, res: Response) => {
+  try {
+    const { user, accessToken, refreshToken } =
+      await authService.loginDemoUser();
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({ user: user, accessToken: accessToken });
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "An internal server error occurred during login." });
+  }
+};

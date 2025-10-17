@@ -11,6 +11,7 @@ import {
   login,
   refresh,
   logout,
+  demoUserLogin,
 } from "../controllers/authController.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 import passport from "passport";
@@ -74,5 +75,7 @@ router.post(
 );
 
 router.get("/processing", verifyRefreshToken, authProcessing);
+
+router.get("/demo", demoUserLogin);
 
 export default router;
