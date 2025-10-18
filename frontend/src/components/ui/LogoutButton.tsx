@@ -9,11 +9,19 @@ function LogoutButton() {
   const navigate = useNavigate();
 
   async function handleLogout() {
-    await axiosPrivate.get("/auth/logout");
+    try {
+      await axiosPrivate.get("/auth/logout");
 
-    setAuth({});
-    navigate("/");
+      setAuth({});
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      navigate("/error", {
+        state: { error: "Logout failed. Please try again." },
+      });
+    }
   }
+
   return (
     <Button onClick={handleLogout} variant={"outline"} className="px-2 md:px-4">
       Log out
