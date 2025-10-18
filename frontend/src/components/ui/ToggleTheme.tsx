@@ -5,7 +5,7 @@ function ToggleTheme() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="border-input relative flex w-fit gap-2 rounded-2xl border p-1 shadow-xs">
+    <div className="border-input relative flex w-fit gap-2 rounded-2xl border-1 p-1 shadow-xs">
       <button
         className={`z-1 cursor-pointer rounded-full ${
           theme === "light" && "text-background"

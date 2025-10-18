@@ -36,14 +36,14 @@ function UserNavDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative cursor-pointer">
+        <button className="relative cursor-pointer rounded-full">
           <Avatar>
             <AvatarImage src={auth.user?.avatar} />
             <AvatarFallback>
               <img src={defaultAvatar} alt="avatar" />
             </AvatarFallback>
           </Avatar>
-          <div className="bg-accent border-primary absolute -right-1 -bottom-1 rounded-full border md:hidden">
+          <div className="bg-accent border-primary absolute -right-1 -bottom-1 rounded-full border">
             <ChevronDown size={16} />
           </div>
         </button>
