@@ -49,9 +49,9 @@ function UserNavDropdown() {
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent>
+      <DropdownMenuContent className="max-w-[200px]">
         <DropdownMenuLabel className="border-input flex justify-center border-b">
-          {auth.user?.username}
+          <span className="truncate">{auth.user?.username}</span>
         </DropdownMenuLabel>
 
         <DropdownMenuItem>
