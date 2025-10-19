@@ -2,6 +2,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { Button } from "./button";
 import useAuth from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
+import { LogOut } from "lucide-react";
 
 function LogoutButton() {
   const axiosPrivate = useAxiosPrivate();
@@ -23,7 +24,12 @@ function LogoutButton() {
   }
 
   return (
-    <Button onClick={handleLogout} variant={"outline"} className="px-2 md:px-4">
+    <Button
+      onClick={handleLogout}
+      variant={"outline"}
+      className="mx-auto flex w-36"
+    >
+      <LogOut />
       Log out
     </Button>
   );
