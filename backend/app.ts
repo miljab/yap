@@ -24,3 +24,5 @@ app.use("/auth", authRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Express app listening on port ${PORT}!`));
+
+export default app;

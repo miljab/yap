@@ -30,9 +30,12 @@ export const signupSchemaWithDb = signupSchema
   )
   .refine(
     async (data) => {
-      const usernameExists = await prisma.user.findUnique({
+      const usernameExists = await prisma.user.findFirst({
         where: {
-          username: data.username.toLowerCase(),
+          OR: [
+            { username: data.username.toLowerCase() },
+            { username: data.username },
+          ],
         },
       });
       return !usernameExists;
