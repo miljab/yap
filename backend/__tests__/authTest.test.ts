@@ -49,7 +49,9 @@ describe("POST /auth/signup", () => {
       });
 
       expect(res.statusCode).toBe(400);
-      expect(res.body).toHaveProperty("errors");
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path: "username" })])
+      );
     });
 
     it("should reject too short username", async () => {
@@ -61,7 +63,9 @@ describe("POST /auth/signup", () => {
       });
 
       expect(res.statusCode).toBe(400);
-      expect(res.body).toHaveProperty("errors");
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path: "username" })])
+      );
     });
 
     it("should reject too long username", async () => {
@@ -75,7 +79,9 @@ describe("POST /auth/signup", () => {
         });
 
       expect(res.statusCode).toBe(400);
-      expect(res.body).toHaveProperty("errors");
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path: "username" })])
+      );
     });
 
     it("should reject taken username", async () => {
@@ -94,7 +100,56 @@ describe("POST /auth/signup", () => {
       });
 
       expect(res.statusCode).toBe(400);
-      expect(res.body).toHaveProperty("errors");
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([
+          {
+            path: "username",
+            error: "Username already in use",
+          },
+        ])
+      );
+    });
+  });
+
+  describe("Email validation", () => {
+    it("should reject invalid email format", async () => {
+      const res = await request(app).post("/auth/signup").send({
+        email: "wrongEmail",
+        username: "testuser",
+        password: "SecurePassword123",
+        confirmPassword: "SecurePassword123",
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path: "email" })])
+      );
+    });
+
+    it("should reject taken email", async () => {
+      await request(app).post("/auth/signup").send({
+        email: "testuser@example.com",
+        username: "testuser",
+        password: "SecurePassword123",
+        confirmPassword: "SecurePassword123",
+      });
+
+      const res = await request(app).post("/auth/signup").send({
+        email: "testuser@example.com",
+        username: "anotherUser",
+        password: "SecurePassword123",
+        confirmPassword: "SecurePassword123",
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([
+          {
+            path: "email",
+            error: "Email already in use",
+          },
+        ])
+      );
     });
   });
 });
