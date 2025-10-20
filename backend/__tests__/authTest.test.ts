@@ -152,4 +152,80 @@ describe("POST /auth/signup", () => {
       );
     });
   });
+
+  describe("Password validation", () => {
+    it("should reject too short password", async () => {
+      const res = await request(app).post("/auth/signup").send({
+        email: "testuser@example.com",
+        username: "testuser",
+        password: "Sh0rt",
+        confirmPassword: "Sh0rt",
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path: "password" })])
+      );
+    });
+
+    it("should reject too long password", async () => {
+      const res = await request(app)
+        .post("/auth/signup")
+        .send({
+          email: "testuser@example.com",
+          username: "testuser",
+          password: "Aa1".repeat(25),
+          confirmPassword: "Aa1".repeat(25),
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path: "password" })])
+      );
+    });
+
+    it("should reject password without at least one uppercase character", async () => {
+      const res = await request(app).post("/auth/signup").send({
+        email: "testuser@example.com",
+        username: "testuser",
+        password: "password1",
+        confirmPassword: "password1",
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path: "password" })])
+      );
+    });
+
+    it("should reject password without at least one number", async () => {
+      const res = await request(app).post("/auth/signup").send({
+        email: "testuser@example.com",
+        username: "testuser",
+        password: "Password",
+        confirmPassword: "Password",
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([expect.objectContaining({ path: "password" })])
+      );
+    });
+
+    it("should reject not matching passwords", async () => {
+      const res = await request(app).post("/auth/signup").send({
+        email: "testuser@example.com",
+        username: "testuser",
+        password: "SecurePassword123",
+        confirmPassword: "NotMatchingPassword123",
+      });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ path: "confirmPassword" }),
+        ])
+      );
+    });
+  });
 });
