@@ -85,6 +85,14 @@ export const authService = {
   },
 
   logout: async (refreshToken: string) => {
+    const existingToken = prisma.refreshToken.findUnique({
+      where: {
+        token: refreshToken,
+      },
+    });
+
+    if (!existingToken) throw new Error("Invalid refresh token");
+
     await prisma.refreshToken.update({
       where: { token: refreshToken },
       data: { revoked: true },

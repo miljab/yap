@@ -58,18 +58,21 @@ describe("GET /auth/logout", () => {
   });
 
   it("should reject logout if refreshToken cookie is missing", async () => {
-    const res = await request(app).get("/auth/logout");
+    const res = await request(app)
+      .get("/auth/logout")
+      .set("Authorization", `Bearer ${accessToken}`);
 
     expect(res.statusCode).toBe(401);
     expect(res.body).toHaveProperty("error", "Unauthorized");
   });
 
-  it("should reject logout if refreshToken is invalid or revoked", async () => {
+  it("should reject logout if refreshToken is invalid", async () => {
     const res = await request(app)
       .get("/auth/logout")
+      .set("Authorization", `Bearer ${accessToken}`)
       .set("Cookie", ["refreshToken=invalidtoken"]);
 
-    expect([401, 500]).toContain(res.statusCode);
+    expect(res.statusCode).toBe(500);
     expect(res.body).toHaveProperty("error");
   });
 
