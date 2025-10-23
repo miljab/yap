@@ -5,7 +5,6 @@ export default defineConfig({
     globals: true,
     environment: "node",
     globalSetup: ["./testSetup.ts"],
-    setupFiles: ["./testCleanup.ts"],
     fileParallelism: false,
   },
 });
