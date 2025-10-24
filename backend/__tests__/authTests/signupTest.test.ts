@@ -1,7 +1,7 @@
-import app from "../app.js";
+import app from "../../app.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
-import { prisma } from "../prisma/prismaClient.js";
+import { prisma } from "../../prisma/prismaClient.js";
 
 describe("POST /auth/signup", () => {
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe("POST /auth/signup", () => {
   });
 
   it("should handle internal server error", async () => {
-    const { authService } = await import("../services/authService.js");
+    const { authService } = await import("../../services/authService.js");
     const signupMock = vi
       .spyOn(authService, "signup")
       .mockRejectedValueOnce(new Error("fail"));

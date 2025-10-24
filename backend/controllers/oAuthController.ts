@@ -12,9 +12,7 @@ export async function oAuthLogin(req: Request, res: Response) {
     const user = req.user as User;
 
     if (!user)
-      return res
-        .status(401)
-        .redirect(process.env.CLIENT_URL + "/?error=auth-error");
+      return res.redirect(process.env.CLIENT_URL + "/?error=auth-error");
 
     const isPending = await oAuthService.isPending(user.id);
 
@@ -27,9 +25,7 @@ export async function oAuthLogin(req: Request, res: Response) {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      return res
-        .status(200)
-        .redirect(process.env.CLIENT_URL + "/auth/processing");
+      return res.redirect(process.env.CLIENT_URL + "/auth/processing");
     }
 
     res.cookie("onboardingToken", generateOnboardingToken(user.id), {

@@ -1,7 +1,7 @@
-import app from "../app.js";
+import app from "../../app.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
-import { prisma } from "../prisma/prismaClient.js";
+import { prisma } from "../../prisma/prismaClient.js";
 
 describe("GET /auth/refresh", () => {
   let refreshTokenCookie: string[];

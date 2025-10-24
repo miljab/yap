@@ -1,7 +1,7 @@
 import { beforeEach, describe, vi, it, expect } from "vitest";
-import { prisma } from "../prisma/prismaClient.js";
-import { googleCallback } from "../passport/googlePassport.js";
-import type { Profile, VerifyCallback } from "passport-google-oauth20";
+import { prisma } from "../../prisma/prismaClient.js";
+import { googleCallback } from "../../passport/googlePassport.js";
+import type { Profile } from "passport-google-oauth20";
 
 describe("Google oAuth authentication", () => {
   beforeEach(async () => {
