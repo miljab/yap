@@ -34,7 +34,7 @@ passport.use(
           });
 
           if (user) {
-            if (!user.account) {
+            if (user.account.length === 0) {
               return done(
                 new Error(
                   "Email not linked to any provider. Try logging in with email."

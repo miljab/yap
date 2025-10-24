@@ -28,7 +28,6 @@ model User {
 
 enum Provider {
   GOOGLE
-  X
   GITHUB
 }
 
