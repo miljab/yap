@@ -38,6 +38,17 @@ export const oAuthService = {
       },
     });
 
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        email: email,
+        NOT: {
+          id: userId,
+        },
+      },
+    });
+
+    if (existingUser) throw new Error("Email already in use");
+
     const userUpdate = await prisma.user.update({
       where: {
         id: userId,

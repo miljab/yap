@@ -74,6 +74,11 @@ export async function onboarding(req: Request, res: Response) {
 
     res.status(200).json({ user: updatedUser, accessToken });
   } catch (error) {
+    if (error instanceof Error && error.message === "Email already in use") {
+      return res.status(400).json({
+        errors: [{ path: "email", error: "Email already in use" }],
+      });
+    }
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
