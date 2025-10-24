@@ -1,5 +1,4 @@
 import express from "express";
-import type { Request, Response } from "express";
 import { validate } from "../middleware/validate.js";
 import {
   signupSchemaWithDb,
