@@ -22,7 +22,7 @@ import { Button } from "./ui/button";
 import { useNavigate } from "react-router";
 import axios from "@/api/axios";
 import useAuth from "@/hooks/useAuth";
-import { AxiosError } from "axios";
+import { isAxiosError } from "axios";
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
@@ -52,7 +52,7 @@ function LoginCard() {
       navigate("/home");
     } catch (error) {
       let message = "Login failed. Please try again later.";
-      if (error instanceof AxiosError && error.response) {
+      if (isAxiosError(error) && error.response) {
         message = error.response.data.error || message;
       }
       form.setError("root", { message });
