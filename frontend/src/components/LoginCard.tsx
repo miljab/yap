@@ -69,7 +69,7 @@ function LoginCard() {
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="flex flex-col gap-8">
             {form.formState.errors.root && (
-              <div className="text-destructive">
+              <div className="text-destructive text-center">
                 {form.formState.errors.root.message}
               </div>
             )}
