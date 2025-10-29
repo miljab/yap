@@ -13,6 +13,12 @@ function LandingPage() {
       searchParams.delete("error");
       setSearchParams(searchParams);
     }
+
+    if (searchParams.get("signup") === "success") {
+      toast.success("Account created successfully! You can log in now.");
+      searchParams.delete("signup");
+      setSearchParams(searchParams);
+    }
   }, [searchParams, setSearchParams]);
 
   return (
