@@ -44,7 +44,7 @@ function SignupCard() {
     try {
       await axios.post("/auth/signup", data);
 
-      navigate("/");
+      navigate("/?signup=success");
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         const responseData = error.response.data;
