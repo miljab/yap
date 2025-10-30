@@ -11,7 +11,7 @@ function Nav() {
   const { auth } = useAuth();
 
   return (
-    <div className="border-input flex h-full w-full items-center justify-around border-b p-2 md:min-h-screen md:max-w-[250px] md:flex-col md:items-start md:justify-center md:border-r md:border-b-0">
+    <nav className="border-input flex h-full w-full items-center justify-around border-b p-2 md:min-h-screen md:max-w-[250px] md:flex-col md:items-start md:justify-center md:border-r md:border-b-0">
       <h1 className="hidden p-4 text-4xl tracking-wider md:mx-auto md:mb-24 md:block md:text-center">
         <Link to="/home">yap.</Link>
       </h1>
@@ -68,7 +68,7 @@ function Nav() {
       <div className="hidden w-full md:mt-8 md:flex md:items-center md:justify-center">
         <ToggleTheme />
       </div>
-    </div>
+    </nav>
   );
 }
 
