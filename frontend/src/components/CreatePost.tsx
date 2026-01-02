@@ -12,7 +12,7 @@ function CreatePost() {
   }
 
   return (
-    <div className="m-2 flex flex-col rounded-md border">
+    <div className="m-4 flex flex-col rounded-md border">
       <div className="relative min-h-16 p-2">
         {(content === "" || content === "\n") && (
           <span className="pointer-events-none absolute top-4 left-4 text-neutral-500 select-none">
