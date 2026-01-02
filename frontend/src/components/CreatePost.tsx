@@ -36,7 +36,7 @@ function CreatePost() {
           </span>
         )}
         <div
-          className="min-h-16 p-2 outline-none"
+          className="max-h-[70vh] min-h-16 overflow-auto p-2 outline-none"
           contentEditable
           ref={divRef}
           onInput={handleInput}
@@ -51,7 +51,7 @@ function CreatePost() {
             Characters: {actualLength}/200
           </span>
         )}
-        <button className="hover:bg-accent cursor-pointer rounded-2xl">
+        <button className="hover:bg-accent cursor-pointer rounded-full p-2">
           <Image />
         </button>
         <Button className="rounded-2xl">Post</Button>
