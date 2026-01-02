@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 
 function CreatePost() {
   const divRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState("");
 
   function handleInput() {
@@ -23,6 +24,10 @@ function CreatePost() {
     }
 
     setContent(text);
+  }
+
+  function triggerFileInput() {
+    fileInputRef.current?.click();
   }
 
   const actualLength = content === "" || content === "\n" ? 0 : content.length;
@@ -51,7 +56,16 @@ function CreatePost() {
             Characters: {actualLength}/200
           </span>
         )}
-        <button className="hover:bg-accent cursor-pointer rounded-full p-2">
+        <input
+          type="file"
+          className="hidden"
+          accept=".jpg, .jpeg, .png, .gif"
+          ref={fileInputRef}
+        />
+        <button
+          className="hover:bg-accent cursor-pointer rounded-full p-2"
+          onClick={triggerFileInput}
+        >
           <Image />
         </button>
         <Button className="rounded-2xl">Post</Button>
