@@ -1,6 +1,7 @@
 import { Image } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 function CreatePost() {
   const divRef = useRef<HTMLDivElement>(null);
@@ -33,8 +34,16 @@ function CreatePost() {
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
+    if (!files) return;
+
+    if (files.length > 4 || files.length + selectedFiles.length > 4) {
+      toast.info("Please, select up to 4 images.");
+      return;
+    }
+
     if (files) {
-      setSelectedFiles(Array.from(files));
+      const newFiles = [...selectedFiles, ...Array.from(files)];
+      setSelectedFiles(newFiles);
     }
   }
 
