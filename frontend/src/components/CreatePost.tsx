@@ -1,4 +1,4 @@
-import { Image } from "lucide-react";
+import { Image, Trash } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -50,14 +50,30 @@ function CreatePost() {
   function displayImages() {
     if (!selectedFiles || selectedFiles.length === 0) return null;
 
-    return selectedFiles.map((file, idx) => (
-      <img
-        key={idx}
-        src={URL.createObjectURL(file)}
-        alt={`preview-${idx}`}
-        className="mr-2 inline-block max-h-40 rounded-md"
-      />
-    ));
+    return (
+      <div className="flex flex-wrap gap-2">
+        {selectedFiles.map((file, idx) => (
+          <div className="relative w-fit">
+            <img
+              key={idx}
+              src={URL.createObjectURL(file)}
+              alt={`preview-${idx}`}
+              className="inline-block h-40 w-40 rounded-md object-cover"
+            />
+            <button
+              className="hover:bg-accent absolute top-2 right-2 cursor-pointer rounded-full bg-neutral-900 p-1"
+              onClick={() => {
+                setSelectedFiles((prevFiles) =>
+                  prevFiles.filter((_, i) => i !== idx),
+                );
+              }}
+            >
+              <Trash />
+            </button>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   const actualLength = content === "" || content === "\n" ? 0 : content.length;
