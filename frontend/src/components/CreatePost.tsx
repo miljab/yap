@@ -6,6 +6,7 @@ function CreatePost() {
   const divRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   function handleInput() {
     let text = divRef.current?.innerText || "";
@@ -30,6 +31,26 @@ function CreatePost() {
     fileInputRef.current?.click();
   }
 
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (files) {
+      setSelectedFiles(Array.from(files));
+    }
+  }
+
+  function displayImages() {
+    if (!selectedFiles || selectedFiles.length === 0) return null;
+
+    return selectedFiles.map((file, idx) => (
+      <img
+        key={idx}
+        src={URL.createObjectURL(file)}
+        alt={`preview-${idx}`}
+        className="mr-2 inline-block max-h-40 rounded-md"
+      />
+    ));
+  }
+
   const actualLength = content === "" || content === "\n" ? 0 : content.length;
 
   return (
@@ -46,7 +67,9 @@ function CreatePost() {
           ref={divRef}
           onInput={handleInput}
           aria-label="Post content"
-        />
+        ></div>
+
+        {displayImages()}
       </div>
       <div className="flex items-center justify-end gap-4 border-t p-2">
         {actualLength > 0 && (
@@ -61,6 +84,8 @@ function CreatePost() {
           className="hidden"
           accept=".jpg, .jpeg, .png, .gif"
           ref={fileInputRef}
+          onChange={handleFileChange}
+          multiple
         />
         <button
           className="hover:bg-accent cursor-pointer rounded-full p-2"
