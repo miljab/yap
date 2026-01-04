@@ -32,6 +32,8 @@ export const postService = {
         orderIndex: idx,
       }));
 
+      console.log(imagesData);
+
       const post = await prisma.post.create({
         data: {
           content: text,
