@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 
+const MAX_FILE_SIZE = 5242880; // 5MB
+
 function CreatePost() {
   const divRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,8 +29,7 @@ function CreatePost() {
       console.error(error);
     }
   }
-
-  function handleInput() {
+  function handleTextInput() {
     let text = divRef.current?.innerText || "";
     if (text.length > 200) {
       text = text.slice(0, 200);
@@ -61,7 +62,14 @@ function CreatePost() {
     }
 
     if (files) {
-      const newFiles = [...selectedFiles, ...Array.from(files)];
+      const validFiles = Array.from(files).filter(
+        (f) => f.size <= MAX_FILE_SIZE,
+      );
+
+      if (validFiles.length < files.length)
+        toast.warning("Max file size is 5MB.");
+
+      const newFiles = [...selectedFiles, ...validFiles];
       setSelectedFiles(newFiles);
     }
   }
@@ -108,7 +116,7 @@ function CreatePost() {
           className="max-h-[70vh] min-h-16 overflow-auto p-2 outline-none"
           contentEditable
           ref={divRef}
-          onInput={handleInput}
+          onInput={handleTextInput}
           aria-label="Post content"
         ></div>
 
