@@ -10,6 +10,7 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "target": "es2020",
+    "typeRoots": ["./types", "./node_modules/@types"],
     "types": ["node"],
     "esModuleInterop": true,
     // For nodejs:
@@ -43,6 +44,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "./types/*"],
   "exclude": ["node_modules"]
 }

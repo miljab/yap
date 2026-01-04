@@ -2,10 +2,7 @@ import "dotenv/config";
 import jwt from "jsonwebtoken";
 import { type Request, type Response, type NextFunction } from "express";
 import { prisma } from "../prisma/prismaClient.js";
-
-export interface JwtPayload {
-  userId: string;
-}
+import { type User } from "@prisma/client";
 
 export const verifyAccessToken = (
   req: Request,
@@ -26,14 +23,14 @@ export const verifyAccessToken = (
     try {
       const user = await prisma.user.findUnique({
         where: {
-          id: (payload as JwtPayload).userId,
+          id: payload.userId,
         },
       });
 
       if (!user)
         return res.status(401).json({ error: "Unauthorized: User not found" });
 
-      req.user = user;
+      req.user = <User>user;
       next();
     } catch (error) {
       console.error(error);
