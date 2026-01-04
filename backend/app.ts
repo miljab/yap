@@ -2,6 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import authRouter from "./routers/authRouter.js";
+import postRouter from "./routers/postRouter.js";
 import passport from "passport";
 import "./passport/googlePassport.js";
 import "./passport/githubPassport.js";
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use("/auth", authRouter);
+app.use(postRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Express app listening on port ${PORT}!`));

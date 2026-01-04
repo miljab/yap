@@ -2,12 +2,31 @@ import { Image, Trash } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 
 function CreatePost() {
   const divRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const axiosPrivate = useAxiosPrivate();
+
+  async function createPost() {
+    try {
+      const formData = new FormData();
+      formData.append("text", content);
+
+      if (selectedFiles && selectedFiles.length > 0) {
+        selectedFiles.forEach((file) => formData.append("images", file));
+      }
+
+      await axiosPrivate.post("/post/new", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   function handleInput() {
     let text = divRef.current?.innerText || "";
@@ -53,15 +72,14 @@ function CreatePost() {
     return (
       <div className="flex flex-wrap gap-2">
         {selectedFiles.map((file, idx) => (
-          <div className="relative w-fit">
+          <div key={idx} className="relative w-fit">
             <img
-              key={idx}
               src={URL.createObjectURL(file)}
               alt={`preview-${idx}`}
               className="inline-block h-40 w-40 rounded-md object-cover"
             />
             <button
-              className="hover:bg-accent absolute top-2 right-2 cursor-pointer rounded-full bg-neutral-900 p-1"
+              className="hover:bg-accent bg-background absolute top-2 right-2 cursor-pointer rounded-full p-1"
               onClick={() => {
                 setSelectedFiles((prevFiles) =>
                   prevFiles.filter((_, i) => i !== idx),
@@ -118,7 +136,9 @@ function CreatePost() {
         >
           <Image />
         </button>
-        <Button className="rounded-2xl">Post</Button>
+        <Button className="rounded-2xl" onClick={createPost}>
+          Post
+        </Button>
       </div>
     </div>
   );
