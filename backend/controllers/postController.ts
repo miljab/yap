@@ -9,6 +9,12 @@ export const createNewPost = async (req: Request, res: Response) => {
   try {
     if (!userId) throw new Error("User ID is required");
 
+    if (!text && images.length === 0)
+      throw new Error("Text or images are required");
+
+    if (text.length > 200) throw new Error("Max 200 characters allowed");
+    if (images.length > 4) throw new Error("Max 4 images allowed");
+
     const post = await postService.createPost({
       userId,
       text,
