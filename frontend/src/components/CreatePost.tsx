@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { Spinner } from "./ui/spinner";
 
 const MAX_FILE_SIZE = 5242880; // 5MB
 
@@ -12,8 +13,10 @@ function CreatePost() {
   const [content, setContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const axiosPrivate = useAxiosPrivate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function createPost() {
+    setIsSubmitting(true);
     try {
       const formData = new FormData();
       formData.append("text", content);
@@ -22,9 +25,23 @@ function CreatePost() {
         selectedFiles.forEach((file) => formData.append("images", file));
       }
 
-      await axiosPrivate.post("/post/new", formData, {
+      const response = await axiosPrivate.post("/post/new", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      if (response.status === 201) {
+        toast.success("Post created successfully.");
+        if (divRef.current) {
+          divRef.current.innerText = "";
+        }
+        setContent("");
+
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        setSelectedFiles([]);
+        setIsSubmitting(false);
+      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to create post. Please try again.");
@@ -123,7 +140,7 @@ function CreatePost() {
 
         {displayImages()}
       </div>
-      <div className="flex items-center justify-end gap-4 border-t p-2">
+      <div className="flex items-center justify-end gap-2 border-t p-2">
         {actualLength > 0 && (
           <span
             className={`grow text-sm ${actualLength > 190 ? "text-red-400" : "text-neutral-500"}`}
@@ -146,11 +163,13 @@ function CreatePost() {
           <Image />
         </button>
         <Button
-          className="rounded-2xl disabled:bg-neutral-950 dark:disabled:bg-neutral-200"
+          className="w-18 rounded-2xl disabled:bg-neutral-950 dark:disabled:bg-neutral-200"
           onClick={createPost}
-          disabled={actualLength === 0 && selectedFiles.length === 0}
+          disabled={
+            (actualLength === 0 && selectedFiles.length === 0) || isSubmitting
+          }
         >
-          Post
+          {isSubmitting ? <Spinner /> : "Post"}
         </Button>
       </div>
     </div>
