@@ -2,6 +2,7 @@ import cloudinary from "../config/cloudinary.js";
 import { nanoid } from "nanoid";
 import { prisma } from "../prisma/prismaClient.js";
 import fs from "fs/promises";
+import AppError from "../utils/appError.js";
 
 export const postService = {
   createPost: async ({
@@ -43,6 +44,25 @@ export const postService = {
           images: true,
         },
       });
+
+      return post;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getPostById: async (postId: string) => {
+    try {
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+        include: {
+          images: true,
+        },
+      });
+
+      if (!post) throw new AppError("Post not found", 404);
 
       return post;
     } catch (error) {

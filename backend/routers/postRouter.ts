@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { createNewPost } from "../controllers/postController.js";
+import { createNewPost, getPostById } from "../controllers/postController.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 
 const router = express.Router();
@@ -15,5 +15,7 @@ router.post(
   upload.array("images", 4),
   createNewPost
 );
+
+router.get("/post/:id", verifyAccessToken, getPostById);
 
 export default router;

@@ -18,6 +18,7 @@ function PostViewPage() {
         setPost(response.data);
       } catch (error) {
         console.error(error);
+
         navigate("/error", {
           state: { error: "Failed to fetch post. Please try again." },
         });

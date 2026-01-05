@@ -34,3 +34,23 @@ export const createNewPost = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const getPostById = async (req: Request, res: Response) => {
+  const postId = req.params.id;
+
+  try {
+    if (!postId) throw new AppError("Post ID is required", 400);
+
+    const post = await postService.getPostById(postId);
+    res.status(200).json(post);
+  } catch (error: any) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    } else {
+      console.error(error);
+      res
+        .status(500)
+        .json({ error: "An unexpected error occurred. Please try again." });
+    }
+  }
+};
