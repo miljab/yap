@@ -27,6 +27,7 @@ function CreatePost() {
       });
     } catch (error) {
       console.error(error);
+      toast.error("Failed to create post. Please try again.");
     }
   }
   function handleTextInput() {
@@ -144,7 +145,11 @@ function CreatePost() {
         >
           <Image />
         </button>
-        <Button className="rounded-2xl" onClick={createPost}>
+        <Button
+          className="rounded-2xl disabled:bg-neutral-950 dark:disabled:bg-neutral-200"
+          onClick={createPost}
+          disabled={actualLength === 0 && selectedFiles.length === 0}
+        >
           Post
         </Button>
       </div>
