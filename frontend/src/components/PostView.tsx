@@ -1,14 +1,53 @@
 import { type Post } from "../types/post";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import defaultAvatar from "@/assets/default-avatar.png";
+import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { Heart, MessageCircleMore } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 type PostViewProps = {
   post: Post;
 };
 
 function PostView({ post }: PostViewProps) {
-  console.log(post);
+  const [isLiking, setLiking] = useState(false);
+  const [isLiked, setLiked] = useState(post.isLiked);
+  const [likeCount, setLikeCount] = useState(post.likeCount);
+  const axiosPrivate = useAxiosPrivate();
+
+  async function handleLike() {
+    if (isLiking) return;
+
+    setLiking(true);
+    const prevLiked = isLiked;
+    const prevLikeCount = likeCount;
+
+    if (isLiked) {
+      setLiked(false);
+      setLikeCount((prev) => prev - 1);
+    } else {
+      setLiked(true);
+      setLikeCount((prev) => prev + 1);
+    }
+
+    try {
+      await axiosPrivate.post(`/post/${post.id}/like`);
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        prevLiked
+          ? "Failed to dislike post. Please try again."
+          : "Failed to like post. Please try again",
+      );
+
+      setLiked(prevLiked);
+      setLikeCount(prevLikeCount);
+    } finally {
+      setLiking(false);
+    }
+  }
 
   return (
     <div className="m-4 flex max-w-[500px] flex-col gap-2 border p-4">
@@ -38,11 +77,15 @@ function PostView({ post }: PostViewProps) {
       </div>
 
       <div className="flex justify-end gap-4">
-        <button>
+        <button
+          disabled={isLiking}
+          onClick={handleLike}
+          className="flex items-center gap-1"
+        >
           <Heart
-            className={`cursor-pointer transition-all duration-300 hover:text-red-500 ${post.isLiked && "fill-red-500 text-red-500"}`}
+            className={`cursor-pointer transition-all duration-300 hover:text-red-500 ${isLiked && "fill-red-500 text-red-500"}`}
           />
-          {post.likeCount > 0 && post.likeCount}
+          {likeCount > 0 && likeCount}
         </button>
         <button>
           <MessageCircleMore />
