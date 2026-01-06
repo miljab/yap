@@ -4,7 +4,7 @@ export type Post = {
   id: string;
   content: string;
   createdAt: Date;
-  author: User;
+  user: User;
   images: Image[];
   comments: Comment[];
   likes: Like[];

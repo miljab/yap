@@ -59,6 +59,8 @@ export const postService = {
         },
         include: {
           images: true,
+          user: true,
+          comments: true,
         },
       });
 
