@@ -81,4 +81,55 @@ export const postService = {
       throw error;
     }
   },
+
+  likePost: async (postId: string, userId: string | undefined) => {
+    try {
+      if (!userId) throw new AppError("User ID is required", 400);
+
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+      });
+
+      if (!post) throw new AppError("Post not found", 404);
+
+      const like = await prisma.postLike.findUnique({
+        where: {
+          userId_postId: {
+            postId,
+            userId,
+          },
+        },
+      });
+
+      if (like) {
+        await prisma.postLike.delete({
+          where: {
+            userId_postId: {
+              postId,
+              userId,
+            },
+          },
+        });
+      } else {
+        await prisma.postLike.create({
+          data: {
+            postId,
+            userId,
+          },
+        });
+      }
+
+      const likeCount = await prisma.postLike.count({
+        where: {
+          postId,
+        },
+      });
+
+      return likeCount;
+    } catch (error) {
+      throw error;
+    }
+  },
 };

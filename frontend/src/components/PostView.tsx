@@ -32,7 +32,8 @@ function PostView({ post }: PostViewProps) {
     }
 
     try {
-      await axiosPrivate.post(`/post/${post.id}/like`);
+      const { data } = await axiosPrivate.post(`/post/${post.id}/like`);
+      setLikeCount(data.likeCount);
     } catch (error) {
       console.error(error);
 

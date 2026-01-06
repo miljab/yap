@@ -1,6 +1,10 @@
 import express from "express";
 import multer from "multer";
-import { createNewPost, getPostById } from "../controllers/postController.js";
+import {
+  createNewPost,
+  getPostById,
+  likePost,
+} from "../controllers/postController.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 
 const router = express.Router();
@@ -17,5 +21,7 @@ router.post(
 );
 
 router.get("/post/:id", verifyAccessToken, getPostById);
+
+router.post("/post/:id/like", verifyAccessToken, likePost);
 
 export default router;

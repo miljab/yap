@@ -55,3 +55,25 @@ export const getPostById = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const likePost = async (req: Request, res: Response) => {
+  const postId = req.params.id;
+  const userId = req.user?.id;
+
+  try {
+    if (!postId) throw new AppError("Post ID is required", 400);
+
+    const updatedLikeCount = await postService.likePost(postId, userId);
+
+    res.status(200).json({ likeCount: updatedLikeCount });
+  } catch (error) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    } else {
+      console.error(error);
+      res
+        .status(500)
+        .json({ error: "An unexpected error occurred. Please try again." });
+    }
+  }
+};
