@@ -37,11 +37,12 @@ export const createNewPost = async (req: Request, res: Response) => {
 
 export const getPostById = async (req: Request, res: Response) => {
   const postId = req.params.id;
+  const userId = req.user?.id;
 
   try {
     if (!postId) throw new AppError("Post ID is required", 400);
 
-    const post = await postService.getPostById(postId);
+    const post = await postService.getPostById(postId, userId);
     res.status(200).json(post);
   } catch (error: any) {
     if (error instanceof AppError) {

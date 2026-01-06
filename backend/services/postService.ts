@@ -51,7 +51,7 @@ export const postService = {
     }
   },
 
-  getPostById: async (postId: string) => {
+  getPostById: async (postId: string, userId: string | undefined) => {
     try {
       const post = await prisma.post.findUnique({
         where: {
@@ -61,12 +61,22 @@ export const postService = {
           images: true,
           user: true,
           comments: true,
+          likes: true,
         },
       });
 
       if (!post) throw new AppError("Post not found", 404);
 
-      return post;
+      const isLiked = post.likes.some((like) => like.userId === userId);
+      const likeCount = post.likes.length;
+
+      const commentCount = post.comments.length;
+
+      if (userId !== post.user.id) {
+        return { ...post, isLiked, likeCount, commentCount, likes: [] };
+      }
+
+      return { ...post, isLiked, likeCount, commentCount };
     } catch (error) {
       throw error;
     }
