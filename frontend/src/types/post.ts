@@ -8,6 +8,9 @@ export type Post = {
   images: Image[];
   comments: Comment[];
   likes: Like[];
+  isLiked: boolean;
+  likeCount: number;
+  commentCount: number;
 };
 
 export type Comment = {

@@ -40,11 +40,13 @@ function PostView({ post }: PostViewProps) {
       <div className="flex justify-end gap-4">
         <button>
           <Heart
-            className={`cursor-pointer transition-all duration-300 hover:text-red-500`}
+            className={`cursor-pointer transition-all duration-300 hover:text-red-500 ${post.isLiked && "fill-red-500 text-red-500"}`}
           />
+          {post.likeCount > 0 && post.likeCount}
         </button>
         <button>
           <MessageCircleMore />
+          {post.commentCount > 0 && post.commentCount}
         </button>
       </div>
     </div>
