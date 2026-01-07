@@ -51,7 +51,7 @@ function PostView({ post }: PostViewProps) {
   }
 
   return (
-    <div className="m-4 flex max-w-[500px] flex-col gap-2 border p-4">
+    <div className="flex max-w-[500px] flex-col gap-2 border p-4">
       <div className="flex items-center gap-1 text-sm">
         <Avatar>
           <AvatarImage src={post.user.avatar} />
@@ -88,7 +88,7 @@ function PostView({ post }: PostViewProps) {
           />
           {likeCount > 0 && likeCount}
         </button>
-        <button>
+        <button className="flex items-center gap-1">
           <MessageCircleMore />
           {post.commentCount > 0 && post.commentCount}
         </button>
