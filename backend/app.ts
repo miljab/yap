@@ -6,6 +6,7 @@ import postRouter from "./routers/postRouter.js";
 import passport from "passport";
 import "./passport/googlePassport.js";
 import "./passport/githubPassport.js";
+import commentRouter from "./routers/commentRouter.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(passport.initialize());
 
 app.use("/auth", authRouter);
 app.use(postRouter);
+app.use(commentRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Express app listening on port ${PORT}!`));
