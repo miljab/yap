@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router";
 import type { Post } from "@/types/post";
 import PostView from "@/components/PostView";
 import CreateComment from "@/components/CreateComment";
+import PostComments from "@/components/PostComments";
 
 function PostViewPage() {
   const params = useParams();
@@ -37,6 +38,7 @@ function PostViewPage() {
     <div className="flex flex-col gap-2 p-4">
       <PostView post={post} />
       <CreateComment postId={post.id} />
+      <PostComments post={post} />
     </div>
   );
 }

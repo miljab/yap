@@ -17,13 +17,17 @@ export type Comment = {
   id: string;
   content: string;
   createdAt: Date;
-  author: User;
+  user: User;
+  images: Image[];
+  replies: Comment[];
 };
 
 export type Like = {
   id: string;
   createdAt: Date;
-  author: User;
+  user: User;
+  postId?: string;
+  commentId?: string;
 };
 
 export type Image = {

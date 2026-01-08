@@ -60,8 +60,12 @@ export const postService = {
         include: {
           images: true,
           user: true,
-          comments: true,
           likes: true,
+          comments: {
+            include: {
+              user: true,
+            },
+          },
         },
       });
 

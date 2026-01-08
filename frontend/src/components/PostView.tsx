@@ -51,7 +51,7 @@ function PostView({ post }: PostViewProps) {
   }
 
   return (
-    <div className="flex max-w-[500px] flex-col gap-2 border p-4">
+    <div className="flex flex-col gap-2 border p-4">
       <div className="flex items-center gap-1 text-sm">
         <Avatar>
           <AvatarImage src={post.user.avatar} />
