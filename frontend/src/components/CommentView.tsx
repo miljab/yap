@@ -28,6 +28,9 @@ function CommentView({ comment }: CommentViewProps) {
 
       <div>
         <p>{comment.content}</p>
+        {comment.images.map((image) => {
+          return <img key={image.id} src={image.url} />;
+        })}
       </div>
     </div>
   );

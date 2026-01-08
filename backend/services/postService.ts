@@ -64,6 +64,7 @@ export const postService = {
           comments: {
             include: {
               user: true,
+              images: true,
             },
           },
         },
