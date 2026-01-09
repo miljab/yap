@@ -5,6 +5,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { Heart, MessageCircleMore } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import ImagePreview from "./ImagePreview";
 
 type PostViewProps = {
   post: Post;
@@ -70,11 +71,7 @@ function PostView({ post }: PostViewProps) {
 
       <div>
         <p>{post.content}</p>
-        <div>
-          {post.images.map((image) => (
-            <img key={image.id} src={image.url} alt="" />
-          ))}
-        </div>
+        <ImagePreview images={post.images} />
       </div>
 
       <div className="flex justify-end gap-4">
