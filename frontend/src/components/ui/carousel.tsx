@@ -47,7 +47,7 @@ function Carousel({
   plugins,
   className,
   children,
-  startIndex = 0, // <-- Add this prop
+  startIndex = 0,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps & { startIndex?: number }) {
   const [carouselRef, api] = useEmblaCarousel(
