@@ -46,7 +46,7 @@ function ImagePreview({ images }: ImagePreviewProps) {
           >
             &times;
           </button>
-          <Carousel className="w-full max-w-xl">
+          <Carousel className="w-full max-w-xl" startIndex={activeIndex}>
             <CarouselContent>
               {images.map((image, idx) => (
                 <CarouselItem key={idx}>
