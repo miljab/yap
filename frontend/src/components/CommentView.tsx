@@ -2,6 +2,7 @@ import type { Comment } from "@/types/post";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import defaultAvatar from "@/assets/default-avatar.png";
+import ImagePreview from "./ImagePreview";
 
 type CommentViewProps = {
   comment: Comment;
@@ -28,9 +29,7 @@ function CommentView({ comment }: CommentViewProps) {
 
       <div>
         <p>{comment.content}</p>
-        {comment.images.map((image) => {
-          return <img key={image.id} src={image.url} />;
-        })}
+        <ImagePreview images={comment.images} />
       </div>
     </div>
   );
