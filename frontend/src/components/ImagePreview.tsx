@@ -52,7 +52,7 @@ function ImagePreview({ images }: ImagePreviewProps) {
                 <CarouselItem key={idx} className="my-auto h-full w-full">
                   <img
                     src={image.url}
-                    className="max-h-md max-w-md rounded-md object-contain"
+                    className="max-h-md m-auto max-w-md rounded-md object-contain"
                   />
                 </CarouselItem>
               ))}
