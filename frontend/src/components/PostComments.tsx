@@ -1,6 +1,7 @@
 import CommentView from "./CommentView";
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import type { Comment } from "@/types/post";
 
 type PostCommentsProps = {
   postId: string;
@@ -32,7 +33,7 @@ function PostComments({ postId }: PostCommentsProps) {
   return (
     <div>
       {comments.map((comment) => {
-        return <CommentView comment={comment} />;
+        return <CommentView key={comment.id} comment={comment} />;
       })}
     </div>
   );
