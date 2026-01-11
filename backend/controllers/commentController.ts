@@ -66,3 +66,34 @@ export const getComments = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const likeComment = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  const commentId = req.params.id;
+
+  try {
+    if (!userId) throw new AppError("User ID is required", 401);
+
+    if (!commentId) throw new AppError("Comment ID is required", 400);
+
+    const updatedLikeCount = await commentService.likeComment(
+      userId,
+      commentId
+    );
+
+    return res.status(200).json({
+      likeCount: updatedLikeCount,
+    });
+  } catch (error) {
+    console.error(error);
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({
+        error: error.message,
+      });
+    } else {
+      return res.status(500).json({
+        error: "Unexpected error occurred. Please try again.",
+      });
+    }
+  }
+};

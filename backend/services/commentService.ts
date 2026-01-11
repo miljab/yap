@@ -2,6 +2,7 @@ import { prisma } from "../prisma/prismaClient.js";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs/promises";
 import { nanoid } from "nanoid";
+import AppError from "../utils/appError.js";
 
 const commentService = {
   replyToPost: async (
@@ -94,6 +95,51 @@ const commentService = {
       );
 
       return commentsWithMeta;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  likeComment: async (userId: string, commentId: string) => {
+    try {
+      const comment = await prisma.comment.findUnique({
+        where: { id: commentId },
+      });
+
+      if (!comment) throw new AppError("Comment not found", 404);
+
+      const like = await prisma.commentLike.findUnique({
+        where: {
+          userId_commentId: {
+            userId,
+            commentId,
+          },
+        },
+      });
+
+      if (like) {
+        await prisma.commentLike.delete({
+          where: {
+            userId_commentId: {
+              userId,
+              commentId,
+            },
+          },
+        });
+      } else {
+        await prisma.commentLike.create({
+          data: {
+            userId,
+            commentId,
+          },
+        });
+      }
+
+      const likeCount = await prisma.commentLike.count({
+        where: { commentId },
+      });
+
+      return likeCount;
     } catch (error) {
       throw error;
     }
