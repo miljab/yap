@@ -48,6 +48,24 @@ const commentService = {
       throw error;
     }
   },
+
+  getComments: async (postId: string) => {
+    try {
+      const comments = await prisma.comment.findMany({
+        where: {
+          postId,
+        },
+        include: {
+          images: true,
+          user: true,
+        },
+      });
+
+      return comments;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default commentService;

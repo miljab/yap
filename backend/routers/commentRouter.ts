@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
-import { replyToPost } from "../controllers/commentController.js";
+import { replyToPost, getComments } from "../controllers/commentController.js";
 
 const router = express.Router();
 const upload = multer({
@@ -15,5 +15,7 @@ router.post(
   upload.array("images", 4),
   replyToPost
 );
+
+router.get("/post/:id/comments", verifyAccessToken, getComments);
 
 export default router;

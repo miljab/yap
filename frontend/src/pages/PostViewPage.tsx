@@ -38,7 +38,7 @@ function PostViewPage() {
     <div className="flex flex-col gap-2 p-4">
       <PostView post={post} />
       <CreateComment postId={post.id} />
-      <PostComments post={post} />
+      <PostComments postId={post.id} />
     </div>
   );
 }

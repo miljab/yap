@@ -40,3 +40,29 @@ export const replyToPost = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const getComments = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  const postId = req.params.id;
+
+  try {
+    if (!userId) throw new AppError("User ID is required", 401);
+
+    if (!postId) throw new AppError("Post ID is required", 400);
+
+    const comments = await commentService.getComments(postId);
+
+    return res.status(200).json(comments);
+  } catch (error) {
+    console.error(error);
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({
+        error: error.message,
+      });
+    } else {
+      return res.status(500).json({
+        error: "Unexpected error occurred. Please try again.",
+      });
+    }
+  }
+};

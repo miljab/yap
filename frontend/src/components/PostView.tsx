@@ -70,7 +70,7 @@ function PostView({ post }: PostViewProps) {
       </div>
 
       <div>
-        <p>{post.content}</p>
+        <p className="text-lg">{post.content}</p>
         <ImagePreview images={post.images} />
       </div>
 

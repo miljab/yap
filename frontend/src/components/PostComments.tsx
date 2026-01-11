@@ -1,18 +1,37 @@
-import type { Post } from "@/types/post";
 import CommentView from "./CommentView";
+import { useEffect, useState } from "react";
+import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 
 type PostCommentsProps = {
-  post: Post;
+  postId: string;
 };
 
-function PostComments({ post }: PostCommentsProps) {
-  console.log(post);
+function PostComments({ postId }: PostCommentsProps) {
+  const axiosPrivate = useAxiosPrivate();
+  const [comments, setComments] = useState<Comment[]>([]);
 
-  if (post.comments.length === 0) return null;
+  console.log(postId);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await axiosPrivate.get(`/post/${postId}/comments`);
+
+        setComments(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchComments();
+  }, [postId, axiosPrivate]);
+
+  if (comments.length === 0) return null;
 
   return (
     <div>
-      {post.comments.map((comment) => {
+      {comments.map((comment) => {
         return <CommentView comment={comment} />;
       })}
     </div>

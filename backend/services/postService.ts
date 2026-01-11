@@ -61,12 +61,6 @@ export const postService = {
           images: true,
           user: true,
           likes: true,
-          comments: {
-            include: {
-              user: true,
-              images: true,
-            },
-          },
         },
       });
 
@@ -75,7 +69,11 @@ export const postService = {
       const isLiked = post.likes.some((like) => like.userId === userId);
       const likeCount = post.likes.length;
 
-      const commentCount = post.comments.length;
+      const commentCount = await prisma.comment.count({
+        where: {
+          postId,
+        },
+      });
 
       if (userId !== post.user.id) {
         return { ...post, isLiked, likeCount, commentCount, likes: [] };
