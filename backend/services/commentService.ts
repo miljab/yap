@@ -49,7 +49,7 @@ const commentService = {
     }
   },
 
-  getComments: async (postId: string) => {
+  getComments: async (postId: string, userId?: string) => {
     try {
       const comments = await prisma.comment.findMany({
         where: {
@@ -61,7 +61,40 @@ const commentService = {
         },
       });
 
-      return comments;
+      // For each comment, fetch likeCount, commentCount (replies), and isLiked
+      const commentsWithMeta = await Promise.all(
+        comments.map(async (comment) => {
+          const [likeCount, commentCount, isLiked] = await Promise.all([
+            prisma.commentLike.count({
+              where: { commentId: comment.id },
+            }),
+            prisma.comment.count({
+              where: { parentId: comment.id },
+            }),
+            userId
+              ? prisma.commentLike
+                  .findUnique({
+                    where: {
+                      userId_commentId: {
+                        userId,
+                        commentId: comment.id,
+                      },
+                    },
+                  })
+                  .then((like) => !!like)
+              : Promise.resolve(false),
+          ]);
+
+          return {
+            ...comment,
+            likeCount,
+            commentCount,
+            isLiked,
+          };
+        })
+      );
+
+      return commentsWithMeta;
     } catch (error) {
       throw error;
     }
