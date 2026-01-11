@@ -61,7 +61,6 @@ const commentService = {
         },
       });
 
-      // For each comment, fetch likeCount, commentCount (replies), and isLiked
       const commentsWithMeta = await Promise.all(
         comments.map(async (comment) => {
           const [likeCount, commentCount, isLiked] = await Promise.all([

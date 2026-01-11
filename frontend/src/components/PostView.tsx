@@ -74,7 +74,7 @@ function PostView({ post }: PostViewProps) {
         <ImagePreview images={post.images} />
       </div>
 
-      <div className="flex justify-end gap-4">
+      <div className="flex justify-start gap-4">
         <button
           disabled={isLiking}
           onClick={handleLike}

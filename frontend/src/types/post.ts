@@ -20,6 +20,9 @@ export type Comment = {
   user: User;
   images: Image[];
   replies: Comment[];
+  isLiked: boolean;
+  likeCount: number;
+  commentCount: number;
 };
 
 export type Like = {
