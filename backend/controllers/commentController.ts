@@ -50,7 +50,7 @@ export const getComments = async (req: Request, res: Response) => {
 
     if (!postId) throw new AppError("Post ID is required", 400);
 
-    const comments = await commentService.getComments(postId);
+    const comments = await commentService.getComments(postId, userId);
 
     return res.status(200).json(comments);
   } catch (error) {

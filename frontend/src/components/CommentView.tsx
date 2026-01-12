@@ -36,7 +36,6 @@ function CommentView({ comment }: CommentViewProps) {
     try {
       const { data } = await axiosPrivate.post(`/comment/${comment.id}/like`);
       setLikeCount(data.likeCount);
-      console.log(data);
     } catch (error) {
       console.error(error);
 
