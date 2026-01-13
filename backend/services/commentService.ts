@@ -12,7 +12,6 @@ const commentService = {
     images: Express.Multer.File[]
   ) => {
     try {
-      console.log(postId);
       let imageUrls = [];
 
       for (const image of images) {

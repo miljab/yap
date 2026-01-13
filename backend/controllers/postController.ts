@@ -3,7 +3,7 @@ import { postService } from "../services/postService.js";
 import AppError from "../utils/appError.js";
 
 export const createNewPost = async (req: Request, res: Response) => {
-  const { text } = req.body;
+  const text = typeof req.body.text === "string" ? req.body.text.trim() : "";
   const images = req.files as Express.Multer.File[];
   const userId = req.user?.id;
 
@@ -15,6 +15,15 @@ export const createNewPost = async (req: Request, res: Response) => {
 
     if (text.length > 200) throw new AppError("Max 200 characters allowed");
     if (images.length > 4) throw new AppError("Max 4 images allowed");
+
+    for (const f of images) {
+      if (!/^image\/(png|jpe?g|webp|gif)$/.test(f.mimetype)) {
+        throw new AppError(
+          "Only image files (png,jpg,jpeg,webp,gif) are allowed",
+          400
+        );
+      }
+    }
 
     const post = await postService.createPost({
       userId,

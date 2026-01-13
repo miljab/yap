@@ -5,19 +5,31 @@ import commentService from "../services/commentService.js";
 export const replyToPost = async (req: Request, res: Response) => {
   const userId = req.user?.id;
   const postId = req.params.id;
-  const { text } = req.body;
-  const images = req.files as Express.Multer.File[];
+  const images =
+    (Array.isArray(req.files) ? (req.files as Express.Multer.File[]) : []) ??
+    [];
+  const text = typeof req.body.text === "string" ? req.body.text.trim() : "";
 
   try {
     if (!userId) throw new AppError("User ID is required", 401);
 
     if (!postId) throw new AppError("Post ID is required", 400);
 
-    if (!text && !images)
+    if (!text && images.length === 0) {
       throw new AppError("Text or images are required", 400);
+    }
+    if (text.length > 200)
+      throw new AppError("Max 200 characters allowed", 400);
+    if (images.length > 4) throw new AppError("Max 4 images allowed", 400);
 
-    if (text.length > 200) throw new AppError("Max 200 characters allowed");
-    if (images.length > 4) throw new AppError("Max 4 images allowed");
+    for (const f of images) {
+      if (!/^image\/(png|jpe?g|webp|gif)$/.test(f.mimetype)) {
+        throw new AppError(
+          "Only image files (png,jpg,jpeg,webp,gif) are allowed",
+          400
+        );
+      }
+    }
 
     const comment = await commentService.replyToPost(
       userId,
