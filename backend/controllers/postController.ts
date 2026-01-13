@@ -1,6 +1,11 @@
 import type { Request, Response } from "express";
 import { postService } from "../services/postService.js";
 import AppError from "../utils/appError.js";
+import {
+  ALLOWED_IMAGE_MIME,
+  MAX_IMAGES,
+  MAX_TEXT_LEN,
+} from "../utils/constants.js";
 
 export const createNewPost = async (req: Request, res: Response) => {
   const text = typeof req.body.text === "string" ? req.body.text.trim() : "";
@@ -13,11 +18,13 @@ export const createNewPost = async (req: Request, res: Response) => {
     if (!text && images.length === 0)
       throw new AppError("Text or images are required");
 
-    if (text.length > 200) throw new AppError("Max 200 characters allowed");
-    if (images.length > 4) throw new AppError("Max 4 images allowed");
+    if (text.length > MAX_TEXT_LEN)
+      throw new AppError("Max 200 characters allowed");
+    if (images.length > MAX_IMAGES)
+      throw new AppError(`Max ${MAX_IMAGES} images allowed`);
 
     for (const f of images) {
-      if (!/^image\/(png|jpe?g|webp|gif)$/.test(f.mimetype)) {
+      if (!ALLOWED_IMAGE_MIME.test(f.mimetype)) {
         throw new AppError(
           "Only image files (png,jpg,jpeg,webp,gif) are allowed",
           400

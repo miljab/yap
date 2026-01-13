@@ -6,17 +6,18 @@ import {
   getComments,
   likeComment,
 } from "../controllers/commentController.js";
+import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
 
 const router = express.Router();
 const upload = multer({
   dest: "uploads/",
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: MAX_IMAGE_SIZE_BYTES },
 });
 
 router.post(
   "/post/:id/reply",
   verifyAccessToken,
-  upload.array("images", 4),
+  upload.array("images", MAX_IMAGES),
   replyToPost
 );
 
