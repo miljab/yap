@@ -55,6 +55,7 @@ const commentService = {
       const comments = await prisma.comment.findMany({
         where: {
           postId,
+          parentId: null,
         },
         include: {
           images: true,
