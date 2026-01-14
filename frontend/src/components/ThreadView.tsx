@@ -1,10 +1,17 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import PostView from "./PostView";
+import type { Post, Comment } from "@/types/post";
+import CommentView from "./CommentView";
 
 function ThreadView() {
   const params = useParams();
   const axiosPrivate = useAxiosPrivate();
+  const [post, setPost] = useState<Post | null>(null);
+  const [comment, setComment] = useState<Comment | null>(null);
+  const [replies, setReplies] = useState<Comment[]>([]);
+  const [parentComments, setParentComments] = useState<Comment[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -13,6 +20,11 @@ function ThreadView() {
           `/comment/${params.id}/replies`,
         );
         console.log(response);
+
+        setPost(response.data.post);
+        setComment(response.data.comment);
+        setReplies(response.data.replies);
+        setParentComments(response.data.parentComments);
       } catch (error) {
         console.error(error);
         // TODO error handling
@@ -22,7 +34,29 @@ function ThreadView() {
     fetchData();
   }, [params, axiosPrivate]);
 
-  return <div>test</div>;
+  if (!post || !comment) return null;
+
+  return (
+    <div>
+      <PostView post={post} />
+
+      <div>
+        {parentComments.map((com) => {
+          return <CommentView key={com.id} comment={com} />;
+        })}
+      </div>
+
+      <div>
+        <CommentView comment={comment} />
+      </div>
+
+      <div>
+        {replies.map((reply) => {
+          return <CommentView key={reply.id} comment={reply} />;
+        })}
+      </div>
+    </div>
+  );
 }
 
 export default ThreadView;
