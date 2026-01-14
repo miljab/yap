@@ -2,7 +2,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 
-function ReplyView() {
+function ThreadView() {
   const params = useParams();
   const axiosPrivate = useAxiosPrivate();
 
@@ -25,4 +25,4 @@ function ReplyView() {
   return <div>test</div>;
 }
 
-export default ReplyView;
+export default ThreadView;

@@ -3,7 +3,7 @@ import RequireAuth from "@/components/RequireAuth";
 import HomePage from "@/pages/HomePage";
 import AuthLayout from "@/layouts/AuthLayout";
 import PostViewPage from "@/pages/PostViewPage";
-import ReplyView from "@/components/ReplyView";
+import ThreadView from "@/components/ThreadView";
 
 const authRoutes = () => {
   return (
@@ -11,7 +11,7 @@ const authRoutes = () => {
       <Route element={<AuthLayout />}>
         <Route path="/home" element={<HomePage />} />
         <Route path="/post/:id" element={<PostViewPage />} />
-        <Route path="/comment/:id" element={<ReplyView />} />
+        <Route path="/comment/:id" element={<ThreadView />} />
       </Route>
     </Route>
   );
