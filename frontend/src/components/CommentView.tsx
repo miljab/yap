@@ -5,6 +5,7 @@ import defaultAvatar from "@/assets/default-avatar.png";
 import ImagePreview from "./ImagePreview";
 import InteractionButtons from "./InteractionButtons";
 import { useLike } from "@/hooks/useLike";
+import { useNavigate } from "react-router";
 
 type CommentViewProps = {
   comment: Comment;
@@ -17,9 +18,37 @@ function CommentView({ comment }: CommentViewProps) {
     initialIsLiked: comment.isLiked,
     initialLikeCount: comment.likeCount,
   });
+  const navigate = useNavigate();
+
+  const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const selection = window.getSelection();
+
+    if (
+      selection &&
+      selection.type === "Range" &&
+      selection.toString().length > 0
+    ) {
+      return;
+    }
+
+    const target = e.target as HTMLElement;
+
+    if (
+      target.closest("button") ||
+      target.closest("a") ||
+      target.closest("[data-no-navigate]")
+    ) {
+      return;
+    }
+
+    navigate(`/comment/${comment.id}`);
+  };
 
   return (
-    <div className="flex flex-col gap-2 border p-2">
+    <div
+      className="flex flex-col gap-2 border p-2"
+      onClick={(e) => handleContainerClick(e)}
+    >
       <div className="flex items-center gap-1 text-sm">
         <Avatar>
           <AvatarImage src={comment.user.avatar} />
@@ -38,7 +67,7 @@ function CommentView({ comment }: CommentViewProps) {
 
       <div>
         <p>{comment.content}</p>
-        <ImagePreview images={comment.images} />
+        <ImagePreview data-no-navigate images={comment.images} />
       </div>
 
       <InteractionButtons

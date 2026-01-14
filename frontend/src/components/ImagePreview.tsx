@@ -12,7 +12,10 @@ type ImagePreviewProps = {
   images: Image[];
 };
 
-function ImagePreview({ images }: ImagePreviewProps) {
+function ImagePreview({
+  images,
+  ...rest
+}: ImagePreviewProps & React.HTMLAttributes<HTMLDivElement>) {
   const [showCarousel, setShowCarousel] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -26,7 +29,7 @@ function ImagePreview({ images }: ImagePreviewProps) {
   }
 
   return (
-    <div>
+    <div {...rest} className="w-fit">
       <div className="flex flex-wrap gap-2">
         {images.map((image, idx) => (
           <img

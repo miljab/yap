@@ -115,3 +115,27 @@ export const likeComment = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const getCommentReplies = async (req: Request, res: Response) => {
+  const commentId = req.params.id;
+
+  try {
+    if (!commentId) throw new AppError("Comment ID is required", 400);
+
+    const { post, comment, parentComments, replies } =
+      await commentService.getCommentReplies(commentId);
+
+    return res.status(200).json({ post, comment, parentComments, replies });
+  } catch (error) {
+    console.error(error);
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({
+        error: error.message,
+      });
+    } else {
+      return res.status(500).json({
+        error: "Unexpected error occurred. Please try again.",
+      });
+    }
+  }
+};

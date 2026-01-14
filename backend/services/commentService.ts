@@ -3,6 +3,7 @@ import cloudinary from "../config/cloudinary.js";
 import fs from "fs/promises";
 import { nanoid } from "nanoid";
 import AppError from "../utils/appError.js";
+import { getCommentReplies } from "../controllers/commentController.js";
 
 const commentService = {
   replyToPost: async (
@@ -139,6 +140,71 @@ const commentService = {
       });
 
       return likeCount;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getCommentReplies: async (commentId: string) => {
+    try {
+      const comment = await prisma.comment.findUnique({
+        where: {
+          id: commentId,
+        },
+        include: {
+          images: true,
+          user: true,
+        },
+      });
+
+      if (!comment) throw new AppError("Comment not found", 404);
+
+      const post = await prisma.post.findUnique({
+        where: {
+          id: comment.postId,
+        },
+        include: {
+          images: true,
+          user: true,
+        },
+      });
+
+      const replies = await prisma.comment.findMany({
+        where: {
+          parentId: comment.id,
+        },
+        include: {
+          images: true,
+          user: true,
+        },
+      });
+
+      const parentComments = [];
+      let currentParentId = comment.parentId;
+
+      while (currentParentId) {
+        const parentComment = await prisma.comment.findUnique({
+          where: {
+            id: currentParentId,
+          },
+          include: {
+            images: true,
+            user: true,
+          },
+        });
+
+        if (!parentComment) break;
+
+        parentComments.unshift(parentComment);
+        currentParentId = parentComment?.parentId;
+      }
+
+      return {
+        comment,
+        post,
+        replies,
+        parentComments,
+      };
     } catch (error) {
       throw error;
     }
