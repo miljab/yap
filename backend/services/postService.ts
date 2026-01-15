@@ -72,6 +72,7 @@ export const postService = {
       const commentCount = await prisma.comment.count({
         where: {
           postId,
+          parentId: null,
         },
       });
 

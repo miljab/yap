@@ -46,7 +46,7 @@ function CommentView({ comment }: CommentViewProps) {
 
   return (
     <div
-      className="flex flex-col gap-2 border p-2"
+      className="flex cursor-pointer flex-col gap-2 border p-2"
       onClick={(e) => handleContainerClick(e)}
     >
       <div className="flex items-center gap-1 text-sm">
