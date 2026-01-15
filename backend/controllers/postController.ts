@@ -6,6 +6,7 @@ import {
   MAX_IMAGES,
   MAX_TEXT_LEN,
 } from "../utils/constants.js";
+import { handleError } from "../utils/errorUtils.js";
 
 export const createNewPost = async (req: Request, res: Response) => {
   const text = typeof req.body.text === "string" ? req.body.text.trim() : "";
@@ -39,15 +40,13 @@ export const createNewPost = async (req: Request, res: Response) => {
     });
 
     res.status(201).json(post);
-  } catch (error: any) {
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    } else {
-      console.error(error);
-      res
-        .status(500)
-        .json({ error: "An unexpected error occurred. Please try again." });
-    }
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
   }
 };
 
@@ -60,15 +59,13 @@ export const getPostById = async (req: Request, res: Response) => {
 
     const post = await postService.getPostById(postId, userId);
     res.status(200).json(post);
-  } catch (error: any) {
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    } else {
-      console.error(error);
-      res
-        .status(500)
-        .json({ error: "An unexpected error occurred. Please try again." });
-    }
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
   }
 };
 
@@ -83,13 +80,11 @@ export const likePost = async (req: Request, res: Response) => {
 
     res.status(200).json({ likeCount: updatedLikeCount });
   } catch (error) {
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({ error: error.message });
-    } else {
-      console.error(error);
-      res
-        .status(500)
-        .json({ error: "An unexpected error occurred. Please try again." });
-    }
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
   }
 };

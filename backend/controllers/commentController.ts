@@ -6,6 +6,7 @@ import {
   MAX_IMAGES,
   MAX_TEXT_LEN,
 } from "../utils/constants.js";
+import { handleError } from "../utils/errorUtils.js";
 
 export const replyToPost = async (req: Request, res: Response) => {
   const userId = req.user?.id;
@@ -47,15 +48,11 @@ export const replyToPost = async (req: Request, res: Response) => {
     return res.status(201).json(comment);
   } catch (error) {
     console.error(error);
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({
-        error: error.message,
-      });
-    } else {
-      return res.status(500).json({
-        error: "Unexpected error occurred. Please try again.",
-      });
-    }
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
   }
 };
 
@@ -73,15 +70,11 @@ export const getComments = async (req: Request, res: Response) => {
     return res.status(200).json(comments);
   } catch (error) {
     console.error(error);
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({
-        error: error.message,
-      });
-    } else {
-      return res.status(500).json({
-        error: "Unexpected error occurred. Please try again.",
-      });
-    }
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
   }
 };
 
@@ -104,15 +97,11 @@ export const likeComment = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({
-        error: error.message,
-      });
-    } else {
-      return res.status(500).json({
-        error: "Unexpected error occurred. Please try again.",
-      });
-    }
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
   }
 };
 
@@ -128,14 +117,10 @@ export const getCommentReplies = async (req: Request, res: Response) => {
     return res.status(200).json({ post, comment, parentComments, replies });
   } catch (error) {
     console.error(error);
-    if (error instanceof AppError) {
-      return res.status(error.statusCode).json({
-        error: error.message,
-      });
-    } else {
-      return res.status(500).json({
-        error: "Unexpected error occurred. Please try again.",
-      });
-    }
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
   }
 };
