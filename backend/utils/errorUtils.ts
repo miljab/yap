@@ -9,7 +9,7 @@ export function handleError(error: unknown) {
   }
 
   return {
-    message: "Internal server error",
+    message: "Unexpected error occurred. Please try again.",
     statusCode: 500,
   };
 }
