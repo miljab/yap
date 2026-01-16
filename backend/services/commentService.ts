@@ -3,7 +3,6 @@ import cloudinary from "../config/cloudinary.js";
 import fs from "fs/promises";
 import { nanoid } from "nanoid";
 import AppError from "../utils/appError.js";
-import { getCommentReplies } from "../controllers/commentController.js";
 
 const commentService = {
   replyToPost: async (
@@ -146,7 +145,7 @@ const commentService = {
     }
   },
 
-  getCommentReplies: async (commentId: string) => {
+  getThread: async (commentId: string) => {
     try {
       const comment = await prisma.comment.findUnique({
         where: {

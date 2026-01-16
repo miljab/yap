@@ -105,14 +105,14 @@ export const likeComment = async (req: Request, res: Response) => {
   }
 };
 
-export const getCommentReplies = async (req: Request, res: Response) => {
+export const getThread = async (req: Request, res: Response) => {
   const commentId = req.params.id;
 
   try {
     if (!commentId) throw new AppError("Comment ID is required", 400);
 
     const { post, comment, parentComments, replies } =
-      await commentService.getCommentReplies(commentId);
+      await commentService.getThread(commentId);
 
     return res.status(200).json({ post, comment, parentComments, replies });
   } catch (error) {
