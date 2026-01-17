@@ -3,13 +3,14 @@ import cloudinary from "../config/cloudinary.js";
 import fs from "fs/promises";
 import { nanoid } from "nanoid";
 import AppError from "../utils/appError.js";
+import type { Comment } from "@prisma/client";
 
 const commentService = {
   replyToPost: async (
     userId: string,
     postId: string,
     text: string,
-    images: Express.Multer.File[]
+    images: Express.Multer.File[],
   ) => {
     try {
       let imageUrls = [];
@@ -63,38 +64,46 @@ const commentService = {
       });
 
       const commentsWithMeta = await Promise.all(
-        comments.map(async (comment) => {
-          const [likeCount, commentCount, isLiked] = await Promise.all([
-            prisma.commentLike.count({
-              where: { commentId: comment.id },
-            }),
-            prisma.comment.count({
-              where: { parentId: comment.id },
-            }),
-            userId
-              ? prisma.commentLike
-                  .findUnique({
-                    where: {
-                      userId_commentId: {
-                        userId,
-                        commentId: comment.id,
-                      },
-                    },
-                  })
-                  .then((like) => !!like)
-              : Promise.resolve(false),
-          ]);
-
-          return {
-            ...comment,
-            likeCount,
-            commentCount,
-            isLiked,
-          };
-        })
+        comments.map(async (comment) =>
+          commentService.getCommentMeta(comment, userId),
+        ),
       );
 
       return commentsWithMeta;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getCommentMeta: async (comment: Comment, userId?: string) => {
+    try {
+      const [likeCount, commentCount, isLiked] = await Promise.all([
+        prisma.commentLike.count({
+          where: { commentId: comment.id },
+        }),
+        prisma.comment.count({
+          where: { parentId: comment.id },
+        }),
+        userId
+          ? prisma.commentLike
+              .findUnique({
+                where: {
+                  userId_commentId: {
+                    userId,
+                    commentId: comment.id,
+                  },
+                },
+              })
+              .then((like) => !!like)
+          : Promise.resolve(false),
+      ]);
+
+      return {
+        ...comment,
+        likeCount,
+        commentCount,
+        isLiked,
+      };
     } catch (error) {
       throw error;
     }
