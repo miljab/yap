@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import { nanoid } from "nanoid";
 import AppError from "../utils/appError.js";
 import type { Comment } from "@prisma/client";
+import { postService } from "./postService.js";
 
 const commentService = {
   replyToPost: async (
@@ -154,7 +155,7 @@ const commentService = {
     }
   },
 
-  getThread: async (commentId: string) => {
+  getThread: async (commentId: string, userId: string) => {
     try {
       const comment = await prisma.comment.findUnique({
         where: {
@@ -168,15 +169,7 @@ const commentService = {
 
       if (!comment) throw new AppError("Comment not found", 404);
 
-      const post = await prisma.post.findUnique({
-        where: {
-          id: comment.postId,
-        },
-        include: {
-          images: true,
-          user: true,
-        },
-      });
+      const post = await postService.getPostById(comment.postId, userId);
 
       const replies = await prisma.comment.findMany({
         where: {
@@ -187,6 +180,12 @@ const commentService = {
           user: true,
         },
       });
+
+      const repliesWithMeta = await Promise.all(
+        replies.map(async (reply) =>
+          commentService.getCommentMeta(reply, userId),
+        ),
+      );
 
       const parentComments = [];
       let currentParentId = comment.parentId;
@@ -208,11 +207,15 @@ const commentService = {
         currentParentId = parentComment?.parentId;
       }
 
+      const parentCommentsWithMeta = await Promise.all(
+        parentComments.map((com) => commentService.getCommentMeta(com, userId)),
+      );
+
       return {
         comment,
         post,
-        replies,
-        parentComments,
+        replies: repliesWithMeta,
+        parentComments: parentCommentsWithMeta,
       };
     } catch (error) {
       throw error;

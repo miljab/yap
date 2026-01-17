@@ -33,7 +33,7 @@ export const replyToPost = async (req: Request, res: Response) => {
       if (!ALLOWED_IMAGE_MIME.test(f.mimetype)) {
         throw new AppError(
           "Only image files (png,jpg,jpeg,webp,gif) are allowed",
-          400
+          400,
         );
       }
     }
@@ -42,7 +42,7 @@ export const replyToPost = async (req: Request, res: Response) => {
       userId,
       postId,
       text,
-      images
+      images,
     );
 
     return res.status(201).json(comment);
@@ -89,7 +89,7 @@ export const likeComment = async (req: Request, res: Response) => {
 
     const updatedLikeCount = await commentService.likeComment(
       userId,
-      commentId
+      commentId,
     );
 
     return res.status(200).json({
@@ -107,12 +107,15 @@ export const likeComment = async (req: Request, res: Response) => {
 
 export const getThread = async (req: Request, res: Response) => {
   const commentId = req.params.id;
+  const userId = req.user?.id;
 
   try {
+    if (!userId) throw new AppError("User ID is required", 401);
+
     if (!commentId) throw new AppError("Comment ID is required", 400);
 
     const { post, comment, parentComments, replies } =
-      await commentService.getThread(commentId);
+      await commentService.getThread(commentId, userId);
 
     return res.status(200).json({ post, comment, parentComments, replies });
   } catch (error) {
