@@ -6,6 +6,7 @@ import ImagePreview from "./ImagePreview";
 import InteractionButtons from "./InteractionButtons";
 import { useLike } from "@/hooks/useLike";
 import { useNavigate } from "react-router";
+import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
 
 type CommentViewProps = {
   comment: Comment;
@@ -93,7 +94,7 @@ function CommentView({
       className="flex cursor-pointer gap-2 p-2"
       onClick={(e) => handleContainerClick(e)}
     >
-      <div className="flex flex-col items-center text-sm">
+      <div className="flex flex-col items-center">
         <Avatar>
           <AvatarImage src={comment.user.avatar} />
           <AvatarFallback>
@@ -104,10 +105,16 @@ function CommentView({
         {isParent && <div className="mt-3 h-full w-[2px] bg-gray-500"></div>}
       </div>
 
-      <div>
-        <span className="flex items-center font-bold">
-          {comment.user.username}
-        </span>
+      <div className="flex flex-col justify-start gap-1">
+        <div className="flex gap-1 text-sm">
+          <span className="flex items-center font-bold">
+            {comment.user.username}
+          </span>
+          <span className="text-neutral-500">&middot;</span>
+          <span className="text-neutral-500">
+            {formatTimeAgoOrDate(comment.createdAt)}
+          </span>
+        </div>
 
         <p>{comment.content}</p>
 

@@ -34,6 +34,8 @@ function ThreadView() {
 
   if (!post || !comment) return null;
 
+  console.log(new Date(), post.createdAt);
+
   return (
     <div>
       <PostView post={post} />
