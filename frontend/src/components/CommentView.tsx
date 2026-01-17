@@ -9,9 +9,15 @@ import { useNavigate } from "react-router";
 
 type CommentViewProps = {
   comment: Comment;
+  isSelected?: boolean;
+  isParent?: boolean;
 };
 
-function CommentView({ comment }: CommentViewProps) {
+function CommentView({
+  comment,
+  isSelected = false,
+  isParent = false,
+}: CommentViewProps) {
   const { isLiked, likeCount, isLiking, handleLike } = useLike({
     itemId: comment.id,
     itemType: "comment",
@@ -44,12 +50,50 @@ function CommentView({ comment }: CommentViewProps) {
     navigate(`/comment/${comment.id}`);
   };
 
+  if (isSelected) {
+    return (
+      <div
+        className="flex cursor-pointer flex-col gap-2 p-2"
+        onClick={(e) => handleContainerClick(e)}
+      >
+        <div className="flex items-center gap-1 text-sm">
+          <Avatar>
+            <AvatarImage src={comment.user.avatar} />
+            <AvatarFallback>
+              <img src={defaultAvatar} alt="avatar" />
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex flex-col">
+            <span className="font-bold">{comment.user.username}</span>
+            <span className="text-neutral-500">
+              {new Date(comment.createdAt).toLocaleString()}
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-lg">{comment.content}</p>
+          <ImagePreview data-no-navigate images={comment.images} />
+        </div>
+
+        <InteractionButtons
+          isLiked={isLiked}
+          likeCount={likeCount}
+          commentCount={comment.commentCount}
+          isLiking={isLiking}
+          onLike={handleLike}
+        />
+      </div>
+    );
+  }
+
   return (
     <div
-      className="flex cursor-pointer flex-col gap-2 border p-2"
+      className="flex cursor-pointer gap-2 p-2"
       onClick={(e) => handleContainerClick(e)}
     >
-      <div className="flex items-center gap-1 text-sm">
+      <div className="flex flex-col items-center text-sm">
         <Avatar>
           <AvatarImage src={comment.user.avatar} />
           <AvatarFallback>
@@ -57,26 +101,30 @@ function CommentView({ comment }: CommentViewProps) {
           </AvatarFallback>
         </Avatar>
 
-        <div className="flex flex-col">
-          <span className="font-bold">{comment.user.username}</span>
-          <span className="text-neutral-500">
-            {new Date(comment.createdAt).toLocaleString()}
-          </span>
-        </div>
+        {isParent && <div className="mt-3 h-full w-[2px] bg-gray-500"></div>}
       </div>
 
       <div>
-        <p>{comment.content}</p>
-        <ImagePreview data-no-navigate images={comment.images} />
-      </div>
+        <span className="flex items-center font-bold">
+          {comment.user.username}
+        </span>
 
-      <InteractionButtons
-        isLiked={isLiked}
-        likeCount={likeCount}
-        commentCount={comment.commentCount}
-        isLiking={isLiking}
-        onLike={handleLike}
-      />
+        <p>{comment.content}</p>
+
+        <div>
+          <ImagePreview data-no-navigate images={comment.images} />
+        </div>
+
+        <div>
+          <InteractionButtons
+            isLiked={isLiked}
+            likeCount={likeCount}
+            commentCount={comment.commentCount}
+            isLiking={isLiking}
+            onLike={handleLike}
+          />
+        </div>
+      </div>
     </div>
   );
 }

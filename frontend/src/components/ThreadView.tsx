@@ -38,14 +38,12 @@ function ThreadView() {
     <div>
       <PostView post={post} />
 
-      <div>
-        {parentComments.map((com) => {
-          return <CommentView key={com.id} comment={com} />;
-        })}
-      </div>
+      {parentComments.map((com) => {
+        return <CommentView key={com.id} comment={com} isParent={true} />;
+      })}
 
       <div>
-        <CommentView comment={comment} />
+        <CommentView isSelected={true} comment={comment} />
       </div>
 
       <div>
