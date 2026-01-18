@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 import PostView from "./PostView";
 import type { Post, Comment } from "@/types/post";
 import CommentView from "./CommentView";
+import CreateComment from "./CreateComment";
 
 function ThreadView() {
   const params = useParams();
@@ -34,8 +35,6 @@ function ThreadView() {
 
   if (!post || !comment) return null;
 
-  console.log(new Date(), post.createdAt);
-
   return (
     <div>
       <PostView post={post} />
@@ -46,6 +45,10 @@ function ThreadView() {
 
       <div>
         <CommentView isSelected={true} comment={comment} />
+      </div>
+
+      <div>
+        <CreateComment postId={post.id} parentId={comment.id} />
       </div>
 
       <div>

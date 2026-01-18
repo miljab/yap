@@ -56,6 +56,54 @@ export const replyToPost = async (req: Request, res: Response) => {
   }
 };
 
+export const replyToComment = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  const commentId = req.params.id;
+  const images =
+    (Array.isArray(req.files) ? (req.files as Express.Multer.File[]) : []) ??
+    [];
+  const text = typeof req.body.text === "string" ? req.body.text.trim() : "";
+
+  try {
+    if (!userId) throw new AppError("User ID is required", 401);
+
+    if (!commentId) throw new AppError("Comment ID is required", 400);
+
+    if (!text && images.length === 0) {
+      throw new AppError("Text or images are required", 400);
+    }
+    if (text.length > MAX_TEXT_LEN)
+      throw new AppError("Max 200 characters allowed", 400);
+    if (images.length > MAX_IMAGES)
+      throw new AppError(`Max ${MAX_IMAGES} images allowed`, 400);
+
+    for (const f of images) {
+      if (!ALLOWED_IMAGE_MIME.test(f.mimetype)) {
+        throw new AppError(
+          "Only image files (png,jpg,jpeg,webp,gif) are allowed",
+          400,
+        );
+      }
+    }
+
+    const comment = await commentService.replyToComment(
+      userId,
+      commentId,
+      text,
+      images,
+    );
+
+    return res.status(201).json(comment);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
+
 export const getComments = async (req: Request, res: Response) => {
   const userId = req.user?.id;
   const postId = req.params.id;

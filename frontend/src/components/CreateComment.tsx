@@ -9,9 +9,10 @@ const MAX_FILE_SIZE = 5242880; // 5MB
 
 type CreateCommentProps = {
   postId: string;
+  parentId?: string;
 };
 
-function CreateComment({ postId }: CreateCommentProps) {
+function CreateComment({ postId, parentId }: CreateCommentProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState("");
@@ -19,7 +20,7 @@ function CreateComment({ postId }: CreateCommentProps) {
   const axiosPrivate = useAxiosPrivate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function createPost() {
+  async function createComment() {
     setIsSubmitting(true);
     try {
       const formData = new FormData();
@@ -29,13 +30,13 @@ function CreateComment({ postId }: CreateCommentProps) {
         selectedFiles.forEach((file) => formData.append("images", file));
       }
 
-      const response = await axiosPrivate.post(
-        `/post/${postId}/reply`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        },
-      );
+      const apiUrlString = parentId
+        ? `/comment/${parentId}/reply`
+        : `/post/${postId}/reply`;
+
+      const response = await axiosPrivate.post(apiUrlString, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (response.status === 201) {
         toast.success("Commented successfully.");
@@ -172,7 +173,7 @@ function CreateComment({ postId }: CreateCommentProps) {
         </button>
         <Button
           className="w-18 rounded-2xl disabled:bg-neutral-950 dark:disabled:bg-neutral-200"
-          onClick={createPost}
+          onClick={createComment}
           disabled={
             (actualLength === 0 && selectedFiles.length === 0) || isSubmitting
           }

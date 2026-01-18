@@ -6,6 +6,7 @@ import {
   getComments,
   likeComment,
   getThread,
+  replyToComment,
 } from "../controllers/commentController.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
 
@@ -19,7 +20,14 @@ router.post(
   "/post/:id/reply",
   verifyAccessToken,
   upload.array("images", MAX_IMAGES),
-  replyToPost
+  replyToPost,
+);
+
+router.post(
+  "/comment/:id/reply",
+  verifyAccessToken,
+  upload.array("images", MAX_IMAGES),
+  replyToComment,
 );
 
 router.get("/post/:id/comments", verifyAccessToken, getComments);

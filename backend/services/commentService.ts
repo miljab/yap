@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 import AppError from "../utils/appError.js";
 import type { Comment } from "@prisma/client";
 import { postService } from "./postService.js";
+import { replyToComment } from "../controllers/commentController.js";
 
 const commentService = {
   replyToPost: async (
@@ -14,6 +15,14 @@ const commentService = {
     images: Express.Multer.File[],
   ) => {
     try {
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+      });
+
+      if (!post) throw new AppError("Post not found", 404);
+
       let imageUrls = [];
 
       for (const image of images) {
@@ -35,6 +44,61 @@ const commentService = {
         data: {
           content: text,
           postId,
+          userId,
+          images: {
+            create: imagesData,
+          },
+        },
+        include: {
+          images: true,
+        },
+      });
+
+      return comment;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  replyToComment: async (
+    userId: string,
+    commentId: string,
+    text: string,
+    images: Express.Multer.File[],
+  ) => {
+    try {
+      const parentComment = await prisma.comment.findUnique({
+        where: {
+          id: commentId,
+        },
+      });
+
+      console.log(commentId);
+
+      if (!parentComment) throw new AppError("Comment not found", 404);
+
+      let imageUrls = [];
+
+      for (const image of images) {
+        const result = await cloudinary.uploader.upload(image.path, {
+          folder: "comment-images",
+          public_id: nanoid(),
+        });
+        imageUrls.push(result.secure_url);
+
+        await fs.unlink(image.path);
+      }
+
+      const imagesData = imageUrls.map((url, idx) => ({
+        url,
+        orderIndex: idx,
+      }));
+
+      const comment = await prisma.comment.create({
+        data: {
+          content: text,
+          postId: parentComment.postId,
+          parentId: parentComment.id,
           userId,
           images: {
             create: imagesData,
@@ -169,6 +233,11 @@ const commentService = {
 
       if (!comment) throw new AppError("Comment not found", 404);
 
+      const commentWithMeta = await commentService.getCommentMeta(
+        comment,
+        userId,
+      );
+
       const post = await postService.getPostById(comment.postId, userId);
 
       const replies = await prisma.comment.findMany({
@@ -212,7 +281,7 @@ const commentService = {
       );
 
       return {
-        comment,
+        comment: commentWithMeta,
         post,
         replies: repliesWithMeta,
         parentComments: parentCommentsWithMeta,
