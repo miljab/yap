@@ -24,6 +24,7 @@ function InteractionButtons({
         onClick={onLike}
         className="flex items-center gap-1 disabled:opacity-50"
         aria-label={isLiked ? "Unlike" : "Like"}
+        data-no-navigate
       >
         <Heart
           className={`cursor-pointer transition-all duration-300 hover:text-red-500 ${

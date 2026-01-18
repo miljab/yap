@@ -5,7 +5,6 @@ import { nanoid } from "nanoid";
 import AppError from "../utils/appError.js";
 import type { Comment } from "@prisma/client";
 import { postService } from "./postService.js";
-import { replyToComment } from "../controllers/commentController.js";
 
 const commentService = {
   replyToPost: async (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { toast } from "sonner";
 
@@ -19,6 +19,11 @@ export function useLike({
   const [isLiked, setLiked] = useState(initialIsLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const axiosPrivate = useAxiosPrivate();
+
+  useEffect(() => {
+    setLiked(initialIsLiked);
+    setLikeCount(initialLikeCount);
+  }, [itemId, initialIsLiked, initialLikeCount]);
 
   async function handleLike() {
     if (isLiking) return;
