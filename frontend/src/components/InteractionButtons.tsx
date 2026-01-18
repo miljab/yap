@@ -27,7 +27,7 @@ function InteractionButtons({
         data-no-navigate
       >
         <Heart
-          className={`cursor-pointer transition-all duration-300 hover:text-red-500 ${
+          className={`cursor-pointer hover:text-red-500 hover:transition-all hover:duration-300 ${
             isLiked && "fill-red-500 text-red-500"
           }`}
         />
