@@ -18,7 +18,6 @@ function ThreadView() {
     const fetchData = async () => {
       try {
         const response = await axiosPrivate.get(`/comment/${params.id}/thread`);
-        console.log(response);
 
         setPost(response.data.post);
         setComment(response.data.comment);

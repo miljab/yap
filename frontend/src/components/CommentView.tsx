@@ -7,6 +7,7 @@ import InteractionButtons from "./InteractionButtons";
 import { useLike } from "@/hooks/useLike";
 import { useNavigate } from "react-router";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
+import preventNavigation from "@/utils/preventNavigation";
 
 type CommentViewProps = {
   comment: Comment;
@@ -28,27 +29,7 @@ function CommentView({
   const navigate = useNavigate();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const selection = window.getSelection();
-
-    if (
-      selection &&
-      selection.type === "Range" &&
-      selection.toString().length > 0
-    ) {
-      return;
-    }
-
-    const target = e.target as HTMLElement;
-
-    if (
-      target.closest("button") ||
-      target.closest("a") ||
-      target.closest("[data-no-navigate]")
-    ) {
-      return;
-    }
-
-    navigate(`/comment/${comment.id}`);
+    preventNavigation(e, navigate, "comment", comment.id);
   };
 
   if (isSelected) {
