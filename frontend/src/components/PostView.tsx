@@ -6,6 +6,7 @@ import InteractionButtons from "./InteractionButtons";
 import { useLike } from "@/hooks/useLike";
 import { useNavigate } from "react-router";
 import preventNavigation from "@/utils/preventNavigation";
+import OptionsButton from "./OptionsButton";
 
 type PostViewProps = {
   post: Post;
@@ -26,7 +27,7 @@ function PostView({ post }: PostViewProps) {
 
   return (
     <div
-      className="flex cursor-pointer flex-col gap-2 border p-4"
+      className="flex cursor-pointer flex-col gap-2 border-b-1 p-4"
       onClick={(e) => handleContainerClick(e)}
     >
       <div className="flex items-center gap-1 text-sm">
@@ -42,6 +43,10 @@ function PostView({ post }: PostViewProps) {
           <span className="text-neutral-500">
             {new Date(post.createdAt).toLocaleString()}
           </span>
+        </div>
+
+        <div className="flex grow justify-end">
+          <OptionsButton />
         </div>
       </div>
 

@@ -72,7 +72,7 @@ function CommentView({
 
   return (
     <div
-      className="flex cursor-pointer gap-2 p-2"
+      className="flex cursor-pointer gap-2 border-b-1 p-2"
       onClick={(e) => handleContainerClick(e)}
     >
       <div className="flex flex-col items-center">
