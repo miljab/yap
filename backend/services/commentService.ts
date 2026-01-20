@@ -127,6 +127,11 @@ const commentService = {
           images: true,
           user: true,
         },
+        orderBy: [
+          {
+            createdAt: "desc",
+          },
+        ],
       });
 
       const commentsWithMeta = await Promise.all(
@@ -249,6 +254,11 @@ const commentService = {
           images: true,
           user: true,
         },
+        orderBy: [
+          {
+            createdAt: "desc",
+          },
+        ],
       });
 
       const repliesWithMeta = await Promise.all(
