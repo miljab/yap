@@ -1,7 +1,7 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import type { Post } from "@/types/post";
+import type { Comment, Post } from "@/types/post";
 import PostView from "@/components/PostView";
 import CreateComment from "@/components/CreateComment";
 import PostComments from "@/components/PostComments";
@@ -11,6 +11,7 @@ function PostViewPage() {
   const axiosPrivate = useAxiosPrivate();
   const [post, setPost] = useState<Post | null>(null);
   const navigate = useNavigate();
+  const [comments, setComments] = useState<Comment[]>([]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -37,8 +38,12 @@ function PostViewPage() {
   return (
     <div className="flex flex-col gap-2 p-4">
       <PostView post={post} />
-      <CreateComment postId={post.id} />
-      <PostComments postId={post.id} />
+      <CreateComment postId={post.id} setComments={setComments} />
+      <PostComments
+        postId={post.id}
+        comments={comments}
+        setComments={setComments}
+      />
     </div>
   );
 }

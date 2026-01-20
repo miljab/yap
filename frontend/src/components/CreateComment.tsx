@@ -1,18 +1,20 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type SetStateAction } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { Spinner } from "./ui/spinner";
 import { Trash, Image } from "lucide-react";
+import type { Comment } from "@/types/post";
 
 const MAX_FILE_SIZE = 5242880; // 5MB
 
 type CreateCommentProps = {
   postId: string;
   parentId?: string;
+  setComments: React.Dispatch<SetStateAction<Comment[]>>;
 };
 
-function CreateComment({ postId, parentId }: CreateCommentProps) {
+function CreateComment({ postId, parentId, setComments }: CreateCommentProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState("");
@@ -50,6 +52,7 @@ function CreateComment({ postId, parentId }: CreateCommentProps) {
         }
         setSelectedFiles([]);
         setIsSubmitting(false);
+        setComments((prev) => [response.data, ...prev]);
       }
     } catch (error) {
       console.error(error);

@@ -1,17 +1,16 @@
 import CommentView from "./CommentView";
-import { useEffect, useState } from "react";
+import { useEffect, type SetStateAction } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import type { Comment } from "@/types/post";
 
 type PostCommentsProps = {
   postId: string;
+  comments: Comment[];
+  setComments: React.Dispatch<SetStateAction<Comment[]>>;
 };
 
-function PostComments({ postId }: PostCommentsProps) {
+function PostComments({ postId, comments, setComments }: PostCommentsProps) {
   const axiosPrivate = useAxiosPrivate();
-  const [comments, setComments] = useState<Comment[]>([]);
-
-  console.log(postId);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -19,14 +18,13 @@ function PostComments({ postId }: PostCommentsProps) {
         const response = await axiosPrivate.get(`/post/${postId}/comments`);
 
         setComments(response.data);
-        console.log(response.data);
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchComments();
-  }, [postId, axiosPrivate]);
+  }, [postId, axiosPrivate, setComments]);
 
   if (comments.length === 0) return null;
 

@@ -47,7 +47,11 @@ function ThreadView() {
       </div>
 
       <div>
-        <CreateComment postId={post.id} parentId={comment.id} />
+        <CreateComment
+          postId={post.id}
+          parentId={comment.id}
+          setComments={setReplies}
+        />
       </div>
 
       <div>

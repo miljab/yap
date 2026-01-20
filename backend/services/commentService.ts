@@ -50,6 +50,7 @@ const commentService = {
         },
         include: {
           images: true,
+          user: true,
         },
       });
 
@@ -105,6 +106,7 @@ const commentService = {
         },
         include: {
           images: true,
+          user: true,
         },
       });
 
