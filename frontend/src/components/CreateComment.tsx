@@ -54,6 +54,7 @@ function CreateComment({ postId, parentId }: CreateCommentProps) {
     } catch (error) {
       console.error(error);
       toast.error("Failed to create comment. Please try again.");
+      setIsSubmitting(false);
     }
   }
   function handleTextInput() {

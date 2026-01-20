@@ -45,6 +45,7 @@ function CreatePost() {
     } catch (error) {
       console.error(error);
       toast.error("Failed to create post. Please try again.");
+      setIsSubmitting(false);
     }
   }
   function handleTextInput() {
