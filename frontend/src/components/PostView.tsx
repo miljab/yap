@@ -7,6 +7,7 @@ import { useLike } from "@/hooks/useLike";
 import { useNavigate } from "react-router";
 import preventNavigation from "@/utils/preventNavigation";
 import OptionsButton from "./OptionsButton";
+import useAuth from "@/hooks/useAuth";
 
 type PostViewProps = {
   post: Post;
@@ -20,6 +21,7 @@ function PostView({ post }: PostViewProps) {
     initialLikeCount: post.likeCount,
   });
   const navigate = useNavigate();
+  const { auth } = useAuth();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     preventNavigation(e, navigate, "post", post.id);
@@ -45,9 +47,11 @@ function PostView({ post }: PostViewProps) {
           </span>
         </div>
 
-        <div className="flex grow justify-end">
-          <OptionsButton />
-        </div>
+        {auth.user?.id === post.user.id && (
+          <div className="flex grow justify-end">
+            <OptionsButton />
+          </div>
+        )}
       </div>
 
       <div>
