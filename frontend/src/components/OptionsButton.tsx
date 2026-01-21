@@ -5,8 +5,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
-function OptionsButton() {
+type OptionsButtonProps = {
+  itemType: "post" | "comment";
+  itemId: string;
+};
+
+function OptionsButton({ itemType, itemId }: OptionsButtonProps) {
+  const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
+
+  const handleDelete = async () => {
+    const apiUrl = `/${itemType}/${itemId}`;
+
+    try {
+      const response = await axiosPrivate.delete(apiUrl);
+
+      toast.info(response.data.message);
+      navigate("/home");
+    } catch (error) {
+      toast.error("Failed to delete post. Please try again.");
+      console.error(error);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -19,7 +44,7 @@ function OptionsButton() {
           <Edit />
           Edit
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-red-500">
+        <DropdownMenuItem className="text-red-500" onClick={handleDelete}>
           <Trash className="text-red-500" />
           Delete
         </DropdownMenuItem>

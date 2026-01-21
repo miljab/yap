@@ -49,7 +49,7 @@ function PostView({ post }: PostViewProps) {
 
         {auth.user?.id === post.user.id && (
           <div className="flex grow justify-end">
-            <OptionsButton />
+            <OptionsButton itemType="post" itemId={post.id} />
           </div>
         )}
       </div>

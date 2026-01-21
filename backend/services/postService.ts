@@ -51,7 +51,7 @@ export const postService = {
     }
   },
 
-  getPostById: async (postId: string, userId: string | undefined) => {
+  getPostById: async (postId: string, userId: string) => {
     try {
       const post = await prisma.post.findUnique({
         where: {
@@ -86,10 +86,8 @@ export const postService = {
     }
   },
 
-  likePost: async (postId: string, userId: string | undefined) => {
+  likePost: async (postId: string, userId: string) => {
     try {
-      if (!userId) throw new AppError("User ID is required", 400);
-
       const post = await prisma.post.findUnique({
         where: {
           id: postId,
@@ -132,6 +130,31 @@ export const postService = {
       });
 
       return likeCount;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  deletePost: async (postId: string, userId: string) => {
+    try {
+      const post = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+      });
+
+      if (!post) throw new AppError("Post not found", 404);
+
+      if (post.userId !== userId)
+        throw new AppError("You are not authorized to delete this post", 403);
+
+      await prisma.post.delete({
+        where: {
+          id: postId,
+        },
+      });
+
+      return { message: "Post deleted successfully" };
     } catch (error) {
       throw error;
     }

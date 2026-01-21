@@ -28,7 +28,7 @@ export const createNewPost = async (req: Request, res: Response) => {
       if (!ALLOWED_IMAGE_MIME.test(f.mimetype)) {
         throw new AppError(
           "Only image files (png,jpg,jpeg,webp,gif) are allowed",
-          400
+          400,
         );
       }
     }
@@ -57,6 +57,8 @@ export const getPostById = async (req: Request, res: Response) => {
   try {
     if (!postId) throw new AppError("Post ID is required", 400);
 
+    if (!userId) throw new AppError("User ID is required", 401);
+
     const post = await postService.getPostById(postId, userId);
     res.status(200).json(post);
   } catch (error) {
@@ -76,9 +78,33 @@ export const likePost = async (req: Request, res: Response) => {
   try {
     if (!postId) throw new AppError("Post ID is required", 400);
 
+    if (!userId) throw new AppError("User ID is required", 401);
+
     const updatedLikeCount = await postService.likePost(postId, userId);
 
     res.status(200).json({ likeCount: updatedLikeCount });
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
+
+export const deletePost = async (req: Request, res: Response) => {
+  const postId = req.params.id;
+  const userId = req.user?.id;
+
+  try {
+    if (!postId) throw new AppError("Post ID is required", 400);
+
+    if (!userId) throw new AppError("User ID is required", 401);
+
+    const result = await postService.deletePost(postId, userId);
+
+    res.status(200).json(result);
   } catch (error) {
     console.error(error);
     const { message, statusCode } = handleError(error);
