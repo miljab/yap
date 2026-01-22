@@ -1,8 +1,6 @@
-import cloudinary from "../config/cloudinary.js";
-import { nanoid } from "nanoid";
 import { prisma } from "../prisma/prismaClient.js";
-import fs from "fs/promises";
 import AppError from "../utils/appError.js";
+import { uploadImages } from "../utils/cloudinaryHelper.js";
 
 export const postService = {
   createPost: async ({
@@ -14,22 +12,7 @@ export const postService = {
     text: string;
     images: Express.Multer.File[];
   }) => {
-    let imageUrls = [];
-
-    for (const image of images) {
-      const result = await cloudinary.uploader.upload(image.path, {
-        folder: "post-images",
-        public_id: nanoid(),
-      });
-      imageUrls.push(result.secure_url);
-
-      await fs.unlink(image.path);
-    }
-
-    const imagesData = imageUrls.map((url, idx) => ({
-      url,
-      orderIndex: idx,
-    }));
+    const imagesData = await uploadImages(images, "post-images");
 
     const post = await prisma.post.create({
       data: {

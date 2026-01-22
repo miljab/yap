@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 import AppError from "../utils/appError.js";
 import type { Comment } from "@prisma/client";
 import { postService } from "./postService.js";
+import { uploadImages } from "../utils/cloudinaryHelper.js";
 
 const commentService = {
   replyToPost: async (
@@ -21,22 +22,7 @@ const commentService = {
 
     if (!post) throw new AppError("Post not found", 404);
 
-    let imageUrls = [];
-
-    for (const image of images) {
-      const result = await cloudinary.uploader.upload(image.path, {
-        folder: "comment-images",
-        public_id: nanoid(),
-      });
-      imageUrls.push(result.secure_url);
-
-      await fs.unlink(image.path);
-    }
-
-    const imagesData = imageUrls.map((url, idx) => ({
-      url,
-      orderIndex: idx,
-    }));
+    const imagesData = await uploadImages(images, "comment-images");
 
     const comment = await prisma.comment.create({
       data: {
@@ -68,26 +54,9 @@ const commentService = {
       },
     });
 
-    console.log(commentId);
-
     if (!parentComment) throw new AppError("Comment not found", 404);
 
-    let imageUrls = [];
-
-    for (const image of images) {
-      const result = await cloudinary.uploader.upload(image.path, {
-        folder: "comment-images",
-        public_id: nanoid(),
-      });
-      imageUrls.push(result.secure_url);
-
-      await fs.unlink(image.path);
-    }
-
-    const imagesData = imageUrls.map((url, idx) => ({
-      url,
-      orderIndex: idx,
-    }));
+    const imagesData = await uploadImages(images, "comment-images");
 
     const comment = await prisma.comment.create({
       data: {
@@ -135,37 +104,33 @@ const commentService = {
   },
 
   getCommentMeta: async (comment: Comment, userId?: string) => {
-    try {
-      const [likeCount, commentCount, isLiked] = await Promise.all([
-        prisma.commentLike.count({
-          where: { commentId: comment.id },
-        }),
-        prisma.comment.count({
-          where: { parentId: comment.id },
-        }),
-        userId
-          ? prisma.commentLike
-              .findUnique({
-                where: {
-                  userId_commentId: {
-                    userId,
-                    commentId: comment.id,
-                  },
+    const [likeCount, commentCount, isLiked] = await Promise.all([
+      prisma.commentLike.count({
+        where: { commentId: comment.id },
+      }),
+      prisma.comment.count({
+        where: { parentId: comment.id },
+      }),
+      userId
+        ? prisma.commentLike
+            .findUnique({
+              where: {
+                userId_commentId: {
+                  userId,
+                  commentId: comment.id,
                 },
-              })
-              .then((like) => !!like)
-          : Promise.resolve(false),
-      ]);
+              },
+            })
+            .then((like) => !!like)
+        : Promise.resolve(false),
+    ]);
 
-      return {
-        ...comment,
-        likeCount,
-        commentCount,
-        isLiked,
-      };
-    } catch (error) {
-      throw error;
-    }
+    return {
+      ...comment,
+      likeCount,
+      commentCount,
+      isLiked,
+    };
   },
 
   likeComment: async (userId: string, commentId: string) => {
