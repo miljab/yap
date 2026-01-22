@@ -13,51 +13,47 @@ const commentService = {
     text: string,
     images: Express.Multer.File[],
   ) => {
-    try {
-      const post = await prisma.post.findUnique({
-        where: {
-          id: postId,
-        },
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (!post) throw new AppError("Post not found", 404);
+
+    let imageUrls = [];
+
+    for (const image of images) {
+      const result = await cloudinary.uploader.upload(image.path, {
+        folder: "comment-images",
+        public_id: nanoid(),
       });
+      imageUrls.push(result.secure_url);
 
-      if (!post) throw new AppError("Post not found", 404);
-
-      let imageUrls = [];
-
-      for (const image of images) {
-        const result = await cloudinary.uploader.upload(image.path, {
-          folder: "comment-images",
-          public_id: nanoid(),
-        });
-        imageUrls.push(result.secure_url);
-
-        await fs.unlink(image.path);
-      }
-
-      const imagesData = imageUrls.map((url, idx) => ({
-        url,
-        orderIndex: idx,
-      }));
-
-      const comment = await prisma.comment.create({
-        data: {
-          content: text,
-          postId,
-          userId,
-          images: {
-            create: imagesData,
-          },
-        },
-        include: {
-          images: true,
-          user: true,
-        },
-      });
-
-      return comment;
-    } catch (error) {
-      throw error;
+      await fs.unlink(image.path);
     }
+
+    const imagesData = imageUrls.map((url, idx) => ({
+      url,
+      orderIndex: idx,
+    }));
+
+    const comment = await prisma.comment.create({
+      data: {
+        content: text,
+        postId,
+        userId,
+        images: {
+          create: imagesData,
+        },
+      },
+      include: {
+        images: true,
+        user: true,
+      },
+    });
+
+    return comment;
   },
 
   replyToComment: async (
@@ -66,84 +62,76 @@ const commentService = {
     text: string,
     images: Express.Multer.File[],
   ) => {
-    try {
-      const parentComment = await prisma.comment.findUnique({
-        where: {
-          id: commentId,
-        },
+    const parentComment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+    });
+
+    console.log(commentId);
+
+    if (!parentComment) throw new AppError("Comment not found", 404);
+
+    let imageUrls = [];
+
+    for (const image of images) {
+      const result = await cloudinary.uploader.upload(image.path, {
+        folder: "comment-images",
+        public_id: nanoid(),
       });
+      imageUrls.push(result.secure_url);
 
-      console.log(commentId);
-
-      if (!parentComment) throw new AppError("Comment not found", 404);
-
-      let imageUrls = [];
-
-      for (const image of images) {
-        const result = await cloudinary.uploader.upload(image.path, {
-          folder: "comment-images",
-          public_id: nanoid(),
-        });
-        imageUrls.push(result.secure_url);
-
-        await fs.unlink(image.path);
-      }
-
-      const imagesData = imageUrls.map((url, idx) => ({
-        url,
-        orderIndex: idx,
-      }));
-
-      const comment = await prisma.comment.create({
-        data: {
-          content: text,
-          postId: parentComment.postId,
-          parentId: parentComment.id,
-          userId,
-          images: {
-            create: imagesData,
-          },
-        },
-        include: {
-          images: true,
-          user: true,
-        },
-      });
-
-      return comment;
-    } catch (error) {
-      throw error;
+      await fs.unlink(image.path);
     }
+
+    const imagesData = imageUrls.map((url, idx) => ({
+      url,
+      orderIndex: idx,
+    }));
+
+    const comment = await prisma.comment.create({
+      data: {
+        content: text,
+        postId: parentComment.postId,
+        parentId: parentComment.id,
+        userId,
+        images: {
+          create: imagesData,
+        },
+      },
+      include: {
+        images: true,
+        user: true,
+      },
+    });
+
+    return comment;
   },
 
   getComments: async (postId: string, userId?: string) => {
-    try {
-      const comments = await prisma.comment.findMany({
-        where: {
-          postId,
-          parentId: null,
+    const comments = await prisma.comment.findMany({
+      where: {
+        postId,
+        parentId: null,
+      },
+      include: {
+        images: true,
+        user: true,
+      },
+      orderBy: [
+        {
+          createdAt: "desc",
         },
-        include: {
-          images: true,
-          user: true,
-        },
-        orderBy: [
-          {
-            createdAt: "desc",
-          },
-        ],
-      });
+      ],
+    });
 
-      const commentsWithMeta = await Promise.all(
-        comments.map(async (comment) =>
-          commentService.getCommentMeta(comment, userId),
-        ),
-      );
+    const commentsWithMeta = await Promise.all(
+      comments.map(async (comment) =>
+        commentService.getCommentMeta(comment, userId),
+      ),
+    );
 
-      return commentsWithMeta;
-    } catch (error) {
-      throw error;
-    }
+    return commentsWithMeta;
   },
 
   getCommentMeta: async (comment: Comment, userId?: string) => {
@@ -181,14 +169,23 @@ const commentService = {
   },
 
   likeComment: async (userId: string, commentId: string) => {
-    try {
-      const comment = await prisma.comment.findUnique({
-        where: { id: commentId },
-      });
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+    });
 
-      if (!comment) throw new AppError("Comment not found", 404);
+    if (!comment) throw new AppError("Comment not found", 404);
 
-      const like = await prisma.commentLike.findUnique({
+    const like = await prisma.commentLike.findUnique({
+      where: {
+        userId_commentId: {
+          userId,
+          commentId,
+        },
+      },
+    });
+
+    if (like) {
+      await prisma.commentLike.delete({
         where: {
           userId_commentId: {
             userId,
@@ -196,40 +193,70 @@ const commentService = {
           },
         },
       });
-
-      if (like) {
-        await prisma.commentLike.delete({
-          where: {
-            userId_commentId: {
-              userId,
-              commentId,
-            },
-          },
-        });
-      } else {
-        await prisma.commentLike.create({
-          data: {
-            userId,
-            commentId,
-          },
-        });
-      }
-
-      const likeCount = await prisma.commentLike.count({
-        where: { commentId },
+    } else {
+      await prisma.commentLike.create({
+        data: {
+          userId,
+          commentId,
+        },
       });
-
-      return likeCount;
-    } catch (error) {
-      throw error;
     }
+
+    const likeCount = await prisma.commentLike.count({
+      where: { commentId },
+    });
+
+    return likeCount;
   },
 
   getThread: async (commentId: string, userId: string) => {
-    try {
-      const comment = await prisma.comment.findUnique({
+    const comment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      include: {
+        images: true,
+        user: true,
+      },
+    });
+
+    if (!comment) throw new AppError("Comment not found", 404);
+
+    const commentWithMeta = await commentService.getCommentMeta(
+      comment,
+      userId,
+    );
+
+    const post = await postService.getPostById(comment.postId, userId);
+
+    const replies = await prisma.comment.findMany({
+      where: {
+        parentId: comment.id,
+      },
+      include: {
+        images: true,
+        user: true,
+      },
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+    });
+
+    const repliesWithMeta = await Promise.all(
+      replies.map(async (reply) =>
+        commentService.getCommentMeta(reply, userId),
+      ),
+    );
+
+    const parentComments = [];
+    let currentParentId = comment.parentId;
+
+    while (currentParentId) {
+      const parentComment = await prisma.comment.findUnique({
         where: {
-          id: commentId,
+          id: currentParentId,
         },
         include: {
           images: true,
@@ -237,69 +264,22 @@ const commentService = {
         },
       });
 
-      if (!comment) throw new AppError("Comment not found", 404);
+      if (!parentComment) break;
 
-      const commentWithMeta = await commentService.getCommentMeta(
-        comment,
-        userId,
-      );
-
-      const post = await postService.getPostById(comment.postId, userId);
-
-      const replies = await prisma.comment.findMany({
-        where: {
-          parentId: comment.id,
-        },
-        include: {
-          images: true,
-          user: true,
-        },
-        orderBy: [
-          {
-            createdAt: "desc",
-          },
-        ],
-      });
-
-      const repliesWithMeta = await Promise.all(
-        replies.map(async (reply) =>
-          commentService.getCommentMeta(reply, userId),
-        ),
-      );
-
-      const parentComments = [];
-      let currentParentId = comment.parentId;
-
-      while (currentParentId) {
-        const parentComment = await prisma.comment.findUnique({
-          where: {
-            id: currentParentId,
-          },
-          include: {
-            images: true,
-            user: true,
-          },
-        });
-
-        if (!parentComment) break;
-
-        parentComments.unshift(parentComment);
-        currentParentId = parentComment?.parentId;
-      }
-
-      const parentCommentsWithMeta = await Promise.all(
-        parentComments.map((com) => commentService.getCommentMeta(com, userId)),
-      );
-
-      return {
-        comment: commentWithMeta,
-        post,
-        replies: repliesWithMeta,
-        parentComments: parentCommentsWithMeta,
-      };
-    } catch (error) {
-      throw error;
+      parentComments.unshift(parentComment);
+      currentParentId = parentComment?.parentId;
     }
+
+    const parentCommentsWithMeta = await Promise.all(
+      parentComments.map((com) => commentService.getCommentMeta(com, userId)),
+    );
+
+    return {
+      comment: commentWithMeta,
+      post,
+      replies: repliesWithMeta,
+      parentComments: parentCommentsWithMeta,
+    };
   },
 };
 

@@ -14,89 +14,90 @@ export const postService = {
     text: string;
     images: Express.Multer.File[];
   }) => {
-    try {
-      let imageUrls = [];
+    let imageUrls = [];
 
-      for (const image of images) {
-        const result = await cloudinary.uploader.upload(image.path, {
-          folder: "post-images",
-          public_id: nanoid(),
-        });
-        imageUrls.push(result.secure_url);
-
-        await fs.unlink(image.path);
-      }
-
-      const imagesData = imageUrls.map((url, idx) => ({
-        url,
-        orderIndex: idx,
-      }));
-
-      const post = await prisma.post.create({
-        data: {
-          content: text,
-          userId,
-          images: {
-            create: imagesData,
-          },
-        },
-        include: {
-          images: true,
-        },
+    for (const image of images) {
+      const result = await cloudinary.uploader.upload(image.path, {
+        folder: "post-images",
+        public_id: nanoid(),
       });
+      imageUrls.push(result.secure_url);
 
-      return post;
-    } catch (error) {
-      throw error;
+      await fs.unlink(image.path);
     }
+
+    const imagesData = imageUrls.map((url, idx) => ({
+      url,
+      orderIndex: idx,
+    }));
+
+    const post = await prisma.post.create({
+      data: {
+        content: text,
+        userId,
+        images: {
+          create: imagesData,
+        },
+      },
+      include: {
+        images: true,
+      },
+    });
+
+    return post;
   },
 
   getPostById: async (postId: string, userId: string) => {
-    try {
-      const post = await prisma.post.findUnique({
-        where: {
-          id: postId,
-        },
-        include: {
-          images: true,
-          user: true,
-          likes: true,
-        },
-      });
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        images: true,
+        user: true,
+        likes: true,
+      },
+    });
 
-      if (!post) throw new AppError("Post not found", 404);
+    if (!post) throw new AppError("Post not found", 404);
 
-      const isLiked = post.likes.some((like) => like.userId === userId);
-      const likeCount = post.likes.length;
+    const isLiked = post.likes.some((like) => like.userId === userId);
+    const likeCount = post.likes.length;
 
-      const commentCount = await prisma.comment.count({
-        where: {
-          postId,
-          parentId: null,
-        },
-      });
+    const commentCount = await prisma.comment.count({
+      where: {
+        postId,
+        parentId: null,
+      },
+    });
 
-      if (userId !== post.user.id) {
-        return { ...post, isLiked, likeCount, commentCount, likes: [] };
-      }
-
-      return { ...post, isLiked, likeCount, commentCount };
-    } catch (error) {
-      throw error;
+    if (userId !== post.user.id) {
+      return { ...post, isLiked, likeCount, commentCount, likes: [] };
     }
+
+    return { ...post, isLiked, likeCount, commentCount };
   },
 
   likePost: async (postId: string, userId: string) => {
-    try {
-      const post = await prisma.post.findUnique({
-        where: {
-          id: postId,
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (!post) throw new AppError("Post not found", 404);
+
+    const like = await prisma.postLike.findUnique({
+      where: {
+        userId_postId: {
+          postId,
+          userId,
         },
-      });
+      },
+    });
 
-      if (!post) throw new AppError("Post not found", 404);
-
-      const like = await prisma.postLike.findUnique({
+    if (like) {
+      await prisma.postLike.delete({
         where: {
           userId_postId: {
             postId,
@@ -104,59 +105,42 @@ export const postService = {
           },
         },
       });
-
-      if (like) {
-        await prisma.postLike.delete({
-          where: {
-            userId_postId: {
-              postId,
-              userId,
-            },
-          },
-        });
-      } else {
-        await prisma.postLike.create({
-          data: {
-            postId,
-            userId,
-          },
-        });
-      }
-
-      const likeCount = await prisma.postLike.count({
-        where: {
+    } else {
+      await prisma.postLike.create({
+        data: {
           postId,
+          userId,
         },
       });
-
-      return likeCount;
-    } catch (error) {
-      throw error;
     }
+
+    const likeCount = await prisma.postLike.count({
+      where: {
+        postId,
+      },
+    });
+
+    return likeCount;
   },
 
   deletePost: async (postId: string, userId: string) => {
-    try {
-      const post = await prisma.post.findUnique({
-        where: {
-          id: postId,
-        },
-      });
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
 
-      if (!post) throw new AppError("Post not found", 404);
+    if (!post) throw new AppError("Post not found", 404);
 
-      if (post.userId !== userId)
-        throw new AppError("You are not authorized to delete this post", 403);
+    if (post.userId !== userId)
+      throw new AppError("You are not authorized to delete this post", 403);
 
-      await prisma.post.delete({
-        where: {
-          id: postId,
-        },
-      });
+    await prisma.post.delete({
+      where: {
+        id: postId,
+      },
+    });
 
-      return { message: "Post deleted successfully" };
-    } catch (error) {
-      throw error;
-    }
+    return { message: "Post deleted successfully" };
   },
 };
