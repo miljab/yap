@@ -1,6 +1,6 @@
 import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
-import { uploadImages } from "../utils/cloudinaryHelper.js";
+import { deleteImages, uploadImages } from "../utils/cloudinaryHelper.js";
 
 export const postService = {
   createPost: async ({
@@ -117,6 +117,17 @@ export const postService = {
 
     if (post.userId !== userId)
       throw new AppError("You are not authorized to delete this post", 403);
+
+    const images = await prisma.image.findMany({
+      where: {
+        postId: postId,
+      },
+    });
+
+    if (images.length > 0) {
+      const deletionResult = await deleteImages(images);
+      console.log(deletionResult);
+    }
 
     await prisma.post.delete({
       where: {

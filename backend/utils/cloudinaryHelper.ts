@@ -30,3 +30,11 @@ export const uploadImages = async (
 
   return imagesDbData;
 };
+
+export const deleteImages = async (images: Image[]) => {
+  const resources = images.map((image) => image.cloudinaryPublicId);
+
+  const result = await cloudinary.api.delete_resources(resources);
+
+  return result;
+};
