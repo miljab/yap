@@ -8,6 +8,17 @@ import {
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { Button } from "./ui/button";
 
 type OptionsButtonProps = {
   itemType: "post" | "comment";
@@ -44,10 +55,39 @@ function OptionsButton({ itemType, itemId }: OptionsButtonProps) {
           <Edit />
           Edit
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-red-500" onClick={handleDelete}>
-          <Trash className="text-red-500" />
-          Delete
-        </DropdownMenuItem>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <DropdownMenuItem
+              variant="destructive"
+              onSelect={(e) => e.preventDefault()}
+            >
+              <Trash />
+              Delete
+            </DropdownMenuItem>
+          </DialogTrigger>
+
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                Are you sure you want to delete this {itemType}?
+              </DialogTitle>
+              <DialogDescription>
+                This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button>Cancel</Button>
+              </DialogClose>
+
+              <Button variant="destructive" onClick={handleDelete}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </DropdownMenuContent>
     </DropdownMenu>
   );
