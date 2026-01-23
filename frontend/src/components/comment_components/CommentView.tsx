@@ -1,9 +1,9 @@
 import type { Comment } from "@/types/post";
-import { Avatar, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarImage } from "../ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import defaultAvatar from "@/assets/default-avatar.png";
-import ImagePreview from "./ImagePreview";
-import InteractionButtons from "./InteractionButtons";
+import ImagePreview from "../ImagePreview";
+import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
 import { useNavigate } from "react-router";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";

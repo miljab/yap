@@ -1,4 +1,4 @@
-import LoginCard from "@/components/LoginCard";
+import LoginCard from "@/components/auth_components/LoginCard";
 import { MemoryRouter } from "react-router";
 import { describe, vi, beforeEach, it, expect } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";

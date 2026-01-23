@@ -1,7 +1,7 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import PostView from "./PostView";
+import PostView from "../post_components/PostView";
 import type { Post, Comment } from "@/types/post";
 import CommentView from "./CommentView";
 import CreateComment from "./CreateComment";

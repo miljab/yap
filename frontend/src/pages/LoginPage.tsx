@@ -1,4 +1,4 @@
-import LoginCard from "@/components/LoginCard";
+import LoginCard from "@/components/auth_components/LoginCard";
 import { Link } from "react-router";
 
 function LoginPage() {

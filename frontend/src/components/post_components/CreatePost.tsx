@@ -1,9 +1,9 @@
 import { Image, Trash } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import { Spinner } from "./ui/spinner";
+import { Spinner } from "../ui/spinner";
 
 const MAX_FILE_SIZE = 5242880; // 5MB
 

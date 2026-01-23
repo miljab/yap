@@ -1,4 +1,4 @@
-import AuthOptions from "@/components/AuthOptions";
+import AuthOptions from "@/components/auth_components/AuthOptions";
 import Hero from "@/components/Hero";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";

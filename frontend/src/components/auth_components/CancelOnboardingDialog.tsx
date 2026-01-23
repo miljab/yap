@@ -6,8 +6,8 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+} from "../ui/dialog";
+import { Button } from "../ui/button";
 import { useNavigate } from "react-router";
 import axios from "@/api/axios";
 

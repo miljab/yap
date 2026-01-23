@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import useTheme from "@/hooks/useTheme";
 import useAuth from "@/hooks/useAuth";
 import axios from "@/api/axios";

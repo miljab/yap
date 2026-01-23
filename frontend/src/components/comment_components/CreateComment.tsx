@@ -1,8 +1,8 @@
 import { useRef, useState, type SetStateAction } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { Spinner } from "./ui/spinner";
+import { Button } from "../ui/button";
+import { Spinner } from "../ui/spinner";
 import { Trash, Image } from "lucide-react";
 import type { Comment } from "@/types/post";
 

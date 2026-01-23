@@ -1,56 +1,73 @@
-import { signupSchema } from "@/schemas/signupSchema";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { onboardingSchema } from "@/schemas/onboardingSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import type z from "zod";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "../ui/card";
 import {
   Form,
-  FormControl,
   FormField,
-  FormLabel,
-  FormMessage,
   FormItem,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import axios from "@/api/axios";
-import { isAxiosError } from "axios";
+import useAuth from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
-import { useState } from "react";
+import { isAxiosError } from "axios";
+import type { User } from "@/types/user";
+import CancelOnboardingDialog from "./CancelOnboardingDialog";
 
-type SignupFormData = z.infer<typeof signupSchema>;
+type OnboardingFormData = z.infer<typeof onboardingSchema>;
 
-function SignupCard() {
-  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+type OnboardingUserData = {
+  onboardingUser: User;
+};
+
+function OnboardingCard({ onboardingUser }: OnboardingUserData) {
+  const { setAuth } = useAuth();
   const navigate = useNavigate();
-  const form = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema),
+
+  const form = useForm<OnboardingFormData>({
+    resolver: zodResolver(onboardingSchema),
     mode: "onTouched",
     defaultValues: {
-      email: "",
+      email: onboardingUser.email || "",
       username: "",
-      password: "",
-      confirmPassword: "",
     },
   });
 
-  async function onSubmit(data: SignupFormData) {
+  async function onSubmit(data: OnboardingFormData) {
     try {
-      await axios.post("/auth/signup", data);
+      const response = await axios.post("/auth/onboarding", data, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
 
-      navigate("/?signup=success");
+      const accessToken = response.data.accessToken;
+      const user = response.data.user;
+
+      setAuth({ user, accessToken });
+      navigate("/home");
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         const responseData = error.response.data;
+
         if (responseData.errors && Array.isArray(responseData.errors)) {
           responseData.errors.forEach(
-            (err: { path: keyof SignupFormData | "root"; error: string }) => {
+            (err: {
+              path: keyof OnboardingFormData | "root";
+              error: string;
+            }) => {
               form.setError(err.path, {
                 type: "server",
                 message: err.error,
@@ -82,11 +99,14 @@ function SignupCard() {
   return (
     <Card className="w-full px-4 py-8">
       <CardHeader>
-        <CardTitle className="text-center text-2xl">Sign up</CardTitle>
+        <CardTitle className="text-lg">Create a username</CardTitle>
+        <CardDescription>
+          Your username will be visible to other users.
+        </CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="flex flex-col gap-8">
+          <CardContent className="flex flex-col gap-4">
             {form.formState.errors.root && (
               <div className="text-destructive">
                 {form.formState.errors.root.message}
@@ -99,7 +119,12 @@ function SignupCard() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" {...field} />
+                    <Input
+                      type="email"
+                      {...field}
+                      required
+                      disabled={onboardingUser.email ? true : false}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -112,49 +137,12 @@ function SignupCard() {
                 <FormItem>
                   <div className="flex justify-between">
                     <FormLabel>Username</FormLabel>
-                    <div
-                      className={`text-muted-foreground text-sm transition-opacity duration-300 ${
-                        isUsernameFocused ? "opacity-100" : "opacity-0"
-                      }`}
-                    >
+                    <div className="text-muted-foreground text-sm">
                       {usernameLength}/32
                     </div>
                   </div>
                   <FormControl>
-                    <Input
-                      {...field}
-                      onFocus={() => setIsUsernameFocused(true)}
-                      onBlur={() => {
-                        field.onBlur();
-                        setIsUsernameFocused(false);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
+                    <Input {...field} required minLength={5} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,9 +150,10 @@ function SignupCard() {
             />
           </CardContent>
 
-          <CardFooter className="mt-12">
-            <Button type="submit" className="ml-auto">
-              Create account
+          <CardFooter className="mt-8 flex justify-between gap-4">
+            <CancelOnboardingDialog />
+            <Button type="submit" className="grow">
+              Confirm
             </Button>
           </CardFooter>
         </form>
@@ -173,4 +162,4 @@ function SignupCard() {
   );
 }
 
-export default SignupCard;
+export default OnboardingCard;

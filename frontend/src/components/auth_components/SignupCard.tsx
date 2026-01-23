@@ -1,73 +1,56 @@
-import { onboardingSchema } from "@/schemas/onboardingSchema";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { signupSchema } from "@/schemas/signupSchema";
 import { useForm } from "react-hook-form";
-import type z from "zod";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "../ui/card";
 import {
   Form,
-  FormField,
-  FormItem,
-  FormLabel,
   FormControl,
+  FormField,
+  FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+  FormItem,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import axios from "@/api/axios";
-import useAuth from "@/hooks/useAuth";
-import { useNavigate } from "react-router";
 import { isAxiosError } from "axios";
-import type { User } from "@/types/user";
-import CancelOnboardingDialog from "./CancelOnboardingDialog";
+import { useNavigate } from "react-router";
+import { useState } from "react";
 
-type OnboardingFormData = z.infer<typeof onboardingSchema>;
+type SignupFormData = z.infer<typeof signupSchema>;
 
-type OnboardingUserData = {
-  onboardingUser: User;
-};
-
-function OnboardingCard({ onboardingUser }: OnboardingUserData) {
-  const { setAuth } = useAuth();
+function SignupCard() {
+  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const navigate = useNavigate();
-
-  const form = useForm<OnboardingFormData>({
-    resolver: zodResolver(onboardingSchema),
+  const form = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
     mode: "onTouched",
     defaultValues: {
-      email: onboardingUser.email || "",
+      email: "",
       username: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
-  async function onSubmit(data: OnboardingFormData) {
+  async function onSubmit(data: SignupFormData) {
     try {
-      const response = await axios.post("/auth/onboarding", data, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+      await axios.post("/auth/signup", data);
 
-      const accessToken = response.data.accessToken;
-      const user = response.data.user;
-
-      setAuth({ user, accessToken });
-      navigate("/home");
+      navigate("/?signup=success");
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         const responseData = error.response.data;
-
         if (responseData.errors && Array.isArray(responseData.errors)) {
           responseData.errors.forEach(
-            (err: {
-              path: keyof OnboardingFormData | "root";
-              error: string;
-            }) => {
+            (err: { path: keyof SignupFormData | "root"; error: string }) => {
               form.setError(err.path, {
                 type: "server",
                 message: err.error,
@@ -99,14 +82,11 @@ function OnboardingCard({ onboardingUser }: OnboardingUserData) {
   return (
     <Card className="w-full px-4 py-8">
       <CardHeader>
-        <CardTitle className="text-lg">Create a username</CardTitle>
-        <CardDescription>
-          Your username will be visible to other users.
-        </CardDescription>
+        <CardTitle className="text-center text-2xl">Sign up</CardTitle>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent className="flex flex-col gap-8">
             {form.formState.errors.root && (
               <div className="text-destructive">
                 {form.formState.errors.root.message}
@@ -119,12 +99,7 @@ function OnboardingCard({ onboardingUser }: OnboardingUserData) {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      {...field}
-                      required
-                      disabled={onboardingUser.email ? true : false}
-                    />
+                    <Input type="email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -137,12 +112,49 @@ function OnboardingCard({ onboardingUser }: OnboardingUserData) {
                 <FormItem>
                   <div className="flex justify-between">
                     <FormLabel>Username</FormLabel>
-                    <div className="text-muted-foreground text-sm">
+                    <div
+                      className={`text-muted-foreground text-sm transition-opacity duration-300 ${
+                        isUsernameFocused ? "opacity-100" : "opacity-0"
+                      }`}
+                    >
                       {usernameLength}/32
                     </div>
                   </div>
                   <FormControl>
-                    <Input {...field} required minLength={5} />
+                    <Input
+                      {...field}
+                      onFocus={() => setIsUsernameFocused(true)}
+                      onBlur={() => {
+                        field.onBlur();
+                        setIsUsernameFocused(false);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm password</FormLabel>
+                  <FormControl>
+                    <Input type="password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -150,10 +162,9 @@ function OnboardingCard({ onboardingUser }: OnboardingUserData) {
             />
           </CardContent>
 
-          <CardFooter className="mt-8 flex justify-between gap-4">
-            <CancelOnboardingDialog />
-            <Button type="submit" className="grow">
-              Confirm
+          <CardFooter className="mt-12">
+            <Button type="submit" className="ml-auto">
+              Create account
             </Button>
           </CardFooter>
         </form>
@@ -162,4 +173,4 @@ function OnboardingCard({ onboardingUser }: OnboardingUserData) {
   );
 }
 
-export default OnboardingCard;
+export default SignupCard;

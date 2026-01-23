@@ -1,6 +1,6 @@
 import ClassicAuthOptions from "./ClassicAuthOptions";
 import OAuthButtons from "./OAuthButtons";
-import Divider from "./ui/Divider";
+import Divider from "../ui/Divider";
 
 function AuthOptions() {
   return (

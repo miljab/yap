@@ -1,4 +1,4 @@
-import SignupCard from "@/components/SignupCard";
+import SignupCard from "@/components/auth_components/SignupCard";
 import { Link } from "react-router";
 
 function SignupPage() {

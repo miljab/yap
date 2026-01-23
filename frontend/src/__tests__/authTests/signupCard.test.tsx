@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import axios from "@/api/axios";
-import SignupCard from "@/components/SignupCard";
+import SignupCard from "@/components/auth_components/SignupCard";
 import { MemoryRouter } from "react-router";
 
 vi.mock("@/api/axios");

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import OnboardingCard from "../components/OnboardingCard";
+import OnboardingCard from "../components/auth_components/OnboardingCard";
 import { Spinner } from "@/components/ui/spinner";
 import type { User } from "@/types/user";
 import axios from "@/api/axios";

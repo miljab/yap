@@ -3,13 +3,13 @@ import { useEffect, type SetStateAction } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import type { Comment } from "@/types/post";
 
-type PostCommentsProps = {
+type CommentsProps = {
   postId: string;
   comments: Comment[];
   setComments: React.Dispatch<SetStateAction<Comment[]>>;
 };
 
-function PostComments({ postId, comments, setComments }: PostCommentsProps) {
+function Comments({ postId, comments, setComments }: CommentsProps) {
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
@@ -36,4 +36,4 @@ function PostComments({ postId, comments, setComments }: PostCommentsProps) {
     </div>
   );
 }
-export default PostComments;
+export default Comments;

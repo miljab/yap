@@ -6,8 +6,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import { loginSchema } from "../schemas/loginSchema";
+} from "../ui/card";
+import { loginSchema } from "@/schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -16,9 +16,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import { useNavigate } from "react-router";
 import axios from "@/api/axios";
 import useAuth from "@/hooks/useAuth";

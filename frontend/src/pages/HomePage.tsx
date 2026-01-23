@@ -1,4 +1,4 @@
-import CreatePost from "@/components/CreatePost";
+import CreatePost from "@/components/post_components/CreatePost";
 
 function HomePage() {
   return (

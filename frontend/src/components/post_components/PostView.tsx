@@ -1,12 +1,12 @@
-import { type Post } from "../types/post";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { type Post } from "@/types/post";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import defaultAvatar from "@/assets/default-avatar.png";
-import ImagePreview from "./ImagePreview";
-import InteractionButtons from "./InteractionButtons";
+import ImagePreview from "../ImagePreview";
+import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
 import { useNavigate } from "react-router";
 import preventNavigation from "@/utils/preventNavigation";
-import OptionsButton from "./OptionsButton";
+import OptionsButton from "../OptionsButton";
 import useAuth from "@/hooks/useAuth";
 
 type PostViewProps = {

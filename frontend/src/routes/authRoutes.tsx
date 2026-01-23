@@ -3,7 +3,7 @@ import RequireAuth from "@/components/RequireAuth";
 import HomePage from "@/pages/HomePage";
 import AuthLayout from "@/layouts/AuthLayout";
 import PostViewPage from "@/pages/PostViewPage";
-import ThreadView from "@/components/ThreadView";
+import ThreadView from "@/components/comment_components/ThreadView";
 
 const authRoutes = () => {
   return (

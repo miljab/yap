@@ -1,5 +1,5 @@
 import axios from "@/api/axios";
-import OnboardingCard from "@/components/OnboardingCard";
+import OnboardingCard from "@/components/auth_components/OnboardingCard";
 import "@testing-library/jest-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
