@@ -24,13 +24,13 @@ import axios from "@/api/axios";
 import useAuth from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
 import { isAxiosError } from "axios";
-import type { User } from "@/types/user";
+import type { OnboardingUser } from "@/types/user";
 import CancelOnboardingDialog from "./CancelOnboardingDialog";
 
 type OnboardingFormData = z.infer<typeof onboardingSchema>;
 
 type OnboardingUserData = {
-  onboardingUser: User;
+  onboardingUser: OnboardingUser;
 };
 
 function OnboardingCard({ onboardingUser }: OnboardingUserData) {

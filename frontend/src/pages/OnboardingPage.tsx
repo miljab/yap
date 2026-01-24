@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import OnboardingCard from "../components/auth_components/OnboardingCard";
 import { Spinner } from "@/components/ui/spinner";
-import type { User } from "@/types/user";
+import type { OnboardingUser } from "@/types/user";
 import axios from "@/api/axios";
 import { useNavigate } from "react-router";
 
 function OnboardingPage() {
   const [isLoading, setLoading] = useState(true);
-  const [onboardingUserData, setOnboardingUserData] = useState<User | null>(
-    null,
-  );
+  const [onboardingUserData, setOnboardingUserData] =
+    useState<OnboardingUser | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,7 +32,7 @@ function OnboardingPage() {
       }
     }
     fetchData();
-  }, []);
+  }, [navigate]);
 
   if (isLoading) {
     return (
