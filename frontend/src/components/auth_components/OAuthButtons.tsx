@@ -1,6 +1,6 @@
 import { Button } from "../ui/button";
-import GoogleLogo from "../assets/google-logo.svg?react";
-import GithubLogo from "../assets/github-logo.svg?react";
+import GoogleLogo from "@/assets/google-logo.svg?react";
+import GithubLogo from "@/assets/github-logo.svg?react";
 import {
   Tooltip,
   TooltipContent,
