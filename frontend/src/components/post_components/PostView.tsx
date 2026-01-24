@@ -1,13 +1,12 @@
 import { type Post } from "@/types/post";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import defaultAvatar from "@/assets/default-avatar.png";
 import ImagePreview from "../ImagePreview";
 import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
 import { useNavigate } from "react-router";
 import preventNavigation from "@/utils/preventNavigation";
 import OptionsButton from "../OptionsButton";
-import useAuth from "@/hooks/useAuth";
+import UserAvatar from "../user_components/UserAvatar";
+import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 
 type PostViewProps = {
   post: Post;
@@ -21,7 +20,7 @@ function PostView({ post }: PostViewProps) {
     initialLikeCount: post.likeCount,
   });
   const navigate = useNavigate();
-  const { auth } = useAuth();
+  const user = useAuthenticatedUser();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     preventNavigation(e, navigate, "post", post.id);
@@ -33,12 +32,10 @@ function PostView({ post }: PostViewProps) {
       onClick={(e) => handleContainerClick(e)}
     >
       <div className="flex items-center gap-1 text-sm">
-        <Avatar>
-          <AvatarImage src={post.user.avatar} />
-          <AvatarFallback>
-            <img src={defaultAvatar} alt="avatar" />
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar
+          avatarUrl={post.user.avatar}
+          username={post.user.username}
+        />
 
         <div className="flex flex-col">
           <span className="font-bold">{post.user.username}</span>
@@ -47,7 +44,7 @@ function PostView({ post }: PostViewProps) {
           </span>
         </div>
 
-        {auth.user?.id === post.user.id && (
+        {user.id === post.user.id && (
           <div className="flex grow justify-end">
             <OptionsButton itemType="post" itemId={post.id} />
           </div>

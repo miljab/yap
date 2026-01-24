@@ -5,17 +5,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import defaultAvatar from "@/assets/default-avatar.png";
+import UserAvatar from "./user_components/UserAvatar";
 import useAuth from "@/hooks/useAuth";
 import { ChevronDown, LogOut, Moon, Sun, User } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import useTheme from "@/hooks/useTheme";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 
 function UserNavDropdown() {
   const axiosPrivate = useAxiosPrivate();
-  const { auth, setAuth } = useAuth();
+  const { setAuth } = useAuth();
+  const user = useAuthenticatedUser();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -37,12 +38,7 @@ function UserNavDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="relative cursor-pointer rounded-full">
-          <Avatar>
-            <AvatarImage src={auth.user?.avatar} />
-            <AvatarFallback>
-              <img src={defaultAvatar} alt="avatar" />
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar avatarUrl={user.avatar} username={user.username} />
           <div className="bg-accent border-primary absolute -right-1 -bottom-1 rounded-full border">
             <ChevronDown size={16} />
           </div>
@@ -51,12 +47,12 @@ function UserNavDropdown() {
 
       <DropdownMenuContent className="max-w-[200px]">
         <DropdownMenuLabel className="border-input flex justify-center border-b">
-          <span className="truncate">{auth.user?.username}</span>
+          <span className="truncate">{user.username}</span>
         </DropdownMenuLabel>
 
         <DropdownMenuItem>
           <Link
-            to={`/user/${auth.user?.username}`}
+            to={`/user/${user.username}`}
             className="flex items-center justify-start gap-1"
           >
             <User />

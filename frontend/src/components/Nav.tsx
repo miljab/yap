@@ -2,13 +2,12 @@ import { Bell, House, Search } from "lucide-react";
 import { Link } from "react-router";
 import UserNavDropdown from "./UserNavDropdown";
 import LogoutButton from "./ui/LogoutButton";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import defaultAvatar from "@/assets/default-avatar.png";
-import useAuth from "@/hooks/useAuth";
 import ToggleTheme from "./ui/ToggleTheme";
+import UserAvatar from "./user_components/UserAvatar";
+import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 
 function Nav() {
-  const { auth } = useAuth();
+  const user = useAuthenticatedUser();
 
   return (
     <div className="md:flex md:w-full md:grow md:justify-end">
@@ -51,16 +50,11 @@ function Nav() {
 
         <div className="md:border-input hidden px-4 py-4 md:mx-auto md:flex md:max-w-full md:flex-col md:gap-4 md:rounded-md md:border md:shadow-xs">
           <Link
-            to={`/user/${auth.user?.username}`}
+            to={`/user/${user.username}`}
             className="hover:bg-accent flex items-center justify-center gap-2 rounded-full p-2"
           >
-            <Avatar>
-              <AvatarImage src={auth.user?.avatar} />
-              <AvatarFallback>
-                <img src={defaultAvatar} alt="avatar" />
-              </AvatarFallback>
-            </Avatar>
-            <span className="truncate">{auth.user?.username}</span>
+            <UserAvatar avatarUrl={user.avatar} username={user.username} />
+            <span className="truncate">{user.username}</span>
           </Link>
 
           <LogoutButton />

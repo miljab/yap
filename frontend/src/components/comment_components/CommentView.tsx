@@ -1,13 +1,11 @@
 import type { Comment } from "@/types/post";
-import { Avatar, AvatarImage } from "../ui/avatar";
-import { AvatarFallback } from "@radix-ui/react-avatar";
-import defaultAvatar from "@/assets/default-avatar.png";
 import ImagePreview from "../ImagePreview";
 import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
 import { useNavigate } from "react-router";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
 import preventNavigation from "@/utils/preventNavigation";
+import UserAvatar from "../user_components/UserAvatar";
 
 type CommentViewProps = {
   comment: Comment;
@@ -39,12 +37,10 @@ function CommentView({
         onClick={(e) => handleContainerClick(e)}
       >
         <div className="flex items-center gap-1 text-sm">
-          <Avatar>
-            <AvatarImage src={comment.user.avatar} />
-            <AvatarFallback>
-              <img src={defaultAvatar} alt="avatar" />
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            avatarUrl={comment.user.avatar}
+            username={comment.user.username}
+          />
 
           <div className="flex flex-col">
             <span className="font-bold">{comment.user.username}</span>
@@ -76,12 +72,10 @@ function CommentView({
       onClick={(e) => handleContainerClick(e)}
     >
       <div className="flex flex-col items-center">
-        <Avatar>
-          <AvatarImage src={comment.user.avatar} />
-          <AvatarFallback>
-            <img src={defaultAvatar} alt="avatar" />
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar
+          avatarUrl={comment.user.avatar}
+          username={comment.user.username}
+        />
 
         {isParent && <div className="mt-3 h-full w-[2px] bg-gray-500"></div>}
       </div>
