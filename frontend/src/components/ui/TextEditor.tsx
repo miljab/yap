@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
+import { Dialog, DialogContent } from "./dialog";
 
 const MAX_FILE_SIZE = 5242880; // 5MB
 
@@ -14,6 +15,9 @@ type TextEditorProps = {
   allowImages?: boolean;
   maxImages?: number;
   submitButtonText: string;
+  asDialog?: boolean;
+  dialogOpen?: boolean;
+  setDialogOpen?: (open: boolean) => void;
 };
 
 function TextEditor({
@@ -24,6 +28,9 @@ function TextEditor({
   allowImages = true,
   maxImages = 4,
   submitButtonText,
+  asDialog = false,
+  dialogOpen,
+  setDialogOpen,
 }: TextEditorProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -140,7 +147,7 @@ function TextEditor({
   const actualLength = content === "" || content === "\n" ? 0 : content.length;
   const warningThreshold = Math.floor(maxLength * 0.95);
 
-  return (
+  const editor = (
     <div className="flex flex-col rounded-md border">
       <div className="relative min-h-16 p-2">
         {actualLength === 0 && (
@@ -198,6 +205,16 @@ function TextEditor({
       </div>
     </div>
   );
+
+  if (asDialog) {
+    return (
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>{editor}</DialogContent>
+      </Dialog>
+    );
+  }
+
+  return editor;
 }
 
 export default TextEditor;
