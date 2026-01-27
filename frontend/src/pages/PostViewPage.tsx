@@ -37,7 +37,7 @@ function PostViewPage() {
 
   return (
     <div className="flex flex-col gap-2 p-4">
-      <PostView post={post} />
+      <PostView post={post} setComments={setComments} />
       <CreateComment postId={post.id} setComments={setComments} />
       <Comments
         postId={post.id}

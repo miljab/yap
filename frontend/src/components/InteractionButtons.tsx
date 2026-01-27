@@ -1,4 +1,7 @@
-import { Heart, MessageCircleMore } from "lucide-react";
+import { Heart } from "lucide-react";
+import CommentButton from "./comment_components/CommentButton";
+import type { SetStateAction } from "react";
+import type { Comment } from "@/types/post";
 
 type InteractionButtonsProps = {
   isLiked: boolean;
@@ -6,7 +9,9 @@ type InteractionButtonsProps = {
   commentCount: number;
   isLiking: boolean;
   onLike: () => void;
-  onComment?: () => void;
+  postId: string;
+  parentId?: string;
+  setComments?: React.Dispatch<SetStateAction<Comment[]>>;
 };
 
 function InteractionButtons({
@@ -15,7 +20,9 @@ function InteractionButtons({
   commentCount,
   isLiking,
   onLike,
-  onComment,
+  postId,
+  parentId,
+  setComments,
 }: InteractionButtonsProps) {
   return (
     <div className="flex justify-start gap-4">
@@ -33,14 +40,13 @@ function InteractionButtons({
         />
         {likeCount > 0 && likeCount}
       </button>
-      <button
-        onClick={onComment}
-        className="flex items-center gap-1"
-        aria-label="Comment"
-      >
-        <MessageCircleMore className="cursor-pointer transition-all duration-300 hover:text-blue-500" />
-        {commentCount > 0 && commentCount}
-      </button>
+
+      <CommentButton
+        commentCount={commentCount}
+        postId={postId}
+        parentId={parentId}
+        setComments={setComments}
+      />
     </div>
   );
 }

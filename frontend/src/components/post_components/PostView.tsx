@@ -1,4 +1,4 @@
-import { type Post } from "@/types/post";
+import type { Post, Comment } from "@/types/post";
 import ImagePreview from "../ImagePreview";
 import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
@@ -7,12 +7,14 @@ import preventNavigation from "@/utils/preventNavigation";
 import OptionsButton from "../OptionsButton";
 import UserAvatar from "../user_components/UserAvatar";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
+import type { SetStateAction } from "react";
 
 type PostViewProps = {
   post: Post;
+  setComments?: React.Dispatch<SetStateAction<Comment[]>>;
 };
 
-function PostView({ post }: PostViewProps) {
+function PostView({ post, setComments }: PostViewProps) {
   const { isLiked, likeCount, isLiking, handleLike } = useLike({
     itemId: post.id,
     itemType: "post",
@@ -62,6 +64,8 @@ function PostView({ post }: PostViewProps) {
         commentCount={post.commentCount}
         isLiking={isLiking}
         onLike={handleLike}
+        postId={post.id}
+        setComments={setComments}
       />
     </div>
   );

@@ -43,7 +43,11 @@ function ThreadView() {
       })}
 
       <div>
-        <CommentView isSelected={true} comment={comment} />
+        <CommentView
+          isSelected={true}
+          comment={comment}
+          setComments={setReplies}
+        />
       </div>
 
       <div>

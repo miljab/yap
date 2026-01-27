@@ -7,7 +7,7 @@ import TextEditor from "../ui/TextEditor";
 type CreateCommentProps = {
   postId: string;
   parentId?: string;
-  setComments: React.Dispatch<SetStateAction<Comment[]>>;
+  setComments?: React.Dispatch<SetStateAction<Comment[]>>;
 };
 
 function CreateComment({ postId, parentId, setComments }: CreateCommentProps) {
@@ -31,7 +31,8 @@ function CreateComment({ postId, parentId, setComments }: CreateCommentProps) {
 
     if (response.status === 201) {
       toast.success("Commented successfully.");
-      setComments((prev) => [response.data, ...prev]);
+
+      if (setComments) setComments((prev) => [response.data, ...prev]);
     }
   }
 
