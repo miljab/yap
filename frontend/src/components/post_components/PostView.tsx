@@ -65,6 +65,7 @@ function PostView({ post, setComments }: PostViewProps) {
         isLiking={isLiking}
         onLike={handleLike}
         postId={post.id}
+        target={post}
         setComments={setComments}
       />
     </div>

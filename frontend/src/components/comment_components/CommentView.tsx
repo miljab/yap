@@ -65,7 +65,7 @@ function CommentView({
           isLiking={isLiking}
           onLike={handleLike}
           postId={comment.postId}
-          parentId={comment.id}
+          target={comment}
           setComments={setComments}
         />
       </div>
@@ -111,7 +111,7 @@ function CommentView({
             isLiking={isLiking}
             onLike={handleLike}
             postId={comment.postId}
-            parentId={comment.id}
+            target={comment}
             setComments={setComments}
           />
         </div>

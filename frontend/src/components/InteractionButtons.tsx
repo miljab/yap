@@ -1,7 +1,7 @@
 import { Heart } from "lucide-react";
 import CommentButton from "./comment_components/CommentButton";
 import type { SetStateAction } from "react";
-import type { Comment } from "@/types/post";
+import type { Post, Comment } from "@/types/post";
 
 type InteractionButtonsProps = {
   isLiked: boolean;
@@ -9,8 +9,9 @@ type InteractionButtonsProps = {
   commentCount: number;
   isLiking: boolean;
   onLike: () => void;
+
   postId: string;
-  parentId?: string;
+  target: Post | Comment;
   setComments?: React.Dispatch<SetStateAction<Comment[]>>;
 };
 
@@ -21,7 +22,7 @@ function InteractionButtons({
   isLiking,
   onLike,
   postId,
-  parentId,
+  target,
   setComments,
 }: InteractionButtonsProps) {
   return (
@@ -44,7 +45,7 @@ function InteractionButtons({
       <CommentButton
         commentCount={commentCount}
         postId={postId}
-        parentId={parentId}
+        target={target}
         setComments={setComments}
       />
     </div>
