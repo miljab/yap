@@ -7,14 +7,13 @@ import preventNavigation from "@/utils/preventNavigation";
 import OptionsButton from "../OptionsButton";
 import UserAvatar from "../user_components/UserAvatar";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
-import type { SetStateAction } from "react";
 
 type PostViewProps = {
   post: Post;
-  setComments?: React.Dispatch<SetStateAction<Comment[]>>;
+  onCommentCreated: (newComment: Comment) => void;
 };
 
-function PostView({ post, setComments }: PostViewProps) {
+function PostView({ post, onCommentCreated }: PostViewProps) {
   const { isLiked, likeCount, isLiking, handleLike } = useLike({
     itemId: post.id,
     itemType: "post",
@@ -66,7 +65,7 @@ function PostView({ post, setComments }: PostViewProps) {
         onLike={handleLike}
         postId={post.id}
         target={post}
-        setComments={setComments}
+        onCommentCreated={onCommentCreated}
       />
     </div>
   );

@@ -6,20 +6,19 @@ import { useNavigate } from "react-router";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
 import preventNavigation from "@/utils/preventNavigation";
 import UserAvatar from "../user_components/UserAvatar";
-import type { SetStateAction } from "react";
 
 type CommentViewProps = {
   comment: Comment;
   isSelected?: boolean;
   isParent?: boolean;
-  setComments?: React.Dispatch<SetStateAction<Comment[]>>;
+  onCommentCreated: (newComment: Comment) => void;
 };
 
 function CommentView({
   comment,
   isSelected = false,
   isParent = false,
-  setComments,
+  onCommentCreated,
 }: CommentViewProps) {
   const { isLiked, likeCount, isLiking, handleLike } = useLike({
     itemId: comment.id,
@@ -66,7 +65,7 @@ function CommentView({
           onLike={handleLike}
           postId={comment.postId}
           target={comment}
-          setComments={setComments}
+          onCommentCreated={onCommentCreated}
         />
       </div>
     );
@@ -112,7 +111,7 @@ function CommentView({
             onLike={handleLike}
             postId={comment.postId}
             target={comment}
-            setComments={setComments}
+            onCommentCreated={onCommentCreated}
           />
         </div>
       </div>

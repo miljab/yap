@@ -1,6 +1,5 @@
 import { Heart } from "lucide-react";
 import CommentButton from "./comment_components/CommentButton";
-import type { SetStateAction } from "react";
 import type { Post, Comment } from "@/types/post";
 
 type InteractionButtonsProps = {
@@ -12,7 +11,7 @@ type InteractionButtonsProps = {
 
   postId: string;
   target: Post | Comment;
-  setComments?: React.Dispatch<SetStateAction<Comment[]>>;
+  onCommentCreated: (newComment: Comment) => void;
 };
 
 function InteractionButtons({
@@ -23,7 +22,7 @@ function InteractionButtons({
   onLike,
   postId,
   target,
-  setComments,
+  onCommentCreated,
 }: InteractionButtonsProps) {
   return (
     <div className="flex justify-start gap-4">
@@ -46,7 +45,7 @@ function InteractionButtons({
         commentCount={commentCount}
         postId={postId}
         target={target}
-        setComments={setComments}
+        onCommentCreated={onCommentCreated}
       />
     </div>
   );

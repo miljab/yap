@@ -13,6 +13,24 @@ function PostViewPage() {
   const navigate = useNavigate();
   const [comments, setComments] = useState<Comment[]>([]);
 
+  const onCommentCreated = (newComment: Comment) => {
+    if (newComment.postId === post?.id && !newComment.parentId) {
+      setComments((prev) => [newComment, ...prev]);
+      setPost((prevPost) => {
+        if (!prevPost) return null;
+        return { ...prevPost, commentCount: prevPost.commentCount + 1 };
+      });
+    } else {
+      setComments((prevComments) =>
+        prevComments.map((c) =>
+          c.id === newComment.parentId
+            ? { ...c, commentCount: c.commentCount + 1 }
+            : c,
+        ),
+      );
+    }
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -37,12 +55,13 @@ function PostViewPage() {
 
   return (
     <div className="flex flex-col gap-2 p-4">
-      <PostView post={post} setComments={setComments} />
-      <CreateComment postId={post.id} setComments={setComments} />
+      <PostView post={post} onCommentCreated={onCommentCreated} />
+      <CreateComment postId={post.id} onCommentCreated={onCommentCreated} />
       <Comments
         postId={post.id}
         comments={comments}
         setComments={setComments}
+        onCommentCreated={onCommentCreated}
       />
     </div>
   );

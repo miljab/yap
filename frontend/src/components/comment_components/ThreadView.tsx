@@ -32,21 +32,63 @@ function ThreadView() {
     fetchData();
   }, [params, axiosPrivate]);
 
+  const onPostCommentCreated = () => {
+    setPost((prevPost) => {
+      if (!prevPost) return null;
+      return { ...prevPost, commentCount: prevPost.commentCount + 1 };
+    });
+  };
+
+  const onSelectedCommentCreated = (newComment: Comment) => {
+    setReplies((prevReplies) => [newComment, ...prevReplies]);
+    setComment((prevComment) => {
+      if (!prevComment) return null;
+      return { ...prevComment, commentCount: prevComment.commentCount + 1 };
+    });
+  };
+
+  const onParentCommentCreated = (newComment: Comment) => {
+    setParentComments((prevComments) =>
+      prevComments.map((c) =>
+        c.id === newComment.parentId
+          ? { ...c, commentCount: c.commentCount + 1 }
+          : c,
+      ),
+    );
+  };
+
+  const onReplyCommentCreated = (newComment: Comment) => {
+    setReplies((prevComments) =>
+      prevComments.map((c) =>
+        c.id === newComment.parentId
+          ? { ...c, commentCount: c.commentCount + 1 }
+          : c,
+      ),
+    );
+  };
+
   if (!post || !comment) return null;
 
   return (
     <div>
-      <PostView post={post} />
+      <PostView post={post} onCommentCreated={onPostCommentCreated} />
 
       {parentComments.map((com) => {
-        return <CommentView key={com.id} comment={com} isParent={true} />;
+        return (
+          <CommentView
+            key={com.id}
+            comment={com}
+            isParent={true}
+            onCommentCreated={onParentCommentCreated}
+          />
+        );
       })}
 
       <div>
         <CommentView
           isSelected={true}
           comment={comment}
-          setComments={setReplies}
+          onCommentCreated={onSelectedCommentCreated}
         />
       </div>
 
@@ -54,13 +96,19 @@ function ThreadView() {
         <CreateComment
           postId={post.id}
           parentId={comment.id}
-          setComments={setReplies}
+          onCommentCreated={onSelectedCommentCreated}
         />
       </div>
 
       <div>
         {replies.map((reply) => {
-          return <CommentView key={reply.id} comment={reply} />;
+          return (
+            <CommentView
+              key={reply.id}
+              comment={reply}
+              onCommentCreated={onReplyCommentCreated}
+            />
+          );
         })}
       </div>
     </div>

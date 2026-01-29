@@ -1,7 +1,6 @@
 import { MessageCircleMore } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import CreateComment from "./CreateComment";
-import type { SetStateAction } from "react";
 import type { Comment, Post } from "@/types/post";
 import UserAvatar from "../user_components/UserAvatar";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
@@ -12,14 +11,14 @@ type CommentButtonProps = {
   commentCount: number;
   postId: string;
   target: Post | Comment;
-  setComments?: React.Dispatch<SetStateAction<Comment[]>>;
+  onCommentCreated: (newComment: Comment) => void;
 };
 
 function CommentButton({
   commentCount,
   postId,
   target,
-  setComments,
+  onCommentCreated,
 }: CommentButtonProps) {
   const [open, setOpen] = useState(false);
 
@@ -66,9 +65,9 @@ function CommentButton({
           <CreateComment
             postId={postId}
             parentId={"postId" in target ? target.id : undefined}
-            setComments={setComments}
             closeDialog={closeDialog}
             autoFocus={true}
+            onCommentCreated={onCommentCreated}
           />
         </div>
       </DialogContent>

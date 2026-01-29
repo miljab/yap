@@ -7,9 +7,15 @@ type CommentsProps = {
   postId: string;
   comments: Comment[];
   setComments: React.Dispatch<SetStateAction<Comment[]>>;
+  onCommentCreated: (newComment: Comment) => void;
 };
 
-function Comments({ postId, comments, setComments }: CommentsProps) {
+function Comments({
+  postId,
+  comments,
+  setComments,
+  onCommentCreated,
+}: CommentsProps) {
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
@@ -31,7 +37,13 @@ function Comments({ postId, comments, setComments }: CommentsProps) {
   return (
     <div>
       {comments.map((comment) => {
-        return <CommentView key={comment.id} comment={comment} />;
+        return (
+          <CommentView
+            key={comment.id}
+            comment={comment}
+            onCommentCreated={onCommentCreated}
+          />
+        );
       })}
     </div>
   );

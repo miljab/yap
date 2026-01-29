@@ -1,4 +1,3 @@
-import { type SetStateAction } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { toast } from "sonner";
 import type { Comment } from "@/types/post";
@@ -7,7 +6,7 @@ import TextEditor from "../ui/TextEditor";
 type CreateCommentProps = {
   postId: string;
   parentId?: string;
-  setComments?: React.Dispatch<SetStateAction<Comment[]>>;
+  onCommentCreated: (newComment: Comment) => void;
   closeDialog?: () => void;
   autoFocus?: boolean;
 };
@@ -15,7 +14,7 @@ type CreateCommentProps = {
 function CreateComment({
   postId,
   parentId,
-  setComments,
+  onCommentCreated,
   closeDialog,
   autoFocus,
 }: CreateCommentProps) {
@@ -40,8 +39,7 @@ function CreateComment({
     if (response.status === 201) {
       toast.success("Commented successfully.");
       if (closeDialog) closeDialog();
-
-      if (setComments) setComments((prev) => [response.data, ...prev]);
+      onCommentCreated(response.data);
     }
   }
 
