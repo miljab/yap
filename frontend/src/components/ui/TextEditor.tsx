@@ -14,6 +14,7 @@ type TextEditorProps = {
   allowImages?: boolean;
   maxImages?: number;
   submitButtonText: string;
+  autoFocus?: boolean;
 };
 
 function TextEditor({
@@ -24,6 +25,7 @@ function TextEditor({
   allowImages = true,
   maxImages = 4,
   submitButtonText,
+  autoFocus = false,
 }: TextEditorProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,6 +39,12 @@ function TextEditor({
       setContent(initialContent);
     }
   }, [initialContent]);
+
+  useEffect(() => {
+    if (autoFocus && divRef.current) {
+      divRef.current.focus();
+    }
+  }, [autoFocus]);
 
   async function handleSubmit() {
     setIsSubmitting(true);

@@ -68,6 +68,7 @@ function CommentButton({
             parentId={"postId" in target ? target.id : undefined}
             setComments={setComments}
             closeDialog={closeDialog}
+            autoFocus={true}
           />
         </div>
       </DialogContent>

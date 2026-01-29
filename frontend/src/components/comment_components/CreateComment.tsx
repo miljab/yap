@@ -9,6 +9,7 @@ type CreateCommentProps = {
   parentId?: string;
   setComments?: React.Dispatch<SetStateAction<Comment[]>>;
   closeDialog?: () => void;
+  autoFocus?: boolean;
 };
 
 function CreateComment({
@@ -16,6 +17,7 @@ function CreateComment({
   parentId,
   setComments,
   closeDialog,
+  autoFocus,
 }: CreateCommentProps) {
   const axiosPrivate = useAxiosPrivate();
 
@@ -48,6 +50,7 @@ function CreateComment({
       onSubmit={handleCreateComment}
       placeholder="Post your reply"
       submitButtonText="Reply"
+      autoFocus={autoFocus}
     />
   );
 }
