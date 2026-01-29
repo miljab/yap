@@ -6,6 +6,7 @@ import type { Comment, Post } from "@/types/post";
 import UserAvatar from "../user_components/UserAvatar";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
 import ImagePreview from "../ImagePreview";
+import { useState } from "react";
 
 type CommentButtonProps = {
   commentCount: number;
@@ -20,8 +21,14 @@ function CommentButton({
   target,
   setComments,
 }: CommentButtonProps) {
+  const [open, setOpen] = useState(false);
+
+  const closeDialog = () => {
+    setOpen(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
         <button className="flex items-center gap-1" aria-label="Comment">
           <MessageCircleMore className="cursor-pointer transition-all duration-300 hover:text-blue-500" />
@@ -60,6 +67,7 @@ function CommentButton({
             postId={postId}
             parentId={"postId" in target ? target.id : undefined}
             setComments={setComments}
+            closeDialog={closeDialog}
           />
         </div>
       </DialogContent>

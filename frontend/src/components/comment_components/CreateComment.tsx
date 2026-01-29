@@ -8,9 +8,15 @@ type CreateCommentProps = {
   postId: string;
   parentId?: string;
   setComments?: React.Dispatch<SetStateAction<Comment[]>>;
+  closeDialog?: () => void;
 };
 
-function CreateComment({ postId, parentId, setComments }: CreateCommentProps) {
+function CreateComment({
+  postId,
+  parentId,
+  setComments,
+  closeDialog,
+}: CreateCommentProps) {
   const axiosPrivate = useAxiosPrivate();
 
   async function handleCreateComment(content: string, files: File[]) {
@@ -31,6 +37,7 @@ function CreateComment({ postId, parentId, setComments }: CreateCommentProps) {
 
     if (response.status === 201) {
       toast.success("Commented successfully.");
+      if (closeDialog) closeDialog();
 
       if (setComments) setComments((prev) => [response.data, ...prev]);
     }
