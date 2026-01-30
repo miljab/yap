@@ -6,19 +6,24 @@ function CreatePost() {
   const axiosPrivate = useAxiosPrivate();
 
   async function handleCreatePost(content: string, files: File[]) {
-    const formData = new FormData();
-    formData.append("text", content);
+    try {
+      const formData = new FormData();
+      formData.append("text", content);
 
-    if (files && files.length > 0) {
-      files.forEach((file) => formData.append("images", file));
-    }
+      if (files && files.length > 0) {
+        files.forEach((file) => formData.append("images", file));
+      }
 
-    const response = await axiosPrivate.post("/post/new", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+      const response = await axiosPrivate.post("/post/new", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    if (response.status === 201) {
-      toast.success("Post created successfully.");
+      if (response.status === 201) {
+        toast.success("Post created successfully.");
+      }
+    } catch (error) {
+      toast.error("Failed to create post. Please try again.");
+      throw error;
     }
   }
 

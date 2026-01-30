@@ -21,25 +21,30 @@ function CreateComment({
   const axiosPrivate = useAxiosPrivate();
 
   async function handleCreateComment(content: string, files: File[]) {
-    const formData = new FormData();
-    formData.append("text", content);
+    try {
+      const formData = new FormData();
+      formData.append("text", content);
 
-    if (files && files.length > 0) {
-      files.forEach((file) => formData.append("images", file));
-    }
+      if (files && files.length > 0) {
+        files.forEach((file) => formData.append("images", file));
+      }
 
-    const apiUrlString = parentId
-      ? `/comment/${parentId}/reply`
-      : `/post/${postId}/reply`;
+      const apiUrlString = parentId
+        ? `/comment/${parentId}/reply`
+        : `/post/${postId}/reply`;
 
-    const response = await axiosPrivate.post(apiUrlString, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+      const response = await axiosPrivate.post(apiUrlString, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    if (response.status === 201) {
-      toast.success("Commented successfully.");
-      if (closeDialog) closeDialog();
-      onCommentCreated(response.data);
+      if (response.status === 201) {
+        toast.success("Commented successfully.");
+        if (closeDialog) closeDialog();
+        onCommentCreated(response.data);
+      }
+    } catch (error) {
+      toast.error("Failed to create comment. Please try again.");
+      throw error;
     }
   }
 

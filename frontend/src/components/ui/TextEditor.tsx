@@ -64,7 +64,6 @@ function TextEditor({
       setSelectedFiles([]);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create post. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
