@@ -66,7 +66,7 @@ function OptionsButton(props: OptionsButtonProps) {
       toast.info("Post edited successfully.");
     } catch (error) {
       toast.error("Failed to edit post. Please try again.");
-      console.error(error);
+      throw error;
     }
   };
 
