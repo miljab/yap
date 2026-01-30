@@ -39,6 +39,7 @@ export const postService = {
         images: true,
         user: true,
         likes: true,
+        history: true,
       },
     });
 
@@ -156,6 +157,13 @@ export const postService = {
       },
       data: {
         content: newContent,
+      },
+    });
+
+    await prisma.postHistory.create({
+      data: {
+        postId: postId,
+        content: post.content,
       },
     });
 
