@@ -19,18 +19,29 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
+import type { Post } from "@/types/post";
+import TextEditor from "./ui/TextEditor";
 
-type OptionsButtonProps = {
-  itemType: "post" | "comment";
+type OptionsButtonCommentProps = {
+  itemType: "comment";
   itemId: string;
 };
 
-function OptionsButton({ itemType, itemId }: OptionsButtonProps) {
+type OptionsButtonPostProps = {
+  itemType: "post";
+  itemId: string;
+  content: string;
+  handlePostUpdate: (newPost: Post) => void;
+};
+
+type OptionsButtonProps = OptionsButtonPostProps | OptionsButtonCommentProps;
+
+function OptionsButton(props: OptionsButtonProps) {
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
 
   const handleDelete = async () => {
-    const apiUrl = `/${itemType}/${itemId}`;
+    const apiUrl = `/${props.itemType}/${props.itemId}`;
 
     try {
       const response = await axiosPrivate.delete(apiUrl);
@@ -43,6 +54,22 @@ function OptionsButton({ itemType, itemId }: OptionsButtonProps) {
     }
   };
 
+  const handlePostEdit = async (content: string) => {
+    if (props.itemType !== "post") return;
+    try {
+      const response = await axiosPrivate.put(
+        `/post/${props.itemId}`,
+        JSON.stringify(content),
+      );
+
+      props.handlePostUpdate(response.data);
+      toast.info("Post edited successfully.");
+    } catch (error) {
+      toast.error("Failed to edit post. Please try again.");
+      console.error(error);
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -51,10 +78,26 @@ function OptionsButton({ itemType, itemId }: OptionsButtonProps) {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-30">
-        <DropdownMenuItem>
-          <Edit />
-          Edit
-        </DropdownMenuItem>
+        {props.itemType === "post" && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Edit />
+                Edit
+              </DropdownMenuItem>
+            </DialogTrigger>
+
+            <DialogContent>
+              <TextEditor
+                onSubmit={handlePostEdit}
+                initialContent={props.content}
+                submitButtonText="Save"
+                allowImages={false}
+                placeholder="Edit post content"
+              />
+            </DialogContent>
+          </Dialog>
+        )}
 
         <Dialog>
           <DialogTrigger asChild>
@@ -70,7 +113,7 @@ function OptionsButton({ itemType, itemId }: OptionsButtonProps) {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                Are you sure you want to delete this {itemType}?
+                Are you sure you want to delete this {props.itemType}?
               </DialogTitle>
               <DialogDescription>
                 This action cannot be undone.

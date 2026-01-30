@@ -71,7 +71,11 @@ function ThreadView() {
 
   return (
     <div>
-      <PostView post={post} onCommentCreated={onPostCommentCreated} />
+      <PostView
+        post={post}
+        setPost={setPost}
+        onCommentCreated={onPostCommentCreated}
+      />
 
       {parentComments.map((com) => {
         return (

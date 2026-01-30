@@ -7,13 +7,15 @@ import preventNavigation from "@/utils/preventNavigation";
 import OptionsButton from "../OptionsButton";
 import UserAvatar from "../user_components/UserAvatar";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
+import type { SetStateAction } from "react";
 
 type PostViewProps = {
   post: Post;
+  setPost: React.Dispatch<SetStateAction<Post | null>>;
   onCommentCreated: (newComment: Comment) => void;
 };
 
-function PostView({ post, onCommentCreated }: PostViewProps) {
+function PostView({ post, setPost, onCommentCreated }: PostViewProps) {
   const { isLiked, likeCount, isLiking, handleLike } = useLike({
     itemId: post.id,
     itemType: "post",
@@ -25,6 +27,10 @@ function PostView({ post, onCommentCreated }: PostViewProps) {
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     preventNavigation(e, navigate, "post", post.id);
+  };
+
+  const handlePostUpdate = (newPost: Post) => {
+    setPost(newPost);
   };
 
   return (
@@ -47,7 +53,12 @@ function PostView({ post, onCommentCreated }: PostViewProps) {
 
         {user.id === post.user.id && (
           <div className="flex grow justify-end">
-            <OptionsButton itemType="post" itemId={post.id} />
+            <OptionsButton
+              itemType="post"
+              itemId={post.id}
+              content={post.content}
+              handlePostUpdate={handlePostUpdate}
+            />
           </div>
         )}
       </div>

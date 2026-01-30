@@ -7,7 +7,7 @@ import { Spinner } from "../ui/spinner";
 const MAX_FILE_SIZE = 5242880; // 5MB
 
 type TextEditorProps = {
-  onSubmit: (content: string, files: File[]) => Promise<void>;
+  onSubmit: (content: string, files?: File[]) => Promise<void>;
   maxLength?: number;
   initialContent?: string;
   placeholder?: string;
