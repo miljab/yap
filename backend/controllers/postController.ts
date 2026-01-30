@@ -114,3 +114,30 @@ export const deletePost = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const updatePost = async (req: Request, res: Response) => {
+  const postId = req.params.id;
+  const userId = req.user?.id;
+  const newContent = req.body.content;
+
+  try {
+    if (!postId) throw new AppError("Post ID is required", 400);
+
+    if (!userId) throw new AppError("User ID is required", 401);
+
+    const updatedPost = await postService.updatePost(
+      postId,
+      userId,
+      newContent,
+    );
+
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};

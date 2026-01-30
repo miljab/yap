@@ -21,6 +21,7 @@ import {
 import { Button } from "./ui/button";
 import type { Post } from "@/types/post";
 import TextEditor from "./ui/TextEditor";
+import { useState } from "react";
 
 type OptionsButtonCommentProps = {
   itemType: "comment";
@@ -39,6 +40,7 @@ type OptionsButtonProps = OptionsButtonPostProps | OptionsButtonCommentProps;
 function OptionsButton(props: OptionsButtonProps) {
   const axiosPrivate = useAxiosPrivate();
   const navigate = useNavigate();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const handleDelete = async () => {
     const apiUrl = `/${props.itemType}/${props.itemId}`;
@@ -57,13 +59,13 @@ function OptionsButton(props: OptionsButtonProps) {
   const handlePostEdit = async (content: string) => {
     if (props.itemType !== "post") return;
     try {
-      const response = await axiosPrivate.put(
-        `/post/${props.itemId}`,
-        JSON.stringify(content),
-      );
+      const response = await axiosPrivate.put(`/post/${props.itemId}`, {
+        content,
+      });
 
       props.handlePostUpdate(response.data);
       toast.info("Post edited successfully.");
+      setEditDialogOpen(false);
     } catch (error) {
       toast.error("Failed to edit post. Please try again.");
       throw error;
@@ -79,7 +81,7 @@ function OptionsButton(props: OptionsButtonProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-30">
         {props.itemType === "post" && (
-          <Dialog>
+          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
             <DialogTrigger asChild>
               <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                 <Edit />

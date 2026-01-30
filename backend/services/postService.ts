@@ -137,4 +137,30 @@ export const postService = {
 
     return { message: "Post deleted successfully" };
   },
+
+  updatePost: async (postId: string, userId: string, newContent: string) => {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (!post) throw new AppError("Post not found", 404);
+
+    if (post.userId !== userId)
+      throw new AppError("You are not authorized to delete this post", 403);
+
+    await prisma.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        content: newContent,
+      },
+    });
+
+    const updatedPost = await postService.getPostById(postId, userId);
+
+    return updatedPost;
+  },
 };

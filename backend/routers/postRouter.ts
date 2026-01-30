@@ -5,6 +5,7 @@ import {
   getPostById,
   likePost,
   deletePost,
+  updatePost,
 } from "../controllers/postController.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
@@ -27,5 +28,7 @@ router.get("/post/:id", verifyAccessToken, getPostById);
 router.post("/post/:id/like", verifyAccessToken, likePost);
 
 router.delete("/post/:id", verifyAccessToken, deletePost);
+
+router.put("/post/:id", verifyAccessToken, updatePost);
 
 export default router;
