@@ -5,7 +5,7 @@ import TextEditor from "../ui/TextEditor";
 function CreatePost() {
   const axiosPrivate = useAxiosPrivate();
 
-  async function handleCreatePost(content: string, files: File[]) {
+  async function handleCreatePost(content: string, files?: File[]) {
     try {
       const formData = new FormData();
       formData.append("text", content);

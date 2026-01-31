@@ -20,7 +20,7 @@ function CreateComment({
 }: CreateCommentProps) {
   const axiosPrivate = useAxiosPrivate();
 
-  async function handleCreateComment(content: string, files: File[]) {
+  async function handleCreateComment(content: string, files?: File[]) {
     try {
       const formData = new FormData();
       formData.append("text", content);
