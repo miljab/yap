@@ -35,41 +35,41 @@ function CommentButton({
         </button>
       </DialogTrigger>
       <DialogContent data-no-navigate>
-        <div>
-          <div className="flex cursor-pointer gap-2 border-b-1 p-2">
-            <div className="flex flex-col items-center">
-              <UserAvatar
-                avatarUrl={target.user.avatar}
-                username={target.user.username}
-              />
+        <div className="flex cursor-pointer gap-2 border-b-1 p-2">
+          <div className="flex flex-col items-center">
+            <UserAvatar
+              avatarUrl={target.user.avatar}
+              username={target.user.username}
+            />
+          </div>
+
+          <div className="flex w-full flex-col justify-start gap-1">
+            <div className="flex gap-1 text-sm">
+              <span className="flex items-center font-bold">
+                {target.user.username}
+              </span>
+              <span className="text-neutral-500">&middot;</span>
+              <span className="text-neutral-500">
+                {formatTimeAgoOrDate(target.createdAt)}
+              </span>
             </div>
 
-            <div className="flex flex-col justify-start gap-1">
-              <div className="flex gap-1 text-sm">
-                <span className="flex items-center font-bold">
-                  {target.user.username}
-                </span>
-                <span className="text-neutral-500">&middot;</span>
-                <span className="text-neutral-500">
-                  {formatTimeAgoOrDate(target.createdAt)}
-                </span>
-              </div>
+            <p className="wrap-break-word contain-inline-size">
+              {target.content}
+            </p>
 
-              <p>{target.content}</p>
-
-              <div>
-                <ImagePreview data-no-navigate images={target.images} />
-              </div>
+            <div>
+              <ImagePreview data-no-navigate images={target.images} />
             </div>
           </div>
-          <CreateComment
-            postId={postId}
-            parentId={"postId" in target ? target.id : undefined}
-            closeDialog={closeDialog}
-            autoFocus={true}
-            onCommentCreated={onCommentCreated}
-          />
         </div>
+        <CreateComment
+          postId={postId}
+          parentId={"postId" in target ? target.id : undefined}
+          closeDialog={closeDialog}
+          autoFocus={true}
+          onCommentCreated={onCommentCreated}
+        />
       </DialogContent>
     </Dialog>
   );

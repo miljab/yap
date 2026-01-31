@@ -156,7 +156,7 @@ function TextEditor({
           </span>
         )}
         <div
-          className="max-h-[70vh] min-h-16 overflow-auto p-2 outline-none"
+          className="max-h-[70vh] min-h-16 overflow-auto p-2 contain-inline-size outline-none"
           contentEditable
           ref={divRef}
           onInput={handleTextInput}
