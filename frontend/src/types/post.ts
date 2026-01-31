@@ -11,6 +11,14 @@ export type Post = {
   isLiked: boolean;
   likeCount: number;
   commentCount: number;
+  history: PostHistory[];
+};
+
+export type PostHistory = {
+  id: string;
+  postId: string;
+  content?: string;
+  createdAt: Date;
 };
 
 export type Comment = {

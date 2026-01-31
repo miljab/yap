@@ -25,7 +25,7 @@ function InteractionButtons({
   onCommentCreated,
 }: InteractionButtonsProps) {
   return (
-    <div className="flex justify-start gap-4">
+    <div className="flex gap-4">
       <button
         disabled={isLiking}
         onClick={onLike}

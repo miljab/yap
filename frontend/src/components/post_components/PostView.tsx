@@ -8,6 +8,7 @@ import OptionsButton from "../OptionsButton";
 import UserAvatar from "../user_components/UserAvatar";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 import type { SetStateAction } from "react";
+import PostEditHistory from "./PostEditHistory";
 
 type PostViewProps = {
   post: Post;
@@ -68,16 +69,20 @@ function PostView({ post, setPost, onCommentCreated }: PostViewProps) {
         <ImagePreview data-no-navigate images={post.images} />
       </div>
 
-      <InteractionButtons
-        isLiked={isLiked}
-        likeCount={likeCount}
-        commentCount={post.commentCount}
-        isLiking={isLiking}
-        onLike={handleLike}
-        postId={post.id}
-        target={post}
-        onCommentCreated={onCommentCreated}
-      />
+      <div className="flex items-center justify-between">
+        <InteractionButtons
+          isLiked={isLiked}
+          likeCount={likeCount}
+          commentCount={post.commentCount}
+          isLiking={isLiking}
+          onLike={handleLike}
+          postId={post.id}
+          target={post}
+          onCommentCreated={onCommentCreated}
+        />
+
+        {post.history.length > 0 && <PostEditHistory post={post} />}
+      </div>
     </div>
   );
 }
