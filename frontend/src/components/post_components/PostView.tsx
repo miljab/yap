@@ -81,7 +81,7 @@ function PostView({ post, setPost, onCommentCreated }: PostViewProps) {
           onCommentCreated={onCommentCreated}
         />
 
-        {post.history.length > 0 && <PostEditHistory history={post.history} />}
+        {post.history.length > 0 && <PostEditHistory post={post} />}
       </div>
     </div>
   );
