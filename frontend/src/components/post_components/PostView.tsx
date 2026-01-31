@@ -65,7 +65,9 @@ function PostView({ post, setPost, onCommentCreated }: PostViewProps) {
       </div>
 
       <div>
-        <p className="text-lg">{post.content}</p>
+        <p className="text-lg wrap-break-word contain-inline-size">
+          {post.content}
+        </p>
         <ImagePreview data-no-navigate images={post.images} />
       </div>
 

@@ -53,7 +53,7 @@ function CommentView({
         </div>
 
         <div>
-          <p className="text-lg">{comment.content}</p>
+          <p className="text-lg wrap-break-word">{comment.content}</p>
           <ImagePreview data-no-navigate images={comment.images} />
         </div>
 
@@ -85,7 +85,7 @@ function CommentView({
         {isParent && <div className="mt-3 h-full w-[2px] bg-gray-500"></div>}
       </div>
 
-      <div className="flex flex-col justify-start gap-1">
+      <div className="flex w-full flex-col justify-start gap-1">
         <div className="flex gap-1 text-sm">
           <span className="flex items-center font-bold">
             {comment.user.username}
@@ -96,7 +96,7 @@ function CommentView({
           </span>
         </div>
 
-        <p>{comment.content}</p>
+        <p className="wrap-break-word contain-inline-size">{comment.content}</p>
 
         <div>
           <ImagePreview data-no-navigate images={comment.images} />
