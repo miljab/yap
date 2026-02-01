@@ -8,10 +8,8 @@ export const userService = {
         username: username,
       },
       include: {
-        posts: true,
-        comments: true,
-        postLikes: true,
-        commentLikes: true,
+        followers: true,
+        following: true,
       },
     });
 
