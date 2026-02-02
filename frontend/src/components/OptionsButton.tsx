@@ -83,13 +83,16 @@ function OptionsButton(props: OptionsButtonProps) {
         {props.itemType === "post" && (
           <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
             <DialogTrigger asChild>
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <DropdownMenuItem
+                onSelect={(e) => e.preventDefault()}
+                data-no-navigate
+              >
                 <Edit />
                 Edit
               </DropdownMenuItem>
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent data-no-navigate>
               <TextEditor
                 onSubmit={handlePostEdit}
                 initialContent={props.content}
@@ -106,13 +109,14 @@ function OptionsButton(props: OptionsButtonProps) {
             <DropdownMenuItem
               variant="destructive"
               onSelect={(e) => e.preventDefault()}
+              data-no-navigate
             >
               <Trash />
               Delete
             </DropdownMenuItem>
           </DialogTrigger>
 
-          <DialogContent>
+          <DialogContent data-no-navigate>
             <DialogHeader>
               <DialogTitle>
                 Are you sure you want to delete this {props.itemType}?

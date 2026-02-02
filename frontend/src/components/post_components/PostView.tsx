@@ -7,16 +7,15 @@ import preventNavigation from "@/utils/preventNavigation";
 import OptionsButton from "../OptionsButton";
 import UserAvatar from "../user_components/UserAvatar";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
-import type { SetStateAction } from "react";
 import PostEditHistory from "./PostEditHistory";
 
 type PostViewProps = {
   post: Post;
-  setPost: React.Dispatch<SetStateAction<Post | null>>;
+  handlePostUpdate: (updatedPost: Post) => void;
   onCommentCreated: (newComment: Comment) => void;
 };
 
-function PostView({ post, setPost, onCommentCreated }: PostViewProps) {
+function PostView({ post, handlePostUpdate, onCommentCreated }: PostViewProps) {
   const { isLiked, likeCount, isLiking, handleLike } = useLike({
     itemId: post.id,
     itemType: "post",
@@ -28,10 +27,6 @@ function PostView({ post, setPost, onCommentCreated }: PostViewProps) {
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     preventNavigation(e, navigate, "post", post.id);
-  };
-
-  const handlePostUpdate = (newPost: Post) => {
-    setPost(newPost);
   };
 
   return (
