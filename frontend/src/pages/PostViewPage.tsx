@@ -31,6 +31,10 @@ function PostViewPage() {
     }
   };
 
+  const handlePostUpdate = (updatedPost: Post) => {
+    setPost(updatedPost);
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -57,7 +61,7 @@ function PostViewPage() {
     <div className="flex flex-col gap-2 p-4">
       <PostView
         post={post}
-        setPost={setPost}
+        handlePostUpdate={handlePostUpdate}
         onCommentCreated={onCommentCreated}
       />
       <CreateComment postId={post.id} onCommentCreated={onCommentCreated} />
