@@ -29,17 +29,9 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
     fetchPosts();
   }, [axiosPrivate, userId]);
 
-  const handleCommentCreated = (newComment: Comment, postId: string) => {
+  const handlePostUpdate = (updatedPost: Post) => {
     setPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId
-          ? {
-              ...post,
-              commentCount: post.commentCount + 1,
-              comments: [newComment, ...post.comments],
-            }
-          : post,
-      ),
+      prev.map((p) => (p.id === updatedPost.id ? updatedPost : p)),
     );
   };
 
@@ -59,8 +51,23 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
   return (
     <div>
       {posts.map((post) => (
-        // placeholder, needs PostView refactor
-        <div>{post.content}</div>
+        <PostView
+          post={post}
+          handlePostUpdate={handlePostUpdate}
+          onCommentCreated={(newComment: Comment) => {
+            setPosts((prev) =>
+              prev.map((p) =>
+                p.id === post.id
+                  ? {
+                      ...p,
+                      comments: [newComment, ...p.comments],
+                      commentCount: p.commentCount + 1,
+                    }
+                  : p,
+              ),
+            );
+          }}
+        />
       ))}
     </div>
   );
