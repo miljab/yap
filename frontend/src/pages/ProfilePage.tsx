@@ -1,4 +1,5 @@
 import ProfileHeader from "@/components/user_components/ProfileHeader";
+import ProfileFeed from "@/components/user_components/ProfileFeed";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import type { User } from "@/types/user";
@@ -28,6 +29,7 @@ function ProfilePage() {
   return (
     <div>
       <ProfileHeader user={user} />
+      <ProfileFeed userId={user.id} />
     </div>
   );
 }
