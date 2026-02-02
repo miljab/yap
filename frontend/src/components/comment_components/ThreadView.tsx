@@ -32,6 +32,10 @@ function ThreadView() {
     fetchData();
   }, [params, axiosPrivate]);
 
+  const handlePostUpdate = (updatedPost: Post) => {
+    setPost(updatedPost);
+  };
+
   const onPostCommentCreated = () => {
     setPost((prevPost) => {
       if (!prevPost) return null;
@@ -73,7 +77,7 @@ function ThreadView() {
     <div>
       <PostView
         post={post}
-        setPost={setPost}
+        handlePostUpdate={handlePostUpdate}
         onCommentCreated={onPostCommentCreated}
       />
 
