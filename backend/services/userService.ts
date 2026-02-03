@@ -69,4 +69,50 @@ export const userService = {
       nextCursor: hasMore ? result[result.length - 1]?.id : null,
     };
   },
+
+  getUserComments: async (
+    userId: string,
+    requesterId: string,
+    cursor?: string,
+    limit: number = DEFAULT_PAGE_LIMIT,
+  ) => {
+    const comments = await prisma.comment.findMany({
+      where: { userId },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      orderBy: { createdAt: "desc" },
+      include: {
+        images: true,
+        user: true,
+        likes: true,
+        _count: {
+          select: {
+            replies: true,
+          },
+        },
+      },
+    });
+
+    const hasMore = comments.length > limit;
+    const result = hasMore ? comments.slice(0, -1) : comments;
+
+    const formattedComments = result.map((comment) => {
+      const isLiked = comment.likes.some((like) => like.userId === requesterId);
+      const likeCount = comment.likes.length;
+      const commentCount = comment._count.replies;
+
+      return {
+        ...comment,
+        isLiked,
+        likeCount,
+        commentCount,
+        likes: userId === requesterId ? comment.likes : [],
+      };
+    });
+
+    return {
+      comments: formattedComments,
+      nextCursor: hasMore ? result[result.length - 1]?.id : null,
+    };
+  },
 };
