@@ -110,7 +110,6 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
                 p.id === post.id
                   ? {
                       ...p,
-                      comments: [newComment, ...p.comments],
                       commentCount: p.commentCount + 1,
                     }
                   : p,

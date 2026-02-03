@@ -36,7 +36,6 @@ export const userService = {
         user: true,
         likes: true,
         history: true,
-        comments: true,
         _count: {
           select: {
             comments: {
