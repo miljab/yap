@@ -21,11 +21,19 @@ function ProfileFeed({ userId }: ProfileFeedProps) {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="posts">
+      <TabsContent
+        value="posts"
+        forceMount
+        className={activeTab !== "posts" ? "hidden" : ""}
+      >
         <ProfilePosts userId={userId} />
       </TabsContent>
 
-      <TabsContent value="comments">
+      <TabsContent
+        value="comments"
+        forceMount
+        className={activeTab !== "comments" ? "hidden" : ""}
+      >
         <ProfileComments userId={userId} />
       </TabsContent>
     </Tabs>
