@@ -1,5 +1,8 @@
 import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
+import cloudinary from "../config/cloudinary.js";
+import fs from "fs/promises";
+import { nanoid } from "nanoid";
 
 const DEFAULT_PAGE_LIMIT = 10;
 
@@ -114,5 +117,39 @@ export const userService = {
       comments: formattedComments,
       nextCursor: hasMore ? result[result.length - 1]?.id : null,
     };
+  },
+
+  updateProfile: async (
+    userId: string,
+    bio?: string,
+    avatarFile?: Express.Multer.File,
+  ) => {
+    let avatarUrl: string | undefined;
+
+    if (avatarFile) {
+      const result = await cloudinary.uploader.upload(avatarFile.path, {
+        folder: "avatars",
+        public_id: nanoid(),
+        transformation: [
+          { width: 400, height: 400, crop: "fill", gravity: "face" },
+        ],
+      });
+      avatarUrl = result.secure_url;
+      await fs.unlink(avatarFile.path);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(bio !== undefined && { bio }),
+        ...(avatarUrl && { avatar: avatarUrl }),
+      },
+      include: {
+        followers: true,
+        following: true,
+      },
+    });
+
+    return updatedUser;
   },
 };
