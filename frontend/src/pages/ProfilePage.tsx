@@ -28,7 +28,7 @@ function ProfilePage() {
 
   return (
     <div>
-      <ProfileHeader user={user} />
+      <ProfileHeader user={user} onUserUpdate={setUser} />
       <ProfileFeed userId={user.id} />
     </div>
   );

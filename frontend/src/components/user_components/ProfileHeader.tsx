@@ -2,11 +2,14 @@ import type { User } from "@/types/user";
 import UserAvatar from "./UserAvatar";
 import { Button } from "../ui/button";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
+import EditProfile from "./EditProfile";
 
 type ProfileHeaderProps = {
   user: User;
+  onUserUpdate: (updatedUser: User) => void;
 };
-function ProfileHeader({ user }: ProfileHeaderProps) {
+
+function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
   const authUser = useAuthenticatedUser();
 
   return (
@@ -18,7 +21,7 @@ function ProfileHeader({ user }: ProfileHeaderProps) {
           className="h-32 w-32"
         />
         {user.id === authUser.id ? (
-          <Button>Edit profile</Button>
+          <EditProfile user={user} onProfileUpdate={onUserUpdate} />
         ) : (
           <Button variant={"outline"}>Follow</Button>
         )}
