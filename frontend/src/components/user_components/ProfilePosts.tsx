@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import type { Post, Comment } from "@/types/post";
+import type { Post } from "@/types/post";
 import { Spinner } from "../ui/spinner";
 import PostView from "../post_components/PostView";
 
@@ -104,7 +104,7 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
           key={post.id}
           post={post}
           handlePostUpdate={handlePostUpdate}
-          onCommentCreated={(newComment: Comment) => {
+          onCommentCreated={() => {
             setPosts((prev) =>
               prev.map((p) =>
                 p.id === post.id
