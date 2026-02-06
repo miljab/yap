@@ -14,6 +14,9 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import UserAvatar from "./UserAvatar";
 import type { User } from "@/types/user";
 import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
+
+const MAX_FILE_SIZE = 5242880; // 5MB
 
 type EditProfileProps = {
   user: User;
@@ -31,10 +34,15 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setAvatarFile(file);
-      setAvatarPreview(URL.createObjectURL(file));
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.warning("Max file size is 5MB.");
+      return;
     }
+
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async () => {
@@ -42,7 +50,7 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
       setIsSubmitting(true);
 
       const formData = new FormData();
-      formData.append("bio", bio);
+      formData.append("bio", bio.trim());
       if (avatarFile) {
         formData.append("avatar", avatarFile);
       }
@@ -53,10 +61,10 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
 
       onProfileUpdate(response.data);
       setOpen(false);
-      toast.success("Profile updated successfully");
+      toast.success("Profile updated successfully.");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update profile");
+      toast.error("Failed to update profile.");
     } finally {
       setIsSubmitting(false);
     }
@@ -116,7 +124,7 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
               rows={3}
               className="border-input bg-background focus-visible:ring-ring/50 focus-visible:border-ring w-full resize-none rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-[3px]"
             />
-            <span className="text-muted-foreground text-xs text-right">
+            <span className="text-muted-foreground text-right text-xs">
               {bio.length}/160
             </span>
           </div>
@@ -129,7 +137,14 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
             </Button>
           </DialogClose>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save"}
+            {isSubmitting ? (
+              <span className="flex gap-1">
+                Saving...
+                <Spinner />
+              </span>
+            ) : (
+              "Save"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

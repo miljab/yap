@@ -131,7 +131,7 @@ export const userService = {
         folder: "avatars",
         public_id: nanoid(),
         transformation: [
-          { width: 400, height: 400, crop: "fill", gravity: "face" },
+          { width: 400, height: 400, crop: "fill", gravity: "center" },
         ],
       });
       avatarUrl = result.secure_url;

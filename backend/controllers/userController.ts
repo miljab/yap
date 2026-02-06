@@ -86,13 +86,17 @@ export const getUserComments = async (req: Request, res: Response) => {
 
 export const updateProfile = async (req: Request, res: Response) => {
   const userId = req.user?.id;
-  const { bio } = req.body;
+  const bio = typeof req.body.bio === "string" ? req.body.bio.trim() : "";
   const avatarFile = req.file;
 
   try {
     if (!userId) throw new AppError("Unauthorized", 401);
 
-    const updatedUser = await userService.updateProfile(userId, bio, avatarFile);
+    const updatedUser = await userService.updateProfile(
+      userId,
+      bio,
+      avatarFile,
+    );
 
     res.status(200).json(updatedUser);
   } catch (error) {
