@@ -9,6 +9,7 @@ import {
   replyToComment,
 } from "../controllers/commentController.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
+import { writeLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 const upload = multer({
@@ -19,6 +20,7 @@ const upload = multer({
 router.post(
   "/post/:id/reply",
   verifyAccessToken,
+  writeLimiter,
   upload.array("images", MAX_IMAGES),
   replyToPost,
 );
@@ -26,6 +28,7 @@ router.post(
 router.post(
   "/comment/:id/reply",
   verifyAccessToken,
+  writeLimiter,
   upload.array("images", MAX_IMAGES),
   replyToComment,
 );

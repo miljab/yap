@@ -23,11 +23,12 @@ import {
 } from "../controllers/oAuthController.js";
 import { verifyOnboardingToken } from "../middleware/verifyOnboardingToken.js";
 import { verifyRefreshToken } from "../middleware/verifyRefreshToken.js";
+import { authLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
-router.post("/signup", validate(signupSchemaWithDb), signup);
-router.post("/login", validate(loginSchema), login);
+router.post("/signup", authLimiter, validate(signupSchemaWithDb), signup);
+router.post("/login", authLimiter, validate(loginSchema), login);
 router.get("/refresh", refresh);
 router.get("/logout", verifyAccessToken, logout);
 
