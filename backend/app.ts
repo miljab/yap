@@ -8,6 +8,7 @@ import "./passport/googlePassport.js";
 import "./passport/githubPassport.js";
 import commentRouter from "./routers/commentRouter.js";
 import userRouter from "./routers/userRouter.js";
+import { globalLimiter } from "./middleware/rateLimiter.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
+app.use(globalLimiter);
 
 app.use("/auth", authRouter);
 app.use(postRouter);
