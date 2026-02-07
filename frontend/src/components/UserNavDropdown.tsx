@@ -52,7 +52,7 @@ function UserNavDropdown() {
 
         <DropdownMenuItem>
           <Link
-            to={`/user/${user.username}`}
+            to={`/profile/${user.username}`}
             className="flex items-center justify-start gap-1"
           >
             <User />

@@ -50,7 +50,7 @@ function Nav() {
 
         <div className="md:border-input hidden px-4 py-4 md:mx-auto md:flex md:max-w-full md:flex-col md:gap-4 md:rounded-md md:border md:shadow-xs">
           <Link
-            to={`/user/${user.username}`}
+            to={`/profile/${user.username}`}
             className="hover:bg-accent flex items-center justify-center gap-2 rounded-full p-2"
           >
             <UserAvatar avatarUrl={user.avatar} username={user.username} />
