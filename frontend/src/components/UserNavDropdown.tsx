@@ -50,7 +50,7 @@ function UserNavDropdown() {
           <span className="truncate">{user.username}</span>
         </DropdownMenuLabel>
 
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link
             to={`/profile/${user.username}`}
             className="flex items-center justify-start gap-1"
