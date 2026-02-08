@@ -10,7 +10,7 @@ function Nav() {
   const user = useAuthenticatedUser();
 
   return (
-    <div className="md:flex md:w-full md:grow md:justify-end">
+    <div className="bg-background sticky top-0 z-50 max-h-[100vh] md:flex md:w-full md:grow md:justify-end">
       <nav className="border-input flex h-full w-full items-center justify-around border-b p-2 md:min-h-screen md:max-w-[250px] md:grow md:flex-col md:items-start md:justify-center md:border-r md:border-b-0">
         <h1 className="hidden p-4 text-4xl tracking-wider md:mx-auto md:mb-24 md:block md:text-center">
           <Link to="/home">yap.</Link>
