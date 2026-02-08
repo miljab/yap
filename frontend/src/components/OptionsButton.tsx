@@ -16,7 +16,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import type { Post } from "@/types/post";
@@ -72,73 +71,76 @@ function OptionsButton(props: OptionsButtonProps) {
     }
   };
 
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="cursor-pointer">
-          <Ellipsis size={20} />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-30">
-        {props.itemType === "post" && (
-          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-            <DialogTrigger asChild>
-              <DropdownMenuItem
-                onSelect={(e) => e.preventDefault()}
-                data-no-navigate
-              >
-                <Edit />
-                Edit
-              </DropdownMenuItem>
-            </DialogTrigger>
-
-            <DialogContent data-no-navigate>
-              <TextEditor
-                onSubmit={handlePostEdit}
-                initialContent={props.content}
-                submitButtonText="Save"
-                allowImages={false}
-                placeholder="Edit post content"
-              />
-            </DialogContent>
-          </Dialog>
-        )}
-
-        <Dialog>
-          <DialogTrigger asChild>
+    <>
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <button className="cursor-pointer">
+            <Ellipsis size={20} />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-30">
+          {props.itemType === "post" && (
             <DropdownMenuItem
-              variant="destructive"
-              onSelect={(e) => e.preventDefault()}
               data-no-navigate
+              onSelect={() => setEditDialogOpen(true)}
             >
-              <Trash />
-              Delete
+              <Edit />
+              Edit
             </DropdownMenuItem>
-          </DialogTrigger>
+          )}
 
-          <DialogContent data-no-navigate>
+          <DropdownMenuItem
+            variant="destructive"
+            data-no-navigate
+            onSelect={() => setDeleteDialogOpen(true)}
+          >
+            <Trash />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {props.itemType === "post" && (
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent className="p-4" data-no-navigate>
             <DialogHeader>
-              <DialogTitle>
-                Are you sure you want to delete this {props.itemType}?
-              </DialogTitle>
-              <DialogDescription>
-                This action cannot be undone.
-              </DialogDescription>
+              <DialogTitle>Edit Post</DialogTitle>
             </DialogHeader>
-
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button>Cancel</Button>
-              </DialogClose>
-
-              <Button variant="destructive" onClick={handleDelete}>
-                Delete
-              </Button>
-            </DialogFooter>
+            <TextEditor
+              onSubmit={handlePostEdit}
+              initialContent={props.content}
+              submitButtonText="Save"
+              allowImages={false}
+              placeholder="Edit post content"
+            />
           </DialogContent>
         </Dialog>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      )}
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent data-no-navigate>
+          <DialogHeader>
+            <DialogTitle>
+              Are you sure you want to delete this {props.itemType}?
+            </DialogTitle>
+            <DialogDescription>This action cannot be undone.</DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button>Cancel</Button>
+            </DialogClose>
+
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
