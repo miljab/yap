@@ -37,7 +37,11 @@ export const userService = {
       include: {
         images: true,
         user: true,
-        likes: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
         history: true,
         _count: {
           select: {
