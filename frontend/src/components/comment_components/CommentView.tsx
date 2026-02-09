@@ -20,11 +20,12 @@ function CommentView({
   isParent = false,
   onCommentCreated,
 }: CommentViewProps) {
-  const { isLiked, likeCount, isLiking, handleLike } = useLike({
+  const { isLiked, likeCount, isLiking, handleLike, likedBy } = useLike({
     itemId: comment.id,
     itemType: "comment",
     initialIsLiked: comment.isLiked,
     initialLikeCount: comment.likeCount,
+    initialLikedBy: comment.likes,
   });
   const navigate = useNavigate();
 
@@ -63,6 +64,7 @@ function CommentView({
           commentCount={comment.commentCount}
           isLiking={isLiking}
           onLike={handleLike}
+          likedBy={likedBy}
           postId={comment.postId}
           target={comment}
           onCommentCreated={onCommentCreated}
@@ -109,6 +111,7 @@ function CommentView({
             commentCount={comment.commentCount}
             isLiking={isLiking}
             onLike={handleLike}
+            likedBy={likedBy}
             postId={comment.postId}
             target={comment}
             onCommentCreated={onCommentCreated}

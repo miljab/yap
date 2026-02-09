@@ -3,7 +3,7 @@ import cloudinary from "../config/cloudinary.js";
 import fs from "fs/promises";
 import { nanoid } from "nanoid";
 import AppError from "../utils/appError.js";
-import type { Comment } from "@prisma/client";
+import type { Comment, CommentLike } from "@prisma/client";
 import { postService } from "./postService.js";
 import { uploadImages } from "../utils/cloudinaryHelper.js";
 
@@ -86,6 +86,11 @@ const commentService = {
       include: {
         images: true,
         user: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
       },
       orderBy: [
         {
@@ -103,7 +108,10 @@ const commentService = {
     return commentsWithMeta;
   },
 
-  getCommentMeta: async (comment: Comment, userId?: string) => {
+  getCommentMeta: async (
+    comment: Comment & { likes?: CommentLike[] },
+    userId?: string,
+  ) => {
     const [likeCount, commentCount, isLiked] = await Promise.all([
       prisma.commentLike.count({
         where: { commentId: comment.id },
@@ -127,6 +135,7 @@ const commentService = {
 
     return {
       ...comment,
+      likes: comment.userId === userId ? comment.likes : [],
       likeCount,
       commentCount,
       isLiked,
@@ -182,6 +191,11 @@ const commentService = {
       include: {
         images: true,
         user: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 
@@ -201,6 +215,11 @@ const commentService = {
       include: {
         images: true,
         user: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
       },
       orderBy: [
         {
@@ -226,6 +245,11 @@ const commentService = {
         include: {
           images: true,
           user: true,
+          likes: {
+            include: {
+              user: true,
+            },
+          },
         },
       });
 
