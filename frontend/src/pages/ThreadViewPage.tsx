@@ -1,12 +1,12 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import PostView from "../post_components/PostView";
+import PostView from "../components/post_components/PostView";
 import type { Post, Comment } from "@/types/post";
-import CommentView from "./CommentView";
-import CreateComment from "./CreateComment";
+import CommentView from "../components/comment_components/CommentView";
+import CreateComment from "../components/comment_components/CreateComment";
 
-function ThreadView() {
+function ThreadViewPage() {
   const params = useParams();
   const axiosPrivate = useAxiosPrivate();
   const [post, setPost] = useState<Post | null>(null);
@@ -123,4 +123,4 @@ function ThreadView() {
   );
 }
 
-export default ThreadView;
+export default ThreadViewPage;
