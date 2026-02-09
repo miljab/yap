@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { toast } from "sonner";
+import type { Like } from "@/types/post";
 
 type UseLikeProps = {
   itemId: string;
   itemType: "post" | "comment";
   initialIsLiked: boolean;
   initialLikeCount: number;
+  initialLikedBy: Like[];
 };
 
 export function useLike({
@@ -14,16 +16,19 @@ export function useLike({
   itemType,
   initialIsLiked,
   initialLikeCount,
+  initialLikedBy,
 }: UseLikeProps) {
   const [isLiking, setLiking] = useState(false);
   const [isLiked, setLiked] = useState(initialIsLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
+  const [likedBy, setLikedBy] = useState(initialLikedBy);
   const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
     setLiked(initialIsLiked);
     setLikeCount(initialLikeCount);
-  }, [itemId, initialIsLiked, initialLikeCount]);
+    setLikedBy(initialLikedBy);
+  }, [itemId, initialIsLiked, initialLikeCount, initialLikedBy]);
 
   async function handleLike() {
     if (isLiking) return;
@@ -64,5 +69,6 @@ export function useLike({
     likeCount,
     isLiking,
     handleLike,
+    likedBy,
   };
 }

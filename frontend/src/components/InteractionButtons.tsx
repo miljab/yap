@@ -1,6 +1,8 @@
 import { Heart } from "lucide-react";
 import CommentButton from "./comment_components/CommentButton";
-import type { Post, Comment } from "@/types/post";
+import type { Post, Comment, Like } from "@/types/post";
+import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
+import LikedBy from "./LikedBy";
 
 type InteractionButtonsProps = {
   isLiked: boolean;
@@ -8,6 +10,7 @@ type InteractionButtonsProps = {
   commentCount: number;
   isLiking: boolean;
   onLike: () => void;
+  likedBy: Like[];
 
   postId: string;
   target: Post | Comment;
@@ -20,26 +23,36 @@ function InteractionButtons({
   commentCount,
   isLiking,
   onLike,
+  likedBy,
   postId,
   target,
   onCommentCreated,
 }: InteractionButtonsProps) {
+  const user = useAuthenticatedUser();
+
   return (
     <div className="flex gap-4">
-      <button
-        disabled={isLiking}
-        onClick={onLike}
-        className="flex items-center gap-1 disabled:opacity-50"
-        aria-label={isLiked ? "Unlike" : "Like"}
-        data-no-navigate
-      >
-        <Heart
-          className={`cursor-pointer hover:text-red-500 hover:transition-all hover:duration-300 ${
-            isLiked && "fill-red-500 text-red-500"
-          }`}
-        />
-        {likeCount > 0 && likeCount}
-      </button>
+      <div className="flex items-center gap-1">
+        <button
+          disabled={isLiking}
+          onClick={onLike}
+          className="disabled:opacity-50"
+          aria-label={isLiked ? "Unlike" : "Like"}
+          data-no-navigate
+        >
+          <Heart
+            className={`cursor-pointer hover:text-red-500 hover:transition-all hover:duration-300 ${
+              isLiked && "fill-red-500 text-red-500"
+            }`}
+          />
+        </button>
+        {likeCount > 0 &&
+          (user.id !== target.user.id ? (
+            likeCount
+          ) : (
+            <LikedBy likes={likedBy} likeCount={likeCount} />
+          ))}
+      </div>
 
       <CommentButton
         commentCount={commentCount}
