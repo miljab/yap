@@ -30,7 +30,7 @@ function LikedBy({ likes, likeCount }: LikedByProps) {
           {likes.map((like, idx) => {
             return (
               <div
-                className={`flex items-center p-1 ${idx !== likes.length - 1 && "border-b-1"}`}
+                className={`flex items-center gap-2 p-1 ${idx !== likes.length - 1 && "border-b-1"}`}
               >
                 <UserAvatar
                   avatarUrl={like.user.avatar}
