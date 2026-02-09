@@ -16,11 +16,12 @@ type PostViewProps = {
 };
 
 function PostView({ post, handlePostUpdate, onCommentCreated }: PostViewProps) {
-  const { isLiked, likeCount, isLiking, handleLike } = useLike({
+  const { isLiked, likeCount, isLiking, handleLike, likedBy } = useLike({
     itemId: post.id,
     itemType: "post",
     initialIsLiked: post.isLiked,
     initialLikeCount: post.likeCount,
+    initialLikedBy: post.likes,
   });
   const navigate = useNavigate();
   const user = useAuthenticatedUser();
@@ -73,6 +74,7 @@ function PostView({ post, handlePostUpdate, onCommentCreated }: PostViewProps) {
           commentCount={post.commentCount}
           isLiking={isLiking}
           onLike={handleLike}
+          likedBy={likedBy}
           postId={post.id}
           target={post}
           onCommentCreated={onCommentCreated}

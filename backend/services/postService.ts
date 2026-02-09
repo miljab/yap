@@ -38,7 +38,11 @@ export const postService = {
       include: {
         images: true,
         user: true,
-        likes: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
         history: true,
       },
     });

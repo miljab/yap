@@ -30,6 +30,7 @@ export type Comment = {
   user: User;
   images: Image[];
   replies: Comment[];
+  likes: Like[];
   isLiked: boolean;
   likeCount: number;
   commentCount: number;
