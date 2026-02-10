@@ -175,3 +175,26 @@ export const getThread = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const deleteComment = async (req: Request, res: Response) => {
+  const commentId = req.params.id;
+  const userId = req.user?.id;
+
+  try {
+    if (!userId)
+      throw new AppError("You must be logged in to delete a comment", 401);
+
+    if (!commentId) throw new AppError("Comment ID is required", 400);
+
+    const result = await commentService.deleteComment(commentId, userId);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
