@@ -14,7 +14,6 @@ type LikedByProps = {
 };
 
 function LikedBy({ likes, likeCount }: LikedByProps) {
-  console.log(likes);
   return (
     <Dialog>
       <DialogTrigger asChild>
