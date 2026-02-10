@@ -6,6 +6,8 @@ import { useNavigate } from "react-router";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
 import preventNavigation from "@/utils/preventNavigation";
 import UserAvatar from "../user_components/UserAvatar";
+import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
+import OptionsButton from "../OptionsButton";
 
 type CommentViewProps = {
   comment: Comment;
@@ -28,6 +30,7 @@ function CommentView({
     initialLikedBy: comment.likes,
   });
   const navigate = useNavigate();
+  const user = useAuthenticatedUser();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     preventNavigation(e, navigate, "comment", comment.id);
@@ -51,6 +54,12 @@ function CommentView({
               {new Date(comment.createdAt).toLocaleString()}
             </span>
           </div>
+
+          {user.id === comment.user.id && (
+            <div className="flex grow justify-end">
+              <OptionsButton itemType="comment" itemId={comment.id} />
+            </div>
+          )}
         </div>
 
         <div>
@@ -96,6 +105,12 @@ function CommentView({
           <span className="text-neutral-500">
             {formatTimeAgoOrDate(comment.createdAt)}
           </span>
+
+          {user.id === comment.user.id && (
+            <div className="flex grow justify-end">
+              <OptionsButton itemType="comment" itemId={comment.id} />
+            </div>
+          )}
         </div>
 
         <p className="wrap-break-word contain-inline-size">{comment.content}</p>
