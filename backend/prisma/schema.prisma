@@ -67,7 +67,7 @@ model Comment {
   updatedAt     DateTime       @updatedAt
   likes         CommentLike[]
   parentId      String?
-  parent        Comment?       @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parent        Comment?       @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   replies       Comment[]      @relation("CommentReplies")
   images        Image[]
   notifications Notification[]
