@@ -48,7 +48,7 @@ function OptionsButton(props: OptionsButtonProps) {
       const response = await axiosPrivate.delete(apiUrl);
 
       toast.info(response.data.message);
-      setEditDialogOpen(false);
+      setDeleteDialogOpen(false);
       props.onDelete();
     } catch (error) {
       toast.error(`Failed to delete ${props.itemType}. Please try again.`);
