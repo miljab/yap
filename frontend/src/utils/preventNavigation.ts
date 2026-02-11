@@ -5,6 +5,7 @@ const preventNavigation = (
   navigate: NavigateFunction,
   itemType: "post" | "comment",
   itemId: string,
+  state?: Record<string, unknown>,
 ) => {
   const selection = window.getSelection();
 
@@ -26,7 +27,7 @@ const preventNavigation = (
     return;
   }
 
-  navigate(`/${itemType}/${itemId}`);
+  navigate(`/${itemType}/${itemId}`, { state });
 };
 
 export default preventNavigation;
