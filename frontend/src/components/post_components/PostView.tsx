@@ -2,7 +2,7 @@ import type { Post, Comment } from "@/types/post";
 import ImagePreview from "../ImagePreview";
 import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import preventNavigation from "@/utils/preventNavigation";
 import OptionsButton from "../OptionsButton";
 import UserAvatar from "../user_components/UserAvatar";
@@ -30,10 +30,11 @@ function PostView({
     initialLikedBy: post.likes,
   });
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useAuthenticatedUser();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    preventNavigation(e, navigate, "post", post.id);
+    preventNavigation(e, navigate, "post", post.id, { from: location.state?.from || location.pathname });
   };
 
   return (
