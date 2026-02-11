@@ -1,6 +1,6 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router";
 import PostView from "../components/post_components/PostView";
 import type { Post, Comment } from "@/types/post";
 import CommentView from "../components/comment_components/CommentView";
@@ -14,9 +14,13 @@ function ThreadViewPage() {
   const [replies, setReplies] = useState<Comment[]>([]);
   const [parentComments, setParentComments] = useState<Comment[]>([]);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isDeleting = useRef(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (isDeleting.current) return;
+
       try {
         const response = await axiosPrivate.get(`/comment/${params.id}/thread`);
 
@@ -80,7 +84,10 @@ function ThreadViewPage() {
         post={post}
         handlePostUpdate={handlePostUpdate}
         onCommentCreated={onPostCommentCreated}
-        onPostDelete={() => navigate("/home")}
+        onPostDelete={() => {
+          isDeleting.current = true;
+          navigate(location.state?.from || "/home");
+        }}
       />
 
       {parentComments.map((com) => {
@@ -90,6 +97,10 @@ function ThreadViewPage() {
             comment={com}
             isParent={true}
             onCommentCreated={onParentCommentCreated}
+            onCommentDelete={() => {
+              isDeleting.current = true;
+              navigate(`/post/${post.id}`, { state: location.state });
+            }}
           />
         );
       })}
@@ -99,6 +110,16 @@ function ThreadViewPage() {
           isSelected={true}
           comment={comment}
           onCommentCreated={onSelectedCommentCreated}
+          onCommentDelete={() => {
+            if (comment.parentId) {
+              navigate(`/comment/${comment.parentId}/`, {
+                state: location.state,
+              });
+            } else {
+              isDeleting.current = true;
+              navigate(`/post/${post.id}`, { state: location.state });
+            }
+          }}
         />
       </div>
 
@@ -117,6 +138,9 @@ function ThreadViewPage() {
               key={reply.id}
               comment={reply}
               onCommentCreated={onReplyCommentCreated}
+              onCommentDelete={() => {
+                setReplies((prev) => prev.filter((r) => r.id !== reply.id));
+              }}
             />
           );
         })}

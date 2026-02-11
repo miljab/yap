@@ -111,6 +111,9 @@ function ProfileComments({ userId }: ProfileCommentsProps) {
           key={comment.id}
           comment={comment}
           onCommentCreated={handleCommentCreated}
+          onCommentDelete={() => {
+            setComments((prev) => prev.filter((c) => c.id !== comment.id));
+          }}
         />
       ))}
 

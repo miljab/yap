@@ -42,6 +42,9 @@ function Comments({
             key={comment.id}
             comment={comment}
             onCommentCreated={onCommentCreated}
+            onCommentDelete={() => {
+              setComments((prev) => prev.filter((c) => c.id !== comment.id));
+            }}
           />
         );
       })}
