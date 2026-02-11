@@ -116,6 +116,9 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
               ),
             );
           }}
+          onPostDelete={() => {
+            setPosts((prev) => prev.filter((p) => p.id !== post.id));
+          }}
         />
       ))}
 

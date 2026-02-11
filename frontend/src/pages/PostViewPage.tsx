@@ -63,6 +63,7 @@ function PostViewPage() {
         post={post}
         handlePostUpdate={handlePostUpdate}
         onCommentCreated={onCommentCreated}
+        onPostDelete={() => navigate("/home")}
       />
       <CreateComment postId={post.id} onCommentCreated={onCommentCreated} />
       <Comments

@@ -1,6 +1,6 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import PostView from "../components/post_components/PostView";
 import type { Post, Comment } from "@/types/post";
 import CommentView from "../components/comment_components/CommentView";
@@ -13,6 +13,7 @@ function ThreadViewPage() {
   const [comment, setComment] = useState<Comment | null>(null);
   const [replies, setReplies] = useState<Comment[]>([]);
   const [parentComments, setParentComments] = useState<Comment[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,6 +80,7 @@ function ThreadViewPage() {
         post={post}
         handlePostUpdate={handlePostUpdate}
         onCommentCreated={onPostCommentCreated}
+        onPostDelete={() => navigate("/home")}
       />
 
       {parentComments.map((com) => {
