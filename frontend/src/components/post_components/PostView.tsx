@@ -13,9 +13,15 @@ type PostViewProps = {
   post: Post;
   handlePostUpdate: (updatedPost: Post) => void;
   onCommentCreated: (newComment: Comment) => void;
+  onPostDelete: () => void;
 };
 
-function PostView({ post, handlePostUpdate, onCommentCreated }: PostViewProps) {
+function PostView({
+  post,
+  handlePostUpdate,
+  onCommentCreated,
+  onPostDelete,
+}: PostViewProps) {
   const { isLiked, likeCount, isLiking, handleLike, likedBy } = useLike({
     itemId: post.id,
     itemType: "post",
@@ -55,6 +61,7 @@ function PostView({ post, handlePostUpdate, onCommentCreated }: PostViewProps) {
               itemId={post.id}
               content={post.content}
               handlePostUpdate={handlePostUpdate}
+              onDelete={onPostDelete}
             />
           </div>
         )}
