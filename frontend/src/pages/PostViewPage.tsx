@@ -37,6 +37,13 @@ function PostViewPage() {
     setPost(updatedPost);
   };
 
+  const onCommentDeleted = () => {
+    setPost((prev) => {
+      if (!prev) return null;
+      return { ...prev, commentCount: prev.commentCount - 1 };
+    });
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
       if (isDeleting.current) return;
@@ -78,6 +85,7 @@ function PostViewPage() {
         comments={comments}
         setComments={setComments}
         onCommentCreated={onCommentCreated}
+        onCommentDeleted={onCommentDeleted}
       />
     </div>
   );
