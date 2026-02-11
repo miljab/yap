@@ -7,6 +7,7 @@ import {
   likeComment,
   getThread,
   replyToComment,
+  deleteComment,
 } from "../controllers/commentController.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
 import { writeLimiter } from "../middleware/rateLimiter.js";
@@ -38,5 +39,7 @@ router.get("/post/:id/comments", verifyAccessToken, getComments);
 router.post("/comment/:id/like", verifyAccessToken, likeComment);
 
 router.get("/comment/:id/thread", verifyAccessToken, getThread);
+
+router.delete("/comment/:id", verifyAccessToken, deleteComment);
 
 export default router;

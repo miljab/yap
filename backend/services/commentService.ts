@@ -270,6 +270,27 @@ const commentService = {
       parentComments: parentCommentsWithMeta,
     };
   },
+
+  deleteComment: async (commentId: string, userId: string) => {
+    const comment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+    });
+
+    if (!comment) throw new AppError("Comment not found", 404);
+
+    if (userId !== comment.userId)
+      throw new AppError("You are not authorized to delete this comment", 403);
+
+    await prisma.comment.delete({
+      where: {
+        id: commentId,
+      },
+    });
+
+    return { message: "Comment deleted successfully" };
+  },
 };
 
 export default commentService;
