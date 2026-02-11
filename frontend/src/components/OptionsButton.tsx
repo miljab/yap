@@ -78,7 +78,7 @@ function OptionsButton(props: OptionsButtonProps) {
     <>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <button className="cursor-pointer">
+          <button className="cursor-pointer p-1">
             <Ellipsis size={20} />
           </button>
         </DropdownMenuTrigger>
