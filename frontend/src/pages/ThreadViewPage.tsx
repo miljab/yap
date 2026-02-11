@@ -146,6 +146,10 @@ function ThreadViewPage() {
               onCommentCreated={onReplyCommentCreated}
               onCommentDelete={() => {
                 setReplies((prev) => prev.filter((r) => r.id !== reply.id));
+                setComment((prev) => {
+                  if (!prev) return null;
+                  return { ...prev, commentCount: prev.commentCount - 1 };
+                });
               }}
             />
           );
