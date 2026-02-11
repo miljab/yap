@@ -98,8 +98,14 @@ function ThreadViewPage() {
             isParent={true}
             onCommentCreated={onParentCommentCreated}
             onCommentDelete={() => {
-              isDeleting.current = true;
-              navigate(`/post/${post.id}`, { state: location.state });
+              if (com.parentId) {
+                navigate(`/comment/${com.parentId}/`, {
+                  state: location.state,
+                });
+              } else {
+                isDeleting.current = true;
+                navigate(`/post/${post.id}`, { state: location.state });
+              }
             }}
           />
         );
