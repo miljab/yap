@@ -2,7 +2,7 @@ import type { Comment } from "@/types/post";
 import ImagePreview from "../ImagePreview";
 import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
 import preventNavigation from "@/utils/preventNavigation";
 import UserAvatar from "../user_components/UserAvatar";
@@ -14,6 +14,7 @@ type CommentViewProps = {
   isSelected?: boolean;
   isParent?: boolean;
   onCommentCreated: (newComment: Comment) => void;
+  onCommentDelete: () => void;
 };
 
 function CommentView({
@@ -21,6 +22,7 @@ function CommentView({
   isSelected = false,
   isParent = false,
   onCommentCreated,
+  onCommentDelete,
 }: CommentViewProps) {
   const { isLiked, likeCount, isLiking, handleLike, likedBy } = useLike({
     itemId: comment.id,
@@ -30,10 +32,11 @@ function CommentView({
     initialLikedBy: comment.likes,
   });
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useAuthenticatedUser();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    preventNavigation(e, navigate, "comment", comment.id);
+    preventNavigation(e, navigate, "comment", comment.id, { from: location.state?.from || location.pathname });
   };
 
   if (isSelected) {
@@ -57,7 +60,11 @@ function CommentView({
 
           {user.id === comment.user.id && (
             <div className="flex grow justify-end">
-              <OptionsButton itemType="comment" itemId={comment.id} />
+              <OptionsButton
+                itemType="comment"
+                itemId={comment.id}
+                onDelete={onCommentDelete}
+              />
             </div>
           )}
         </div>
@@ -108,7 +115,11 @@ function CommentView({
 
           {user.id === comment.user.id && (
             <div className="flex grow justify-end">
-              <OptionsButton itemType="comment" itemId={comment.id} />
+              <OptionsButton
+                itemType="comment"
+                itemId={comment.id}
+                onDelete={onCommentDelete}
+              />
             </div>
           )}
         </div>

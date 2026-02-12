@@ -7,7 +7,6 @@ import {
 } from "./ui/dropdown-menu";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { toast } from "sonner";
-import { useNavigate } from "react-router";
 import {
   Dialog,
   DialogClose,
@@ -25,6 +24,7 @@ import { useState } from "react";
 type OptionsButtonCommentProps = {
   itemType: "comment";
   itemId: string;
+  onDelete: () => void;
 };
 
 type OptionsButtonPostProps = {
@@ -32,13 +32,13 @@ type OptionsButtonPostProps = {
   itemId: string;
   content: string;
   handlePostUpdate: (newPost: Post) => void;
+  onDelete: () => void;
 };
 
 type OptionsButtonProps = OptionsButtonPostProps | OptionsButtonCommentProps;
 
 function OptionsButton(props: OptionsButtonProps) {
   const axiosPrivate = useAxiosPrivate();
-  const navigate = useNavigate();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const handleDelete = async () => {
@@ -48,9 +48,10 @@ function OptionsButton(props: OptionsButtonProps) {
       const response = await axiosPrivate.delete(apiUrl);
 
       toast.info(response.data.message);
-      navigate("/home");
+      setDeleteDialogOpen(false);
+      props.onDelete();
     } catch (error) {
-      toast.error("Failed to delete post. Please try again.");
+      toast.error(`Failed to delete ${props.itemType}. Please try again.`);
       console.error(error);
     }
   };
@@ -77,7 +78,7 @@ function OptionsButton(props: OptionsButtonProps) {
     <>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <button className="cursor-pointer">
+          <button className="cursor-pointer p-1">
             <Ellipsis size={20} />
           </button>
         </DropdownMenuTrigger>

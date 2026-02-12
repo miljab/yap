@@ -8,6 +8,7 @@ type CommentsProps = {
   comments: Comment[];
   setComments: React.Dispatch<SetStateAction<Comment[]>>;
   onCommentCreated: (newComment: Comment) => void;
+  onCommentDeleted: () => void;
 };
 
 function Comments({
@@ -15,6 +16,7 @@ function Comments({
   comments,
   setComments,
   onCommentCreated,
+  onCommentDeleted,
 }: CommentsProps) {
   const axiosPrivate = useAxiosPrivate();
 
@@ -42,6 +44,10 @@ function Comments({
             key={comment.id}
             comment={comment}
             onCommentCreated={onCommentCreated}
+            onCommentDelete={() => {
+              setComments((prev) => prev.filter((c) => c.id !== comment.id));
+              onCommentDeleted();
+            }}
           />
         );
       })}

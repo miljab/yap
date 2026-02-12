@@ -1,6 +1,6 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate, useLocation } from "react-router";
 import type { Comment, Post } from "@/types/post";
 import PostView from "../components/post_components/PostView";
 import CreateComment from "@/components/comment_components/CreateComment";
@@ -11,7 +11,9 @@ function PostViewPage() {
   const axiosPrivate = useAxiosPrivate();
   const [post, setPost] = useState<Post | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const [comments, setComments] = useState<Comment[]>([]);
+  const isDeleting = useRef(false);
 
   const onCommentCreated = (newComment: Comment) => {
     if (newComment.postId === post?.id && !newComment.parentId) {
@@ -35,8 +37,17 @@ function PostViewPage() {
     setPost(updatedPost);
   };
 
+  const onCommentDeleted = () => {
+    setPost((prev) => {
+      if (!prev) return null;
+      return { ...prev, commentCount: prev.commentCount - 1 };
+    });
+  };
+
   useEffect(() => {
     const fetchPost = async () => {
+      if (isDeleting.current) return;
+
       try {
         const response = await axiosPrivate.get(`/post/${params.id}`);
 
@@ -63,6 +74,10 @@ function PostViewPage() {
         post={post}
         handlePostUpdate={handlePostUpdate}
         onCommentCreated={onCommentCreated}
+        onPostDelete={() => {
+          isDeleting.current = true;
+          navigate(location.state?.from || "/home");
+        }}
       />
       <CreateComment postId={post.id} onCommentCreated={onCommentCreated} />
       <Comments
@@ -70,6 +85,7 @@ function PostViewPage() {
         comments={comments}
         setComments={setComments}
         onCommentCreated={onCommentCreated}
+        onCommentDeleted={onCommentDeleted}
       />
     </div>
   );

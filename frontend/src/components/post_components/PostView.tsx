@@ -2,7 +2,7 @@ import type { Post, Comment } from "@/types/post";
 import ImagePreview from "../ImagePreview";
 import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import preventNavigation from "@/utils/preventNavigation";
 import OptionsButton from "../OptionsButton";
 import UserAvatar from "../user_components/UserAvatar";
@@ -13,9 +13,15 @@ type PostViewProps = {
   post: Post;
   handlePostUpdate: (updatedPost: Post) => void;
   onCommentCreated: (newComment: Comment) => void;
+  onPostDelete: () => void;
 };
 
-function PostView({ post, handlePostUpdate, onCommentCreated }: PostViewProps) {
+function PostView({
+  post,
+  handlePostUpdate,
+  onCommentCreated,
+  onPostDelete,
+}: PostViewProps) {
   const { isLiked, likeCount, isLiking, handleLike, likedBy } = useLike({
     itemId: post.id,
     itemType: "post",
@@ -24,10 +30,11 @@ function PostView({ post, handlePostUpdate, onCommentCreated }: PostViewProps) {
     initialLikedBy: post.likes,
   });
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useAuthenticatedUser();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    preventNavigation(e, navigate, "post", post.id);
+    preventNavigation(e, navigate, "post", post.id, { from: location.state?.from || location.pathname });
   };
 
   return (
@@ -55,6 +62,7 @@ function PostView({ post, handlePostUpdate, onCommentCreated }: PostViewProps) {
               itemId={post.id}
               content={post.content}
               handlePostUpdate={handlePostUpdate}
+              onDelete={onPostDelete}
             />
           </div>
         )}
