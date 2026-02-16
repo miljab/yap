@@ -6,8 +6,12 @@ body {
   box-sizing: border-box;
 }
 
-body {
-  @apply !min-w-full;
+#root {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  overflow-x: auto;
+  width: 100%;
 }
 
 @theme {
@@ -133,15 +137,8 @@ body {
 }
 
 html {
-  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: oklch(0.5 0 0) transparent;
-}
-
-html body[data-scroll-locked] {
-  margin-right: 0px !important;
-  margin-left: 0px !important;
-  overflow: visible !important;
 }
 
 .dark {
