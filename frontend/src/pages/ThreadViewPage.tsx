@@ -129,7 +129,7 @@ function ThreadViewPage() {
         />
       </div>
 
-      <div>
+      <div className="border-t border-b">
         <CreateComment
           postId={post.id}
           parentId={comment.id}
