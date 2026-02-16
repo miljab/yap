@@ -2,6 +2,8 @@ import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
 import { deleteImages, uploadImages } from "../utils/cloudinaryHelper.js";
 
+const DEFAULT_PAGE_LIMIT = 10;
+
 export const postService = {
   createPost: async ({
     userId,
@@ -174,5 +176,54 @@ export const postService = {
     const updatedPost = await postService.getPostById(postId, userId);
 
     return updatedPost;
+  },
+
+  getHomeFeed: async (
+    userId: string,
+    cursor?: string,
+    limit: number = DEFAULT_PAGE_LIMIT,
+  ) => {
+    const posts = await prisma.post.findMany({
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      orderBy: { createdAt: "desc" },
+      include: {
+        images: true,
+        user: true,
+        history: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+          },
+        },
+      },
+    });
+
+    const hasMore = posts.length > limit;
+    const result = hasMore ? posts.slice(0, -1) : posts;
+
+    const formattedPosts = result.map((post) => {
+      const isLiked = post.likes.some((like) => like.userId === userId);
+      const likeCount = post.likes.length;
+      const commentCount = post._count.comments;
+
+      return {
+        ...post,
+        isLiked,
+        likeCount,
+        commentCount,
+        likes: userId === post.userId ? post.likes : [],
+      };
+    });
+
+    return {
+      posts: formattedPosts,
+      nextCursor: hasMore ? result[result.length - 1]?.id : null,
+    };
   },
 };

@@ -141,3 +141,26 @@ export const updatePost = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getHomeFeed = async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  const cursor = req.query.cursor as string | undefined;
+  const limit = req.query.limit
+    ? parseInt(req.query.limit as string)
+    : undefined;
+
+  try {
+    if (!userId) throw new AppError("Unauthorized", 401);
+
+    const posts = await postService.getHomeFeed(userId, cursor, limit);
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
