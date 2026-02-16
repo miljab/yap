@@ -35,7 +35,7 @@ function CommentButton({
         </button>
       </DialogTrigger>
       <DialogContent data-no-navigate>
-        <div className="flex cursor-pointer gap-2 border-b-1 p-2">
+        <div className="flex cursor-pointer gap-2 p-2">
           <div className="flex flex-col items-center">
             <UserAvatar
               avatarUrl={target.user.avatar}
@@ -63,13 +63,15 @@ function CommentButton({
             </div>
           </div>
         </div>
-        <CreateComment
-          postId={postId}
-          parentId={"postId" in target ? target.id : undefined}
-          closeDialog={closeDialog}
-          autoFocus={true}
-          onCommentCreated={onCommentCreated}
-        />
+        <div className="rounded-md border">
+          <CreateComment
+            postId={postId}
+            parentId={"postId" in target ? target.id : undefined}
+            closeDialog={closeDialog}
+            autoFocus={true}
+            onCommentCreated={onCommentCreated}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

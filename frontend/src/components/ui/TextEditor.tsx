@@ -148,7 +148,7 @@ function TextEditor({
   const warningThreshold = Math.floor(maxLength * 0.95);
 
   return (
-    <div className="flex flex-col rounded-md border">
+    <div className="flex flex-col">
       <div className="relative min-h-16 p-2">
         {actualLength === 0 && (
           <span className="pointer-events-none absolute top-4 left-4 text-neutral-500 select-none">

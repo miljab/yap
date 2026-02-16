@@ -110,13 +110,15 @@ function OptionsButton(props: OptionsButtonProps) {
             <DialogHeader>
               <DialogTitle>Edit Post</DialogTitle>
             </DialogHeader>
-            <TextEditor
-              onSubmit={handlePostEdit}
-              initialContent={props.content}
-              submitButtonText="Save"
-              allowImages={false}
-              placeholder="Edit post content"
-            />
+            <div className="rounded-md border">
+              <TextEditor
+                onSubmit={handlePostEdit}
+                initialContent={props.content}
+                submitButtonText="Save"
+                allowImages={false}
+                placeholder="Edit post content"
+              />
+            </div>
           </DialogContent>
         </Dialog>
       )}

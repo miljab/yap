@@ -36,13 +36,15 @@ function CommentView({
   const user = useAuthenticatedUser();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    preventNavigation(e, navigate, "comment", comment.id, { from: location.state?.from || location.pathname });
+    preventNavigation(e, navigate, "comment", comment.id, {
+      from: location.state?.from || location.pathname,
+    });
   };
 
   if (isSelected) {
     return (
       <div
-        className="flex cursor-pointer flex-col gap-2 p-2"
+        className="flex cursor-pointer flex-col gap-2 p-4"
         onClick={(e) => handleContainerClick(e)}
       >
         <div className="flex items-center gap-1 text-sm">
@@ -104,7 +106,7 @@ function CommentView({
       </div>
 
       <div className="flex w-full flex-col justify-start gap-1">
-        <div className="flex gap-1 text-sm">
+        <div className="flex items-center gap-1 text-sm">
           <span className="flex items-center font-bold">
             {comment.user.username}
           </span>
