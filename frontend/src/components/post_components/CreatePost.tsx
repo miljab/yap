@@ -28,7 +28,7 @@ function CreatePost() {
   }
 
   return (
-    <div className="m-4">
+    <div className="border-b">
       <TextEditor
         onSubmit={handleCreatePost}
         placeholder="What's on your mind?"

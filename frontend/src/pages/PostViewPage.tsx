@@ -69,7 +69,7 @@ function PostViewPage() {
   }
 
   return (
-    <div className="flex flex-col gap-2 p-4">
+    <div className="flex flex-col">
       <PostView
         post={post}
         handlePostUpdate={handlePostUpdate}
@@ -79,7 +79,9 @@ function PostViewPage() {
           navigate(location.state?.from || "/home");
         }}
       />
-      <CreateComment postId={post.id} onCommentCreated={onCommentCreated} />
+      <div className="border-b">
+        <CreateComment postId={post.id} onCommentCreated={onCommentCreated} />
+      </div>
       <Comments
         postId={post.id}
         comments={comments}
