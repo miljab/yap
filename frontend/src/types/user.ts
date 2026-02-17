@@ -5,8 +5,9 @@ export type User = {
   createdAt: Date;
   avatar: string;
   bio?: string;
-  followers: User[];
-  following: User[];
+  followersCount: number;
+  followingCount: number;
+  isFollowed: boolean;
 };
 
 export type OnboardingUser = {
