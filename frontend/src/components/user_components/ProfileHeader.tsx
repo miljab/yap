@@ -23,7 +23,7 @@ function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
         {user.id === authUser.id ? (
           <EditProfile user={user} onProfileUpdate={onUserUpdate} />
         ) : (
-          <FollowButton isFollowed={user.isFollowed} />
+          <FollowButton initialIsFollowed={user.isFollowed} userId={user.id} />
         )}
       </div>
 
