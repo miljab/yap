@@ -193,4 +193,52 @@ export const userService = {
       _count: undefined,
     };
   },
+
+  followProfile: async (requesterId: string, userId: string) => {
+    if (requesterId === userId)
+      throw new AppError("Cannot follow yourself", 400);
+
+    const existingFollow = await prisma.user.findFirst({
+      where: {
+        id: requesterId,
+        following: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    if (existingFollow) {
+      await prisma.user.update({
+        where: {
+          id: requesterId,
+        },
+        data: {
+          following: {
+            disconnect: {
+              id: userId,
+            },
+          },
+        },
+      });
+
+      return { isFollowed: false };
+    } else {
+      await prisma.user.update({
+        where: {
+          id: requesterId,
+        },
+        data: {
+          following: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      });
+
+      return { isFollowed: true };
+    }
+  },
 };

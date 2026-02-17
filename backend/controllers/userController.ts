@@ -109,3 +109,25 @@ export const updateProfile = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const followProfile = async (req: Request, res: Response) => {
+  const requesterId = req.user?.id;
+  const userId = req.params.userId;
+
+  try {
+    if (!requesterId) throw new AppError("Unauthorized", 401);
+
+    if (!userId) throw new AppError("User ID is required", 400);
+
+    const isFollowed = await userService.followProfile(requesterId, userId);
+
+    res.status(200).json(isFollowed);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
