@@ -5,11 +5,12 @@ import { handleError } from "../utils/errorUtils.js";
 
 export const getUserProfile = async (req: Request, res: Response) => {
   const username = req.params.username;
+  const requesterId = req.user?.id;
 
   try {
     if (!username) throw new AppError("Username is required", 400);
 
-    const user = await userService.getUserProfile(username);
+    const user = await userService.getUserProfile(username, requesterId);
 
     res.status(200).json(user);
   } catch (error) {

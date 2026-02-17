@@ -7,20 +7,43 @@ import { nanoid } from "nanoid";
 const DEFAULT_PAGE_LIMIT = 10;
 
 export const userService = {
-  getUserProfile: async (username: string) => {
+  getUserProfile: async (username: string, requesterId?: string) => {
     const user = await prisma.user.findUnique({
       where: {
         username: username,
       },
       include: {
-        followers: true,
-        following: true,
+        _count: {
+          select: {
+            followers: true,
+            following: true,
+          },
+        },
       },
     });
 
     if (!user) throw new AppError("User not found", 404);
 
-    return user;
+    const isFollowed = requesterId
+      ? (await prisma.user.findFirst({
+          where: {
+            id: user.id,
+            followers: {
+              some: {
+                id: requesterId,
+              },
+            },
+          },
+        })) !== null
+      : false;
+
+    return {
+      ...user,
+      followersCount: user._count.followers,
+      followingCount: user._count.following,
+      isFollowed,
+      _count: undefined,
+    };
   },
 
   getUserPosts: async (
@@ -153,11 +176,21 @@ export const userService = {
         ...(avatarUrl && { avatar: avatarUrl }),
       },
       include: {
-        followers: true,
-        following: true,
+        _count: {
+          select: {
+            followers: true,
+            following: true,
+          },
+        },
       },
     });
 
-    return updatedUser;
+    return {
+      ...updatedUser,
+      followersCount: updatedUser._count.followers,
+      followingCount: updatedUser._count.following,
+      isFollowed: false,
+      _count: undefined,
+    };
   },
 };
