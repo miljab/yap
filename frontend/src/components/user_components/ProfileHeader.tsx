@@ -3,6 +3,7 @@ import UserAvatar from "./UserAvatar";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 import EditProfile from "./EditProfile";
 import FollowButton from "../FollowButton";
+import FollowList from "../FollowList";
 
 type ProfileHeaderProps = {
   user: User;
@@ -34,12 +35,16 @@ function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
       <div className="flex flex-col gap-1 text-sm text-neutral-500">
         <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
         <div className="flex gap-4">
-          <button className="cursor-pointer hover:underline">
-            {user.followingCount} Following
-          </button>
-          <button className="cursor-pointer hover:underline">
-            {user.followersCount} Followers
-          </button>
+          <FollowList
+            type="following"
+            count={user.followingCount}
+            user={user}
+          />
+          <FollowList
+            type="followers"
+            count={user.followersCount}
+            user={user}
+          />
         </div>
       </div>
     </div>
