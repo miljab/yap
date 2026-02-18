@@ -131,3 +131,65 @@ export const followProfile = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getFollowingUsers = async (req: Request, res: Response) => {
+  const requesterId = req.user?.id;
+  const userId = req.params.userId;
+  const cursor = req.query.cursor as string | undefined;
+  const limit = req.query.limit
+    ? parseInt(req.query.limit as string)
+    : undefined;
+
+  try {
+    if (!requesterId) throw new AppError("Unauthorized", 401);
+
+    if (!userId) throw new AppError("User ID is required", 400);
+
+    const followingUsers = await userService.getFollowingUsers(
+      requesterId,
+      userId,
+      cursor,
+      limit,
+    );
+
+    res.status(200).json(followingUsers);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
+
+export const getFollowers = async (req: Request, res: Response) => {
+  const requesterId = req.user?.id;
+  const userId = req.params.userId;
+  const cursor = req.query.cursor as string | undefined;
+  const limit = req.query.limit
+    ? parseInt(req.query.limit as string)
+    : undefined;
+
+  try {
+    if (!requesterId) throw new AppError("Unauthorized", 401);
+
+    if (!userId) throw new AppError("User ID is required", 400);
+
+    const followers = await userService.getFollowers(
+      requesterId,
+      userId,
+      cursor,
+      limit,
+    );
+
+    res.status(200).json(followers);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};

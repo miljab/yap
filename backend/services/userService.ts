@@ -241,4 +241,115 @@ export const userService = {
       return { isFollowed: true };
     }
   },
+
+  getFollowingUsers: async (
+    requesterId: string,
+    userId: string,
+    cursor?: string,
+    limit: number = DEFAULT_PAGE_LIMIT,
+  ) => {
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        following: {
+          take: limit + 1,
+          ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+          orderBy: { username: "asc" },
+        },
+      },
+    });
+
+    if (!targetUser) throw new AppError("User not found", 404);
+
+    const following = targetUser.following;
+    const hasMore = following.length > limit;
+    const result = hasMore ? following.slice(0, -1) : following;
+
+    const followingIds = result.map((u) => u.id);
+
+    const requesterFollowing = await prisma.user.findUnique({
+      where: { id: requesterId },
+      select: {
+        following: {
+          where: { id: { in: followingIds } },
+          select: { id: true },
+        },
+      },
+    });
+
+    const requesterFollowingSet = new Set(
+      requesterFollowing?.following.map((u) => u.id) || [],
+    );
+
+    const formattedUsers = result.map((user) => ({
+      ...user,
+      isFollowed: requesterFollowingSet.has(user.id),
+    }));
+
+    return {
+      users: formattedUsers,
+      nextCursor: hasMore ? result[result.length - 1]?.id : null,
+    };
+  },
+
+  getFollowers: async (
+    requesterId: string,
+    userId: string,
+    cursor?: string,
+    limit: number = DEFAULT_PAGE_LIMIT,
+  ) => {
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        followers: {
+          take: limit + 1,
+          ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+          orderBy: { username: "asc" },
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                following: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!targetUser) throw new AppError("User not found", 404);
+
+    const followers = targetUser.followers;
+    const hasMore = followers.length > limit;
+    const result = hasMore ? followers.slice(0, -1) : followers;
+
+    const followerIds = result.map((u) => u.id);
+
+    const requesterFollowing = await prisma.user.findUnique({
+      where: { id: requesterId },
+      select: {
+        following: {
+          where: { id: { in: followerIds } },
+          select: { id: true },
+        },
+      },
+    });
+
+    const requesterFollowingSet = new Set(
+      requesterFollowing?.following.map((u) => u.id) || [],
+    );
+
+    const formattedUsers = result.map((user) => ({
+      ...user,
+      followersCount: user._count.followers,
+      followingCount: user._count.following,
+      isFollowed: requesterFollowingSet.has(user.id),
+      _count: undefined,
+    }));
+
+    return {
+      users: formattedUsers,
+      nextCursor: hasMore ? result[result.length - 1]?.id : null,
+    };
+  },
 };
