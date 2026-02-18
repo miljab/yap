@@ -131,11 +131,11 @@ function FollowList({ type, count, user }: FollowListProps) {
                   username={follow.username}
                 />
                 <span>{follow.username}</span>
-                {authenticatedUser.id === user.id && (
+                {authenticatedUser.id !== follow.id && (
                   <div className="flex grow justify-end">
                     <FollowButton
                       initialIsFollowed={follow.isFollowed}
-                      userId={user.id}
+                      userId={follow.id}
                     />
                   </div>
                 )}
