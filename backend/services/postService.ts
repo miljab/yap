@@ -226,4 +226,62 @@ export const postService = {
       nextCursor: hasMore ? result[result.length - 1]?.id : null,
     };
   },
+
+  getFollowingFeed: async (
+    userId: string,
+    cursor?: string,
+    limit: number = DEFAULT_PAGE_LIMIT,
+  ) => {
+    const posts = await prisma.post.findMany({
+      where: {
+        user: {
+          followers: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      orderBy: { createdAt: "desc" },
+      include: {
+        images: true,
+        user: true,
+        history: true,
+        likes: {
+          include: {
+            user: true,
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+          },
+        },
+      },
+    });
+
+    const hasMore = posts.length > limit;
+    const result = hasMore ? posts.slice(0, -1) : posts;
+
+    const formattedPosts = result.map((post) => {
+      const isLiked = post.likes.some((like) => like.userId === userId);
+      const likeCount = post.likes.length;
+      const commentCount = post._count.comments;
+
+      return {
+        ...post,
+        isLiked,
+        likeCount,
+        commentCount,
+        likes: userId === post.userId ? post.likes : [],
+      };
+    });
+
+    return {
+      posts: formattedPosts,
+      nextCursor: hasMore ? result[result.length - 1]?.id : null,
+    };
+  },
 };
