@@ -1,38 +1,97 @@
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import HomeFeedAllPosts from "./HomeFeedAllPosts";
-import HomeFeedFollowing from "./HomeFeedFollowing";
+import { useCallback } from "react";
+import type { Post } from "@/types/post";
+import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import PostView from "./PostView";
+import { Spinner } from "../ui/spinner";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
-function HomeFeed() {
-  const [activeTab, setActiveTab] = useState("all");
+type HomeFeedProps = {
+  type: "all" | "following";
+};
+
+function HomeFeed({ type }: HomeFeedProps) {
+  const axiosPrivate = useAxiosPrivate();
+
+  const fetchPosts = useCallback(
+    async (currentCursor?: string) => {
+      let url;
+
+      if (type === "all") {
+        url = currentCursor ? `/feed?cursor=${currentCursor}` : "/feed";
+      } else {
+        url = currentCursor
+          ? `/feed/following?cursor=${currentCursor}`
+          : "/feed/following";
+      }
+      const response = await axiosPrivate.get(url);
+
+      return {
+        items: response.data.posts,
+        nextCursor: response.data.nextCursor,
+      };
+    },
+    [axiosPrivate, type],
+  );
+
+  const {
+    items: posts,
+    setItems: setPosts,
+    isLoading,
+    initialLoad,
+    loaderRef,
+  } = useInfiniteScroll<Post>(fetchPosts, []);
+
+  const handlePostUpdate = (updatedPost: Post) => {
+    setPosts((prev) =>
+      prev.map((p) => (p.id === updatedPost.id ? updatedPost : p)),
+    );
+  };
+
+  if (initialLoad) {
+    return (
+      <div className="flex justify-center p-4">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div className="p-4 text-center text-neutral-500">
+        No posts to display
+      </div>
+    );
+  }
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList variant="line" className="w-full">
-        <TabsTrigger value="all" className="flex-1 cursor-pointer">
-          All
-        </TabsTrigger>
-        <TabsTrigger value="following" className="flex-1 cursor-pointer">
-          Following
-        </TabsTrigger>
-      </TabsList>
+    <div>
+      {posts.map((post) => (
+        <PostView
+          key={post.id}
+          post={post}
+          handlePostUpdate={handlePostUpdate}
+          onCommentCreated={() => {
+            setPosts((prev) =>
+              prev.map((p) =>
+                p.id === post.id
+                  ? {
+                      ...p,
+                      commentCount: p.commentCount + 1,
+                    }
+                  : p,
+              ),
+            );
+          }}
+          onPostDelete={() => {
+            setPosts((prev) => prev.filter((p) => p.id !== post.id));
+          }}
+        />
+      ))}
 
-      <TabsContent
-        value="all"
-        forceMount
-        className={activeTab !== "all" ? "hidden" : ""}
-      >
-        <HomeFeedAllPosts />
-      </TabsContent>
-
-      <TabsContent
-        value="following"
-        forceMount
-        className={activeTab !== "following" ? "hidden" : ""}
-      >
-        <HomeFeedFollowing />
-      </TabsContent>
-    </Tabs>
+      <div ref={loaderRef} className="flex justify-center p-4">
+        {isLoading && <Spinner />}
+      </div>
+    </div>
   );
 }
 
