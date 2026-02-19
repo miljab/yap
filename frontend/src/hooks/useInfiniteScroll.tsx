@@ -63,12 +63,18 @@ export function useInfiniteScroll<T>(
     isFetchingRef.current = false;
   }, []);
 
+  // Reset when deps change
   useEffect(() => {
     reset();
-    fetchNext();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
+
+  // Initial fetch when in initialLoad state
+  useEffect(() => {
+    if (initialLoad && !isLoading) {
+      fetchNext();
+    }
+  }, [initialLoad, isLoading, fetchNext]);
 
   useEffect(() => {
     const loader = loaderRef.current;
