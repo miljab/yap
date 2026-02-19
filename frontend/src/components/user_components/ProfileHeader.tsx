@@ -1,8 +1,9 @@
 import type { User } from "@/types/user";
 import UserAvatar from "./UserAvatar";
-import { Button } from "../ui/button";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 import EditProfile from "./EditProfile";
+import FollowButton from "../FollowButton";
+import FollowList from "../FollowList";
 
 type ProfileHeaderProps = {
   user: User;
@@ -23,7 +24,7 @@ function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
         {user.id === authUser.id ? (
           <EditProfile user={user} onProfileUpdate={onUserUpdate} />
         ) : (
-          <Button variant={"outline"}>Follow</Button>
+          <FollowButton initialIsFollowed={user.isFollowed} userId={user.id} />
         )}
       </div>
 
@@ -34,12 +35,16 @@ function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
       <div className="flex flex-col gap-1 text-sm text-neutral-500">
         <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
         <div className="flex gap-4">
-          <button className="cursor-pointer hover:underline">
-            {user.following.length} Following
-          </button>
-          <button className="cursor-pointer hover:underline">
-            {user.following.length} Followers
-          </button>
+          <FollowList
+            type="following"
+            count={user.followingCount}
+            user={user}
+          />
+          <FollowList
+            type="followers"
+            count={user.followersCount}
+            user={user}
+          />
         </div>
       </div>
     </div>
