@@ -1,22 +1,40 @@
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import type { Comment } from "@/types/post";
 import CommentView from "@/components/comment_components/CommentView";
 import { Spinner } from "../ui/spinner";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 type ProfileCommentsProps = {
   userId: string;
 };
 
 function ProfileComments({ userId }: ProfileCommentsProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
-  const loaderRef = useRef<HTMLDivElement>(null);
-  const isLoadingRef = useRef(false);
   const axiosPrivate = useAxiosPrivate();
+
+  const fetchComments = useCallback(
+    async (currentCursor?: string) => {
+      const url = currentCursor
+        ? `/users/${userId}/comments?cursor=${currentCursor}`
+        : `/users/${userId}/comments`;
+
+      const response = await axiosPrivate.get(url);
+
+      return {
+        items: response.data.comments,
+        nextCursor: response.data.nextCursor,
+      };
+    },
+    [axiosPrivate, userId],
+  );
+
+  const {
+    items: comments,
+    setItems: setComments,
+    isLoading,
+    initialLoad,
+    loaderRef,
+  } = useInfiniteScroll<Comment>(fetchComments, [userId]);
 
   const handleCommentCreated = (newComment: Comment) => {
     setComments((prev) =>
@@ -27,68 +45,6 @@ function ProfileComments({ userId }: ProfileCommentsProps) {
       ),
     );
   };
-
-  const fetchComments = useCallback(
-    async (currentCursor?: string) => {
-      if (isLoadingRef.current) return;
-      isLoadingRef.current = true;
-
-      try {
-        setIsLoading(true);
-        const url = currentCursor
-          ? `/users/${userId}/comments?cursor=${currentCursor}`
-          : `/users/${userId}/comments`;
-
-        const response = await axiosPrivate.get(url);
-
-        setComments((prev) =>
-          currentCursor
-            ? [...prev, ...response.data.comments]
-            : response.data.comments,
-        );
-        setCursor(response.data.nextCursor);
-        setHasMore(response.data.nextCursor !== null);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-        setInitialLoad(false);
-        isLoadingRef.current = false;
-      }
-    },
-    [axiosPrivate, userId],
-  );
-
-  useEffect(() => {
-    setComments([]);
-    setCursor(null);
-    setHasMore(true);
-    setInitialLoad(true);
-    fetchComments();
-  }, [userId, fetchComments]);
-
-  useEffect(() => {
-    const loader = loaderRef.current;
-    if (!loader) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          hasMore &&
-          !isLoading &&
-          !initialLoad
-        ) {
-          fetchComments(cursor ?? undefined);
-        }
-      },
-      { threshold: 0.1 },
-    );
-
-    observer.observe(loader);
-
-    return () => observer.disconnect();
-  }, [cursor, hasMore, isLoading, initialLoad, fetchComments]);
 
   if (initialLoad) {
     return (

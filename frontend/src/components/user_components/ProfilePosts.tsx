@@ -1,83 +1,39 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useCallback } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import type { Post } from "@/types/post";
 import { Spinner } from "../ui/spinner";
 import PostView from "../post_components/PostView";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 type ProfilePostsProps = {
   userId: string;
 };
 
 function ProfilePosts({ userId }: ProfilePostsProps) {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true);
-  const loaderRef = useRef<HTMLDivElement>(null);
-  const isLoadingRef = useRef(false);
   const axiosPrivate = useAxiosPrivate();
 
   const fetchPosts = useCallback(
     async (currentCursor?: string) => {
-      if (isLoadingRef.current) return;
-      isLoadingRef.current = true;
+      const url = currentCursor
+        ? `/users/${userId}/posts?cursor=${currentCursor}`
+        : `/users/${userId}/posts`;
+      const response = await axiosPrivate.get(url);
 
-      try {
-        setIsLoading(true);
-        const url = currentCursor
-          ? `/users/${userId}/posts?cursor=${currentCursor}`
-          : `/users/${userId}/posts`;
-        const response = await axiosPrivate.get(url);
-
-        setPosts((prev) =>
-          currentCursor
-            ? [...prev, ...response.data.posts]
-            : response.data.posts,
-        );
-        setCursor(response.data.nextCursor);
-        setHasMore(response.data.nextCursor !== null);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-        setInitialLoad(false);
-        isLoadingRef.current = false;
-      }
+      return {
+        items: response.data.posts,
+        nextCursor: response.data.nextCursor,
+      };
     },
     [axiosPrivate, userId],
   );
 
-  useEffect(() => {
-    setPosts([]);
-    setCursor(null);
-    setHasMore(true);
-    setInitialLoad(true);
-    fetchPosts();
-  }, [userId, fetchPosts]);
-
-  useEffect(() => {
-    const loader = loaderRef.current;
-    if (!loader) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          hasMore &&
-          !isLoading &&
-          !initialLoad
-        ) {
-          fetchPosts(cursor ?? undefined);
-        }
-      },
-      { threshold: 0.1 },
-    );
-
-    observer.observe(loader);
-
-    return () => observer.disconnect();
-  }, [cursor, hasMore, isLoading, initialLoad, fetchPosts]);
+  const {
+    items: posts,
+    setItems: setPosts,
+    isLoading,
+    initialLoad,
+    loaderRef,
+  } = useInfiniteScroll<Post>(fetchPosts, [userId]);
 
   const handlePostUpdate = (updatedPost: Post) => {
     setPosts((prev) =>

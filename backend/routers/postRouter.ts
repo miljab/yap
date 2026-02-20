@@ -7,6 +7,7 @@ import {
   deletePost,
   updatePost,
   getHomeFeed,
+  getFollowingFeed,
 } from "../controllers/postController.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
@@ -35,5 +36,7 @@ router.delete("/post/:id", verifyAccessToken, deletePost);
 router.put("/post/:id", verifyAccessToken, updatePost);
 
 router.get("/feed", verifyAccessToken, getHomeFeed);
+
+router.get("/feed/following", verifyAccessToken, getFollowingFeed);
 
 export default router;

@@ -6,12 +6,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import UserAvatar from "./user_components/UserAvatar";
 import { Spinner } from "./ui/spinner";
 import FollowButton from "./FollowButton";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 type FollowListProps = {
   type: "following" | "followers";
@@ -20,79 +21,31 @@ type FollowListProps = {
 };
 
 function FollowList({ type, count, user }: FollowListProps) {
-  const [follows, setFollows] = useState<User[]>([]);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const loaderRef = useRef<HTMLDivElement>(null);
-  const isLoadingRef = useRef(false);
   const axiosPrivate = useAxiosPrivate();
   const authenticatedUser = useAuthenticatedUser();
 
   const fetchFollows = useCallback(
     async (currentCursor?: string) => {
-      if (isLoadingRef.current) return;
-      isLoadingRef.current = true;
+      const url = currentCursor
+        ? `/users/${user.id}/${type}?cursor=${currentCursor}`
+        : `/users/${user.id}/${type}`;
+      const response = await axiosPrivate.get(url);
 
-      try {
-        setIsLoading(true);
-        const url = currentCursor
-          ? `/users/${user.id}/${type}?cursor=${currentCursor}`
-          : `/users/${user.id}/${type}`;
-        const response = await axiosPrivate.get(url);
-
-        setFollows((prev) =>
-          currentCursor
-            ? [...prev, ...response.data.users]
-            : response.data.users,
-        );
-        setCursor(response.data.nextCursor);
-        setHasMore(response.data.nextCursor !== null);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-        setInitialLoad(false);
-        isLoadingRef.current = false;
-      }
+      return {
+        items: response.data.users,
+        nextCursor: response.data.nextCursor,
+      };
     },
     [axiosPrivate, user.id, type],
   );
 
-  useEffect(() => {
-    if (isOpen) {
-      setFollows([]);
-      setCursor(null);
-      setHasMore(true);
-      setInitialLoad(true);
-      fetchFollows();
-    }
-  }, [isOpen, fetchFollows]);
-
-  useEffect(() => {
-    const loader = loaderRef.current;
-    if (!loader) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          hasMore &&
-          !isLoading &&
-          !initialLoad
-        ) {
-          fetchFollows(cursor ?? undefined);
-        }
-      },
-      { threshold: 0.1 },
-    );
-
-    observer.observe(loader);
-
-    return () => observer.disconnect();
-  }, [cursor, hasMore, isLoading, initialLoad, fetchFollows]);
+  const {
+    items: follows,
+    isLoading,
+    initialLoad,
+    loaderRef,
+  } = useInfiniteScroll<User>(fetchFollows, [isOpen, user.id, type]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
