@@ -26,10 +26,18 @@ export const postService = {
       },
       include: {
         images: true,
+        user: true,
       },
     });
 
-    return post;
+    return {
+      ...post,
+      isLiked: false,
+      likeCount: 0,
+      commentCount: 0,
+      likes: [],
+      history: [],
+    };
   },
 
   getPostById: async (postId: string, userId: string) => {
