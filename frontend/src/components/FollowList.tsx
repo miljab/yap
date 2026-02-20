@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import UserAvatar from "./user_components/UserAvatar";
 import { Spinner } from "./ui/spinner";
