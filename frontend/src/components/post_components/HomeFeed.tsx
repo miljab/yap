@@ -4,6 +4,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import PostView from "./PostView";
 import { Spinner } from "../ui/spinner";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import CreatePost from "./CreatePost";
 
 type HomeFeedProps = {
   type: "all" | "following";
@@ -41,6 +42,10 @@ function HomeFeed({ type }: HomeFeedProps) {
     loaderRef,
   } = useInfiniteScroll<Post>(fetchPosts, []);
 
+  const handlePostCreate = (newPost: Post) => {
+    setPosts((prev) => [newPost, ...prev]);
+  };
+
   const handlePostUpdate = (updatedPost: Post) => {
     setPosts((prev) =>
       prev.map((p) => (p.id === updatedPost.id ? updatedPost : p)),
@@ -65,6 +70,9 @@ function HomeFeed({ type }: HomeFeedProps) {
 
   return (
     <div>
+      <CreatePost
+        onPostCreate={type === "all" ? handlePostCreate : undefined}
+      />
       {posts.map((post) => (
         <PostView
           key={post.id}

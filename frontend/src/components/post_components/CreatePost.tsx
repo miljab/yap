@@ -1,8 +1,13 @@
 import { toast } from "sonner";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import TextEditor from "../ui/TextEditor";
+import type { Post } from "@/types/post";
 
-function CreatePost() {
+type CreatePostProps = {
+  onPostCreate?: (post: Post) => void;
+};
+
+function CreatePost({ onPostCreate }: CreatePostProps) {
   const axiosPrivate = useAxiosPrivate();
 
   async function handleCreatePost(content: string, files?: File[]) {
@@ -20,6 +25,7 @@ function CreatePost() {
 
       if (response.status === 201) {
         toast.success("Post created successfully.");
+        if (onPostCreate) onPostCreate(response.data);
       }
     } catch (error) {
       toast.error("Failed to create post. Please try again.");
