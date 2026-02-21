@@ -53,7 +53,11 @@ function Nav() {
             to={`/profile/${user.username}`}
             className="hover:bg-accent flex items-center justify-center gap-2 rounded-full p-2"
           >
-            <UserAvatar avatarUrl={user.avatar} username={user.username} />
+            <UserAvatar
+              avatarUrl={user.avatar}
+              username={user.username}
+              redirect={false}
+            />
             <span className="truncate">{user.username}</span>
           </Link>
 
