@@ -2,7 +2,7 @@ import type { Post, Comment } from "@/types/post";
 import ImagePreview from "../ImagePreview";
 import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation, Link } from "react-router";
 import preventNavigation from "@/utils/preventNavigation";
 import OptionsButton from "../OptionsButton";
 import UserAvatar from "../user_components/UserAvatar";
@@ -51,7 +51,12 @@ function PostView({
         />
 
         <div className="flex flex-col">
-          <span className="font-bold">{post.user.username}</span>
+          <Link
+            to={`/profile/${post.user.username}`}
+            className="w-fit cursor-pointer font-bold hover:underline"
+          >
+            {post.user.username}
+          </Link>
           <span className="text-neutral-500">
             {new Date(post.createdAt).toLocaleString()}
           </span>

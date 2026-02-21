@@ -2,7 +2,7 @@ import type { Comment } from "@/types/post";
 import ImagePreview from "../ImagePreview";
 import InteractionButtons from "../InteractionButtons";
 import { useLike } from "@/hooks/useLike";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation, Link } from "react-router";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
 import preventNavigation from "@/utils/preventNavigation";
 import UserAvatar from "../user_components/UserAvatar";
@@ -54,7 +54,12 @@ function CommentView({
           />
 
           <div className="flex flex-col">
-            <span className="font-bold">{comment.user.username}</span>
+            <Link
+              to={`/profile/${comment.user.username}`}
+              className="w-fit cursor-pointer font-bold hover:underline"
+            >
+              {comment.user.username}
+            </Link>
             <span className="text-neutral-500">
               {new Date(comment.createdAt).toLocaleString()}
             </span>
@@ -107,9 +112,12 @@ function CommentView({
 
       <div className="flex w-full flex-col justify-start gap-1">
         <div className="flex items-center gap-1 text-sm">
-          <span className="flex items-center font-bold">
+          <Link
+            to={`/profile/${comment.user.username}`}
+            className="flex cursor-pointer items-center font-bold hover:underline"
+          >
             {comment.user.username}
-          </span>
+          </Link>
           <span className="text-neutral-500">&middot;</span>
           <span className="text-neutral-500">
             {formatTimeAgoOrDate(comment.createdAt)}

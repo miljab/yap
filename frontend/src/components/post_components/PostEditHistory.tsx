@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import { Link } from "react-router";
 
 type PostHistoryProps = {
   post: Post;
@@ -40,9 +41,12 @@ function PostEditHistory({ post }: PostHistoryProps) {
 
                 <div className="flex grow flex-col justify-start gap-1">
                   <div className="flex gap-1 text-sm">
-                    <span className="flex items-center font-bold">
+                    <Link
+                      to={`/profile/${post.user.username}`}
+                      className="flex cursor-pointer items-center font-bold hover:underline"
+                    >
                       {post.user.username}
-                    </span>
+                    </Link>
                     <span className="text-neutral-500">&middot;</span>
                     <span className="text-neutral-500">
                       {new Date(h.createdAt).toLocaleString()}
