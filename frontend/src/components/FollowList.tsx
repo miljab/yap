@@ -73,19 +73,24 @@ function FollowList({ type, count, user }: FollowListProps) {
         ) : follows.length === 0 ? (
           <div className="p-4 text-center text-neutral-500">No {type} yet</div>
         ) : (
-          <div className="flex max-h-[500px] flex-col gap-2 overflow-auto">
+          <div className="flex max-h-[500px] flex-col overflow-auto">
             {follows.map((follow, idx) => (
               <div
                 key={follow.id}
-                className={`flex items-center gap-2 p-1 ${idx !== follows.length - 1 && "border-b-1"}`}
+                className={`flex items-center gap-2 p-2 ${idx !== follows.length - 1 && "border-b-1"}`}
               >
                 <UserAvatar
                   avatarUrl={follow.avatar}
                   username={follow.username}
                 />
-                <span>{follow.username}</span>
+                <div className="flex grow flex-col">
+                  <span>{follow.username}</span>
+                  <p className="truncate wrap-break-word text-neutral-500 contain-inline-size">
+                    {follow.bio}
+                  </p>
+                </div>
                 {authenticatedUser.id !== follow.id && (
-                  <div className="flex grow justify-end">
+                  <div className="flex justify-end">
                     <FollowButton
                       initialIsFollowed={follow.isFollowed}
                       userId={follow.id}
