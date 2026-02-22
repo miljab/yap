@@ -65,6 +65,16 @@ describe("POST /post/new", () => {
     expect(res.body).toHaveProperty("error", "Text or images are required");
   });
 
+  it("should reject post with whitespace-only text", async () => {
+    const res = await request(app)
+      .post("/post/new")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .field("text", "   ");
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty("error", "Text or images are required");
+  });
+
   it("should create a post with images only", async () => {
     const res = await request(app)
       .post("/post/new")
