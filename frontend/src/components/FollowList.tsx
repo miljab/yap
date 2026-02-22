@@ -13,6 +13,7 @@ import { Spinner } from "./ui/spinner";
 import FollowButton from "./FollowButton";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { Link } from "react-router";
 
 type FollowListProps = {
   type: "following" | "followers";
@@ -84,7 +85,13 @@ function FollowList({ type, count, user }: FollowListProps) {
                   username={follow.username}
                 />
                 <div className="flex grow flex-col">
-                  <span>{follow.username}</span>
+                  <Link
+                    to={`/profile/${follow.username}`}
+                    className="cursor-pointer wrap-break-word contain-inline-size hover:underline"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {follow.username}
+                  </Link>
                   <p className="truncate wrap-break-word text-neutral-500 contain-inline-size">
                     {follow.bio}
                   </p>

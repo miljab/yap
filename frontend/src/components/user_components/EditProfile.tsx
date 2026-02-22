@@ -96,6 +96,7 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
               avatarUrl={avatarPreview ?? user.avatar}
               username={user.username}
               className="h-24 w-24"
+              redirect={false}
             />
             <input
               ref={fileInputRef}

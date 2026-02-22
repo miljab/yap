@@ -7,6 +7,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import UserAvatar from "./user_components/UserAvatar";
+import { Link } from "react-router";
 
 type LikedByProps = {
   likes: Like[];
@@ -35,7 +36,12 @@ function LikedBy({ likes, likeCount }: LikedByProps) {
                   avatarUrl={like.user.avatar}
                   username={like.user.username}
                 />
-                <span>{like.user.username}</span>
+                <Link
+                  to={`/profile/${like.user.username}`}
+                  className="cursor-pointer hover:underline"
+                >
+                  {like.user.username}
+                </Link>
               </div>
             );
           })}

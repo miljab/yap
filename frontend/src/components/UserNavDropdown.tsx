@@ -38,7 +38,11 @@ function UserNavDropdown() {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <button className="relative cursor-pointer rounded-full">
-          <UserAvatar avatarUrl={user.avatar} username={user.username} />
+          <UserAvatar
+            avatarUrl={user.avatar}
+            username={user.username}
+            redirect={false}
+          />
           <div className="bg-accent border-primary absolute -right-1 -bottom-1 rounded-full border">
             <ChevronDown size={16} />
           </div>

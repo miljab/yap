@@ -6,6 +6,7 @@ import UserAvatar from "../user_components/UserAvatar";
 import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
 import ImagePreview from "../ImagePreview";
 import { useState } from "react";
+import { Link } from "react-router";
 
 type CommentButtonProps = {
   commentCount: number;
@@ -45,9 +46,12 @@ function CommentButton({
 
           <div className="flex w-full flex-col justify-start gap-1">
             <div className="flex gap-1 text-sm">
-              <span className="flex items-center font-bold">
+              <Link
+                to={`/profile/${target.user.username}`}
+                className="flex cursor-pointer items-center font-bold hover:underline"
+              >
                 {target.user.username}
-              </span>
+              </Link>
               <span className="text-neutral-500">&middot;</span>
               <span className="text-neutral-500">
                 {formatTimeAgoOrDate(target.createdAt)}
