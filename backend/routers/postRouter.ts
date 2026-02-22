@@ -12,6 +12,7 @@ import {
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
 import { writeLimiter } from "../middleware/rateLimiter.js";
+import { createMulterErrorHandler } from "../middleware/handleMulterError.js";
 
 const router = express.Router();
 const upload = multer({
@@ -24,6 +25,7 @@ router.post(
   verifyAccessToken,
   writeLimiter,
   upload.array("images", MAX_IMAGES),
+  createMulterErrorHandler(MAX_IMAGES),
   createNewPost,
 );
 

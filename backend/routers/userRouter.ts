@@ -11,6 +11,7 @@ import {
   getFollowers,
 } from "../controllers/userController.js";
 import { MAX_IMAGE_SIZE_BYTES } from "../utils/constants.js";
+import { createMulterErrorHandler } from "../middleware/handleMulterError.js";
 
 const router = express.Router();
 
@@ -25,6 +26,7 @@ router.put(
   "/profile",
   verifyAccessToken,
   upload.single("avatar"),
+  createMulterErrorHandler(1),
   updateProfile,
 );
 
