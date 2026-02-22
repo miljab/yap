@@ -61,9 +61,7 @@ function FollowList({ type, count, user }: FollowListProps) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {type === "following"
-              ? `${user.username} is following...`
-              : `${user.username} is followed by...`}
+            {type === "following" ? `Following...` : `Followed by...`}
           </DialogTitle>
         </DialogHeader>
 
