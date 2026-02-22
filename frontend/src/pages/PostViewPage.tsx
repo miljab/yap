@@ -5,6 +5,7 @@ import type { Comment, Post } from "@/types/post";
 import PostView from "../components/post_components/PostView";
 import CreateComment from "@/components/comment_components/CreateComment";
 import Comments from "@/components/comment_components/Comments";
+import BackButton from "@/components/BackButton";
 
 function PostViewPage() {
   const params = useParams();
@@ -70,6 +71,7 @@ function PostViewPage() {
 
   return (
     <div className="flex flex-col">
+      <BackButton />
       <PostView
         post={post}
         handlePostUpdate={handlePostUpdate}

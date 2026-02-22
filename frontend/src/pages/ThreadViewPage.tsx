@@ -5,6 +5,7 @@ import PostView from "../components/post_components/PostView";
 import type { Post, Comment } from "@/types/post";
 import CommentView from "../components/comment_components/CommentView";
 import CreateComment from "../components/comment_components/CreateComment";
+import BackButton from "@/components/BackButton";
 
 function ThreadViewPage() {
   const params = useParams();
@@ -80,6 +81,7 @@ function ThreadViewPage() {
 
   return (
     <div>
+      <BackButton />
       <PostView
         post={post}
         handlePostUpdate={handlePostUpdate}
