@@ -158,12 +158,18 @@ export const postService = {
       where: {
         id: postId,
       },
+      include: {
+        images: true,
+      },
     });
 
     if (!post) throw new AppError("Post not found", 404);
 
     if (post.userId !== userId)
       throw new AppError("You are not authorized to delete this post", 403);
+
+    if (!newContent && post.images.length === 0)
+      throw new AppError("Text or images are required");
 
     await prisma.post.update({
       where: {
