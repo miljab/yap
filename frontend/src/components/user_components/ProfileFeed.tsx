@@ -12,7 +12,7 @@ function ProfileFeed({ userId }: ProfileFeedProps) {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList variant="line" className="w-full">
+      <TabsList variant="line" className="w-full border-b">
         <TabsTrigger value="posts" className="flex-1 cursor-pointer">
           Posts
         </TabsTrigger>
