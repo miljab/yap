@@ -31,6 +31,7 @@ type OptionsButtonPostProps = {
   itemType: "post";
   itemId: string;
   content: string;
+  images: { id: string }[];
   handlePostUpdate: (newPost: Post) => void;
   onDelete: () => void;
 };
@@ -117,6 +118,7 @@ function OptionsButton(props: OptionsButtonProps) {
                 submitButtonText="Save"
                 allowImages={false}
                 placeholder="Edit post content"
+                existingImagesCount={props.images.length}
               />
             </div>
           </DialogContent>

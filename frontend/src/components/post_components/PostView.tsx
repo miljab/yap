@@ -68,6 +68,7 @@ function PostView({
               itemType="post"
               itemId={post.id}
               content={post.content}
+              images={post.images}
               handlePostUpdate={handlePostUpdate}
               onDelete={onPostDelete}
             />
