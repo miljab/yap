@@ -28,9 +28,11 @@ function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
         )}
       </div>
 
-      <span className="text-xl font-bold">{user.username}</span>
+      <span className="truncate text-xl font-bold">{user.username}</span>
 
-      {user.bio && <p>{user.bio}</p>}
+      {user.bio && (
+        <p className="wrap-break-word contain-inline-size">{user.bio}</p>
+      )}
 
       <div className="flex flex-col gap-1 text-sm text-neutral-500">
         <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
