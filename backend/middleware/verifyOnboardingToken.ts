@@ -1,13 +1,13 @@
 import "dotenv/config";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import type { JwtPayload } from "./verifyAccessToken.js";
 import { prisma } from "../prisma/prismaClient.js";
+import type { User } from "@prisma/client";
 
 export async function verifyOnboardingToken(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const token: string | undefined = req.cookies.onboardingToken;
 
@@ -26,7 +26,7 @@ export async function verifyOnboardingToken(
       try {
         const user = await prisma.user.findUnique({
           where: {
-            id: (payload as JwtPayload).userId,
+            id: payload.userId,
           },
         });
 
@@ -35,12 +35,12 @@ export async function verifyOnboardingToken(
             .status(401)
             .json({ error: "Unauthorized: User not found" });
 
-        req.user = user;
+        req.user = <User>user;
         next();
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
       }
-    }
+    },
   );
 }
