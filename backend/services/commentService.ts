@@ -75,6 +75,14 @@ const commentService = {
   },
 
   getComments: async (postId: string, userId?: string) => {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (!post) throw new AppError("Post not found", 404);
+
     const comments = await prisma.comment.findMany({
       where: {
         postId,
