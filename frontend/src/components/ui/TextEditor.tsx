@@ -15,6 +15,7 @@ type TextEditorProps = {
   maxImages?: number;
   submitButtonText: string;
   autoFocus?: boolean;
+  existingImagesCount?: number;
 };
 
 function TextEditor({
@@ -26,6 +27,7 @@ function TextEditor({
   maxImages = 4,
   submitButtonText,
   autoFocus = false,
+  existingImagesCount = 0,
 }: TextEditorProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -197,7 +199,10 @@ function TextEditor({
           className="w-18 rounded-2xl disabled:bg-neutral-950 dark:disabled:bg-neutral-200"
           onClick={handleSubmit}
           disabled={
-            (actualLength === 0 && selectedFiles.length === 0) || isSubmitting
+            (actualLength === 0 &&
+              selectedFiles.length === 0 &&
+              existingImagesCount === 0) ||
+            isSubmitting
           }
         >
           {isSubmitting ? <Spinner /> : submitButtonText}

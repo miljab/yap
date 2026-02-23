@@ -53,9 +53,15 @@ function PostEditHistory({ post }: PostHistoryProps) {
                     </span>
                   </div>
 
-                  <p className="wrap-break-word contain-inline-size">
-                    {h.content}
-                  </p>
+                  {h.content ? (
+                    <p className="wrap-break-word contain-inline-size">
+                      {h.content}
+                    </p>
+                  ) : (
+                    <span className="text-neutral-500 italic">
+                      (No caption)
+                    </span>
+                  )}
                 </div>
               </div>
             );

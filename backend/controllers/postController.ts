@@ -125,6 +125,9 @@ export const updatePost = async (req: Request, res: Response) => {
 
     if (!userId) throw new AppError("User ID is required", 401);
 
+    if (newContent && newContent.length > MAX_TEXT_LEN)
+      throw new AppError("Max 200 characters allowed");
+
     const updatedPost = await postService.updatePost(
       postId,
       userId,
