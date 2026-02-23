@@ -2,11 +2,12 @@ import "dotenv/config";
 import { prisma } from "../prisma/prismaClient.js";
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
+import type { User } from "@prisma/client";
 
 export async function verifyRefreshToken(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     const refreshToken = req.cookies.refreshToken;
@@ -16,7 +17,7 @@ export async function verifyRefreshToken(
 
     const decoded = jwt.verify(
       refreshToken,
-      process.env.REFRESH_TOKEN_SECRET!
+      process.env.REFRESH_TOKEN_SECRET!,
     ) as { userId: string };
 
     const storedToken = await prisma.refreshToken.findFirst({
@@ -38,7 +39,7 @@ export async function verifyRefreshToken(
       return res.status(401).json({ error: "Invalid refresh token" });
     }
 
-    req.user = storedToken.user;
+    req.user = <User>storedToken.user;
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
