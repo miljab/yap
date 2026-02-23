@@ -1,7 +1,4 @@
 import { prisma } from "../prisma/prismaClient.js";
-import cloudinary from "../config/cloudinary.js";
-import fs from "fs/promises";
-import { nanoid } from "nanoid";
 import AppError from "../utils/appError.js";
 import type { Comment, CommentLike } from "@prisma/client";
 import { postService } from "./postService.js";
@@ -78,6 +75,14 @@ const commentService = {
   },
 
   getComments: async (postId: string, userId?: string) => {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+    });
+
+    if (!post) throw new AppError("Post not found", 404);
+
     const comments = await prisma.comment.findMany({
       where: {
         postId,
