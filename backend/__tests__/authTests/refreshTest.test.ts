@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { prisma } from "../../prisma/prismaClient.js";
 
-const app = createApp({ enableRateLimit: false });
+const app = createApp({ enableRateLimit: false, enableCsrf: false });
 
 describe("GET /auth/refresh", () => {
   let refreshTokenCookie: string[];

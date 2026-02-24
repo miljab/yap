@@ -10,7 +10,7 @@ describe("POST /auth/login", () => {
     password: "LoginPassword123",
   };
 
-  const app = createApp({ enableRateLimit: false });
+  const app = createApp({ enableRateLimit: false, enableCsrf: false });
 
   beforeEach(async () => {
     await prisma.user.deleteMany();

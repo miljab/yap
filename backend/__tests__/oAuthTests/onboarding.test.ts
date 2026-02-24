@@ -39,7 +39,7 @@ describe("Onboarding Routes", () => {
   });
 
   beforeAll(async () => {
-    app = createApp({ enableRateLimit: false });
+    app = createApp({ enableRateLimit: false, enableCsrf: false });
   });
 
   test("GET /onboarding/user returns user data if authenticated", async () => {
