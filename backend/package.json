@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch app.ts",
-    "test": "npx dotenv -e .env.test vitest"
+    "test": "dotenv -e .env.test -- vitest run --exclude __tests__/rateLimit.test.ts",
+    "test:rate": "dotenv -e .env.test -v NODE_ENV=production -v RATE_LIMIT_ENABLED=true -- vitest run __tests__/rateLimit.test.ts"
   },
   "keywords": [],
   "author": "",
