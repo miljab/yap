@@ -1,8 +1,7 @@
-import app from "../app.js";
+import createApp from "../app.js";
 import { vi, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import request from "supertest";
 import { prisma } from "../prisma/prismaClient.js";
-import { resetRateLimitCounters } from "../middleware/rateLimiter.js";
 
 vi.mock("../utils/cloudinaryHelper.js", () => ({
   uploadImages: vi.fn().mockImplementation(async (images) => {
@@ -16,13 +15,14 @@ vi.mock("../utils/cloudinaryHelper.js", () => ({
 }));
 
 beforeAll(async () => {
-  resetRateLimitCounters();
   await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();
   await prisma.post.deleteMany();
 });
 
 describe("Rate Limiting - writeLimiter (30 req/min)", () => {
+  const app = createApp({ enableRateLimit: true, enableCsrf: false });
+
   const userData = {
     email: "rateuser@example.com",
     username: "rateuser",
@@ -32,7 +32,6 @@ describe("Rate Limiting - writeLimiter (30 req/min)", () => {
   let accessToken: string;
 
   beforeEach(async () => {
-    resetRateLimitCounters();
     await prisma.refreshToken.deleteMany();
     await prisma.user.deleteMany();
     await prisma.post.deleteMany();
@@ -81,6 +80,8 @@ describe("Rate Limiting - writeLimiter (30 req/min)", () => {
 });
 
 describe("Rate Limiting - authLimiter (10 req/min)", () => {
+  const app = createApp({ enableRateLimit: true, enableCsrf: false });
+
   const userData = {
     email: "authrate@example.com",
     username: "authrate",
@@ -88,7 +89,6 @@ describe("Rate Limiting - authLimiter (10 req/min)", () => {
   };
 
   beforeEach(async () => {
-    resetRateLimitCounters();
     await prisma.refreshToken.deleteMany();
     await prisma.user.deleteMany();
 
@@ -130,6 +130,8 @@ describe("Rate Limiting - authLimiter (10 req/min)", () => {
 });
 
 describe("Rate Limiting - globalLimiter (100 req/min)", () => {
+  const app = createApp({ enableRateLimit: true, enableCsrf: false });
+
   const userData = {
     email: "globalrate@example.com",
     username: "globalrate",
@@ -139,7 +141,6 @@ describe("Rate Limiting - globalLimiter (100 req/min)", () => {
   let accessToken: string;
 
   beforeEach(async () => {
-    resetRateLimitCounters();
     await prisma.refreshToken.deleteMany();
     await prisma.user.deleteMany();
 
