@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, type ReactNode } from "react";
 import axios from "../api/axios";
+import { fetchCsrfToken } from "../api/axios";
 import type { User } from "@/types/user";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -27,7 +28,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const verifySession = async () => {
+    const initApp = async () => {
+      await fetchCsrfToken();
       try {
         const response = await axios.get<AuthState>("/auth/refresh", {
           withCredentials: true,
@@ -43,7 +45,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     };
 
-    verifySession();
+    initApp();
   }, []);
 
   if (isLoading) {
