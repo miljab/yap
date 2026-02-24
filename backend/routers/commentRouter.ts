@@ -10,39 +10,47 @@ import {
   deleteComment,
 } from "../controllers/commentController.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
-import { writeLimiter } from "../middleware/rateLimiter.js";
 import { createMulterErrorHandler } from "../middleware/handleMulterError.js";
+import type { RequestHandler } from "express";
 
-const router = express.Router();
-const upload = multer({
-  dest: "uploads/",
-  limits: { fileSize: MAX_IMAGE_SIZE_BYTES },
-});
-
-router.post(
-  "/post/:id/reply",
-  verifyAccessToken,
+const createCommentRouter = ({
   writeLimiter,
-  upload.array("images", MAX_IMAGES),
-  createMulterErrorHandler(MAX_IMAGES),
-  replyToPost,
-);
+}: {
+  writeLimiter: RequestHandler;
+}) => {
+  const router = express.Router();
+  const upload = multer({
+    dest: "uploads/",
+    limits: { fileSize: MAX_IMAGE_SIZE_BYTES },
+  });
 
-router.post(
-  "/comment/:id/reply",
-  verifyAccessToken,
-  writeLimiter,
-  upload.array("images", MAX_IMAGES),
-  createMulterErrorHandler(MAX_IMAGES),
-  replyToComment,
-);
+  router.post(
+    "/post/:id/reply",
+    verifyAccessToken,
+    writeLimiter,
+    upload.array("images", MAX_IMAGES),
+    createMulterErrorHandler(MAX_IMAGES),
+    replyToPost,
+  );
 
-router.get("/post/:id/comments", verifyAccessToken, getComments);
+  router.post(
+    "/comment/:id/reply",
+    verifyAccessToken,
+    writeLimiter,
+    upload.array("images", MAX_IMAGES),
+    createMulterErrorHandler(MAX_IMAGES),
+    replyToComment,
+  );
 
-router.post("/comment/:id/like", verifyAccessToken, likeComment);
+  router.get("/post/:id/comments", verifyAccessToken, getComments);
 
-router.get("/comment/:id/thread", verifyAccessToken, getThread);
+  router.post("/comment/:id/like", verifyAccessToken, likeComment);
 
-router.delete("/comment/:id", verifyAccessToken, deleteComment);
+  router.get("/comment/:id/thread", verifyAccessToken, getThread);
 
-export default router;
+  router.delete("/comment/:id", verifyAccessToken, deleteComment);
+
+  return router;
+};
+
+export default createCommentRouter;

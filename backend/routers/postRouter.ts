@@ -11,34 +11,42 @@ import {
 } from "../controllers/postController.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
-import { writeLimiter } from "../middleware/rateLimiter.js";
 import { createMulterErrorHandler } from "../middleware/handleMulterError.js";
+import type { RequestHandler } from "express";
 
-const router = express.Router();
-const upload = multer({
-  dest: "uploads/",
-  limits: { fileSize: MAX_IMAGE_SIZE_BYTES },
-});
-
-router.post(
-  "/post/new",
-  verifyAccessToken,
+const createPostRouter = ({
   writeLimiter,
-  upload.array("images", MAX_IMAGES),
-  createMulterErrorHandler(MAX_IMAGES),
-  createNewPost,
-);
+}: {
+  writeLimiter: RequestHandler;
+}) => {
+  const router = express.Router();
+  const upload = multer({
+    dest: "uploads/",
+    limits: { fileSize: MAX_IMAGE_SIZE_BYTES },
+  });
 
-router.get("/post/:id", verifyAccessToken, getPostById);
+  router.post(
+    "/post/new",
+    verifyAccessToken,
+    writeLimiter,
+    upload.array("images", MAX_IMAGES),
+    createMulterErrorHandler(MAX_IMAGES),
+    createNewPost,
+  );
 
-router.post("/post/:id/like", verifyAccessToken, likePost);
+  router.get("/post/:id", verifyAccessToken, getPostById);
 
-router.delete("/post/:id", verifyAccessToken, deletePost);
+  router.post("/post/:id/like", verifyAccessToken, likePost);
 
-router.put("/post/:id", verifyAccessToken, updatePost);
+  router.delete("/post/:id", verifyAccessToken, deletePost);
 
-router.get("/feed", verifyAccessToken, getHomeFeed);
+  router.put("/post/:id", verifyAccessToken, updatePost);
 
-router.get("/feed/following", verifyAccessToken, getFollowingFeed);
+  router.get("/feed", verifyAccessToken, getHomeFeed);
 
-export default router;
+  router.get("/feed/following", verifyAccessToken, getFollowingFeed);
+
+  return router;
+};
+
+export default createPostRouter;

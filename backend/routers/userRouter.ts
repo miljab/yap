@@ -13,31 +13,35 @@ import {
 import { MAX_IMAGE_SIZE_BYTES } from "../utils/constants.js";
 import { createMulterErrorHandler } from "../middleware/handleMulterError.js";
 
-const router = express.Router();
+const createUserRouter = () => {
+  const router = express.Router();
 
-const upload = multer({
-  dest: "uploads/",
-  limits: { fileSize: MAX_IMAGE_SIZE_BYTES },
-});
+  const upload = multer({
+    dest: "uploads/",
+    limits: { fileSize: MAX_IMAGE_SIZE_BYTES },
+  });
 
-router.get("/profile/:username", verifyAccessToken, getUserProfile);
+  router.get("/profile/:username", verifyAccessToken, getUserProfile);
 
-router.put(
-  "/profile",
-  verifyAccessToken,
-  upload.single("avatar"),
-  createMulterErrorHandler(1),
-  updateProfile,
-);
+  router.put(
+    "/profile",
+    verifyAccessToken,
+    upload.single("avatar"),
+    createMulterErrorHandler(1),
+    updateProfile,
+  );
 
-router.get("/users/:userId/posts", verifyAccessToken, getUserPosts);
+  router.get("/users/:userId/posts", verifyAccessToken, getUserPosts);
 
-router.get("/users/:userId/comments", verifyAccessToken, getUserComments);
+  router.get("/users/:userId/comments", verifyAccessToken, getUserComments);
 
-router.put("/users/:userId/follow", verifyAccessToken, followProfile);
+  router.put("/users/:userId/follow", verifyAccessToken, followProfile);
 
-router.get("/users/:userId/following", verifyAccessToken, getFollowingUsers);
+  router.get("/users/:userId/following", verifyAccessToken, getFollowingUsers);
 
-router.get("/users/:userId/followers", verifyAccessToken, getFollowers);
+  router.get("/users/:userId/followers", verifyAccessToken, getFollowers);
 
-export default router;
+  return router;
+};
+
+export default createUserRouter;
