@@ -54,16 +54,26 @@ function HomeFeed({ type }: HomeFeedProps) {
 
   if (initialLoad) {
     return (
-      <div className="flex justify-center p-4">
-        <Spinner />
+      <div>
+        <CreatePost
+          onPostCreate={type === "all" ? handlePostCreate : undefined}
+        />
+        <div className="flex justify-center p-4">
+          <Spinner />
+        </div>
       </div>
     );
   }
 
   if (posts.length === 0) {
     return (
-      <div className="p-4 text-center text-neutral-500">
-        No posts to display
+      <div>
+        <CreatePost
+          onPostCreate={type === "all" ? handlePostCreate : undefined}
+        />
+        <div className="p-4 text-center text-neutral-500">
+          No posts to display
+        </div>
       </div>
     );
   }
