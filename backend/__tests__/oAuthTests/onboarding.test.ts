@@ -2,7 +2,7 @@ import express from "express";
 import request from "supertest";
 import cookieParser from "cookie-parser";
 import { prisma } from "../../prisma/prismaClient.js";
-import authRouter from "../../routers/authRouter.js";
+import createApp from "../../app.js";
 import { generateOnboardingToken } from "../../utils/generateTokens.js";
 import { describe, beforeAll, beforeEach, test, expect } from "vitest";
 import type { User } from "@prisma/client";
@@ -39,16 +39,7 @@ describe("Onboarding Routes", () => {
   });
 
   beforeAll(async () => {
-    app = express();
-    app.use(cookieParser());
-    app.use(express.json());
-    app.use((req, res, next) => {
-      if (req.cookies.onboardingToken) {
-        req.user = testUser;
-      }
-      next();
-    });
-    app.use(authRouter);
+    app = createApp({ enableRateLimit: false, enableCsrf: false });
   });
 
   test("GET /onboarding/user returns user data if authenticated", async () => {
@@ -56,7 +47,7 @@ describe("Onboarding Routes", () => {
     const onboardingToken = generateOnboardingToken(testUser.id);
 
     const res = await request(app)
-      .get("/onboarding/user")
+      .get("/auth/onboarding/user")
       .set("Cookie", [`onboardingToken=${onboardingToken}`]);
 
     expect(res.status).toBe(200);
@@ -68,7 +59,7 @@ describe("Onboarding Routes", () => {
     const onboardingToken = generateOnboardingToken(testUser.id);
 
     const res = await request(app)
-      .post("/onboarding")
+      .post("/auth/onboarding")
       .set("Cookie", [`onboardingToken=${onboardingToken}`])
       .send({ email: "newemail@example.com", username: "newusername" });
 
@@ -97,7 +88,7 @@ describe("Onboarding Routes", () => {
     const onboardingToken = generateOnboardingToken(testUser.id);
 
     const res = await request(app)
-      .post("/onboarding")
+      .post("/auth/onboarding")
       .set("Cookie", [`onboardingToken=${onboardingToken}`])
       .send({ email: "taken@example.com", username: "newuser" });
 
@@ -117,7 +108,7 @@ describe("Onboarding Routes", () => {
     const onboardingToken = generateOnboardingToken(testUser.id);
 
     const res = await request(app)
-      .post("/onboarding")
+      .post("/auth/onboarding")
       .set("Cookie", [`onboardingToken=${onboardingToken}`])
       .send({ username: "nouser" });
 
@@ -142,7 +133,7 @@ describe("Onboarding Routes", () => {
     const onboardingToken = generateOnboardingToken(testUser.id);
 
     const res = await request(app)
-      .post("/onboarding")
+      .post("/auth/onboarding")
       .set("Cookie", [`onboardingToken=${onboardingToken}`])
       .send({ email: "newemail@example.com", username: "takenUsername" });
 
@@ -162,7 +153,7 @@ describe("Onboarding Routes", () => {
     const onboardingToken = generateOnboardingToken(testUser.id);
 
     const res = await request(app)
-      .delete("/onboarding/cancel")
+      .delete("/auth/onboarding/cancel")
       .set("Cookie", [`onboardingToken=${onboardingToken}`]);
 
     expect(res.status).toBe(200);

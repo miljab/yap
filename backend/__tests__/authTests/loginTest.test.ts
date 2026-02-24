@@ -1,7 +1,7 @@
-import app from "../../app.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { prisma } from "../../prisma/prismaClient.js";
+import createApp from "../../app.js";
 
 describe("POST /auth/login", () => {
   const userData = {
@@ -9,6 +9,8 @@ describe("POST /auth/login", () => {
     username: "loginuser",
     password: "LoginPassword123",
   };
+
+  const app = createApp({ enableRateLimit: false, enableCsrf: false });
 
   beforeEach(async () => {
     await prisma.user.deleteMany();
@@ -31,7 +33,7 @@ describe("POST /auth/login", () => {
     expect(res.body).toHaveProperty("user");
     expect(res.body).toHaveProperty("accessToken");
     expect(res.headers["set-cookie"]).toEqual(
-      expect.arrayContaining([expect.stringContaining("refreshToken")])
+      expect.arrayContaining([expect.stringContaining("refreshToken")]),
     );
   });
 
@@ -45,7 +47,7 @@ describe("POST /auth/login", () => {
     expect(res.body).toHaveProperty("user");
     expect(res.body).toHaveProperty("accessToken");
     expect(res.headers["set-cookie"]).toEqual(
-      expect.arrayContaining([expect.stringContaining("refreshToken")])
+      expect.arrayContaining([expect.stringContaining("refreshToken")]),
     );
   });
 
@@ -58,7 +60,7 @@ describe("POST /auth/login", () => {
     expect(res.statusCode).toBe(401);
     expect(res.body).toHaveProperty(
       "error",
-      "Wrong email/username or password"
+      "Wrong email/username or password",
     );
   });
 
@@ -71,7 +73,7 @@ describe("POST /auth/login", () => {
     expect(res.statusCode).toBe(401);
     expect(res.body).toHaveProperty(
       "error",
-      "Wrong email/username or password"
+      "Wrong email/username or password",
     );
   });
 
@@ -99,7 +101,7 @@ describe("POST /auth/login", () => {
 
     expect(res.statusCode).toBe(400);
     expect(res.body.errors).toEqual(
-      expect.arrayContaining([expect.objectContaining({ path: "identifier" })])
+      expect.arrayContaining([expect.objectContaining({ path: "identifier" })]),
     );
   });
 
@@ -110,7 +112,7 @@ describe("POST /auth/login", () => {
 
     expect(res.statusCode).toBe(400);
     expect(res.body.errors).toEqual(
-      expect.arrayContaining([expect.objectContaining({ path: "password" })])
+      expect.arrayContaining([expect.objectContaining({ path: "password" })]),
     );
   });
 });

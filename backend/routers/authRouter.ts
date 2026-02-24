@@ -23,62 +23,66 @@ import {
 } from "../controllers/oAuthController.js";
 import { verifyOnboardingToken } from "../middleware/verifyOnboardingToken.js";
 import { verifyRefreshToken } from "../middleware/verifyRefreshToken.js";
-import { authLimiter } from "../middleware/rateLimiter.js";
+import type { RequestHandler } from "express";
 
-const router = express.Router();
+const createAuthRouter = ({ authLimiter }: { authLimiter: RequestHandler }) => {
+  const router = express.Router();
 
-router.post("/signup", authLimiter, validate(signupSchemaWithDb), signup);
-router.post("/login", authLimiter, validate(loginSchema), login);
-router.get("/refresh", refresh);
-router.get("/logout", verifyAccessToken, logout);
+  router.post("/signup", authLimiter, validate(signupSchemaWithDb), signup);
+  router.post("/login", authLimiter, validate(loginSchema), login);
+  router.get("/refresh", refresh);
+  router.get("/logout", verifyAccessToken, logout);
 
-router.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    session: false,
-  })
-);
+  router.get(
+    "/google",
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      session: false,
+    }),
+  );
 
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: process.env.CLIENT_URL + "/?error=auth-error",
-    session: false,
-  }),
-  oAuthLogin
-);
+  router.get(
+    "/google/callback",
+    passport.authenticate("google", {
+      failureRedirect: process.env.CLIENT_URL + "/?error=auth-error",
+      session: false,
+    }),
+    oAuthLogin,
+  );
 
-router.get(
-  "/github",
-  passport.authenticate("github", {
-    scope: ["profile", "email"],
-    session: false,
-  })
-);
+  router.get(
+    "/github",
+    passport.authenticate("github", {
+      scope: ["profile", "email"],
+      session: false,
+    }),
+  );
 
-router.get(
-  "/github/callback",
-  passport.authenticate("github", {
-    failureRedirect: process.env.CLIENT_URL + "/?error=auth-error",
-    session: false,
-  }),
-  oAuthLogin
-);
+  router.get(
+    "/github/callback",
+    passport.authenticate("github", {
+      failureRedirect: process.env.CLIENT_URL + "/?error=auth-error",
+      session: false,
+    }),
+    oAuthLogin,
+  );
 
-router.get("/onboarding/user", verifyOnboardingToken, onboardingUserData);
+  router.get("/onboarding/user", verifyOnboardingToken, onboardingUserData);
 
-router.post(
-  "/onboarding",
-  verifyOnboardingToken,
-  validate(onboardingSchema),
-  onboarding
-);
+  router.post(
+    "/onboarding",
+    verifyOnboardingToken,
+    validate(onboardingSchema),
+    onboarding,
+  );
 
-router.delete("/onboarding/cancel", verifyOnboardingToken, cancelOnboarding);
+  router.delete("/onboarding/cancel", verifyOnboardingToken, cancelOnboarding);
 
-router.get("/processing", verifyRefreshToken, authProcessing);
+  router.get("/processing", verifyRefreshToken, authProcessing);
 
-router.get("/demo", demoUserLogin);
+  router.get("/demo", demoUserLogin);
 
-export default router;
+  return router;
+};
+
+export default createAuthRouter;
