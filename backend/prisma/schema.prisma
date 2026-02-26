@@ -13,10 +13,10 @@ model User {
   email         String?        @unique
   password      String?
   createdAt     DateTime       @default(now())
-  avatar        String?
+  avatar        Avatar?
   bio           String?
-  following     User[]         @relation("UserFollowing")
-  followers     User[]         @relation("UserFollowing")
+  following     Follow[]       @relation("UserFollowing")
+  followers     Follow[]       @relation("UserFollowers")
   posts         Post[]
   comments      Comment[]
   notifications Notification[]
@@ -24,6 +24,24 @@ model User {
   commentLikes  CommentLike[]
   refreshToken  RefreshToken[]
   account       Account[]
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  follower    User   @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User   @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}
+
+model Avatar {
+  id                 String @id @default(uuid())
+  cloudinaryPublicId String
+  url                String
+  userId             String @unique
+  user               User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Provider {
