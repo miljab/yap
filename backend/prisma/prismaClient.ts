@@ -7,15 +7,4 @@ export const prisma = new PrismaClient({
       password: true,
     },
   },
-}).$extends({
-  result: {
-    user: {
-      avatar: {
-        needs: { avatar: true },
-        compute(user) {
-          return user.avatar ?? process.env.DEFAULT_AVATAR_URL!;
-        },
-      },
-    },
-  },
 });
