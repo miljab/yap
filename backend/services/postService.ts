@@ -1,3 +1,4 @@
+import { postPresenter } from "../presenters/postPresenter.js";
 import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
 import { deleteImages, uploadImages } from "../utils/cloudinaryHelper.js";
@@ -25,19 +26,25 @@ export const postService = {
         },
       },
       include: {
-        images: true,
-        user: true,
+        images: {
+          select: {
+            url: true,
+            orderIndex: true,
+          },
+        },
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    return {
-      ...post,
-      isLiked: false,
-      likeCount: 0,
-      commentCount: 0,
-      likes: [],
-      history: [],
-    };
+    return postPresenter.new(post);
   },
 
   getPostById: async (postId: string, userId: string) => {
@@ -46,34 +53,40 @@ export const postService = {
         id: postId,
       },
       include: {
-        images: true,
-        user: true,
-        likes: {
-          include: {
-            user: true,
+        images: {
+          select: {
+            url: true,
+            orderIndex: true,
           },
         },
-        history: true,
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
+        likes: {
+          where: { userId },
+          select: {
+            userId: true,
+          },
+        },
+
+        _count: {
+          select: {
+            comments: true,
+            likes: true,
+          },
+        },
       },
     });
 
     if (!post) throw new AppError("Post not found", 404);
 
-    const isLiked = post.likes.some((like) => like.userId === userId);
-    const likeCount = post.likes.length;
-
-    const commentCount = await prisma.comment.count({
-      where: {
-        postId,
-        parentId: null,
-      },
-    });
-
-    if (userId !== post.user.id) {
-      return { ...post, isLiked, likeCount, commentCount, likes: [] };
-    }
-
-    return { ...post, isLiked, likeCount, commentCount };
+    return postPresenter.single(post);
   },
 
   likePost: async (postId: string, userId: string) => {
@@ -169,14 +182,45 @@ export const postService = {
       throw new AppError("You are not authorized to delete this post", 403);
 
     if (!newContent && post.images.length === 0)
-      throw new AppError("Text or images are required");
+      throw new AppError("Text or images are required", 400);
 
-    await prisma.post.update({
+    const updatedPost = await prisma.post.update({
       where: {
         id: postId,
       },
       data: {
         content: newContent,
+      },
+      include: {
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
+        images: {
+          select: {
+            url: true,
+            orderIndex: true,
+          },
+        },
+
+        _count: {
+          select: {
+            comments: true,
+            likes: true,
+          },
+        },
+
+        likes: {
+          where: { userId },
+          select: {
+            userId: true,
+          },
+        },
       },
     });
 
@@ -187,9 +231,7 @@ export const postService = {
       },
     });
 
-    const updatedPost = await postService.getPostById(postId, userId);
-
-    return updatedPost;
+    return postPresenter.single(updatedPost);
   },
 
   getHomeFeed: async (
@@ -202,16 +244,31 @@ export const postService = {
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       orderBy: { createdAt: "desc" },
       include: {
-        images: true,
-        user: true,
-        history: true,
-        likes: {
-          include: {
-            user: true,
+        images: {
+          select: {
+            url: true,
+            orderIndex: true,
           },
         },
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
+        likes: {
+          where: { userId },
+          select: {
+            userId: true,
+          },
+        },
+
         _count: {
           select: {
+            likes: true,
             comments: true,
           },
         },
@@ -220,25 +277,9 @@ export const postService = {
 
     const hasMore = posts.length > limit;
     const result = hasMore ? posts.slice(0, -1) : posts;
+    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
 
-    const formattedPosts = result.map((post) => {
-      const isLiked = post.likes.some((like) => like.userId === userId);
-      const likeCount = post.likes.length;
-      const commentCount = post._count.comments;
-
-      return {
-        ...post,
-        isLiked,
-        likeCount,
-        commentCount,
-        likes: userId === post.userId ? post.likes : [],
-      };
-    });
-
-    return {
-      posts: formattedPosts,
-      nextCursor: hasMore ? result[result.length - 1]?.id : null,
-    };
+    return postPresenter.feed(result, { nextCursor });
   },
 
   getFollowingFeed: async (
@@ -251,7 +292,7 @@ export const postService = {
         user: {
           followers: {
             some: {
-              id: userId,
+              followerId: userId,
             },
           },
         },
@@ -260,17 +301,35 @@ export const postService = {
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       orderBy: { createdAt: "desc" },
       include: {
-        images: true,
-        user: true,
-        history: true,
-        likes: {
-          include: {
-            user: true,
+        images: {
+          select: {
+            url: true,
+            orderIndex: true,
           },
         },
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
+
+        likes: {
+          where: {
+            userId,
+          },
+          select: {
+            userId: true,
+          },
+        },
+
         _count: {
           select: {
             comments: true,
+            likes: true,
           },
         },
       },
@@ -278,24 +337,8 @@ export const postService = {
 
     const hasMore = posts.length > limit;
     const result = hasMore ? posts.slice(0, -1) : posts;
+    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
 
-    const formattedPosts = result.map((post) => {
-      const isLiked = post.likes.some((like) => like.userId === userId);
-      const likeCount = post.likes.length;
-      const commentCount = post._count.comments;
-
-      return {
-        ...post,
-        isLiked,
-        likeCount,
-        commentCount,
-        likes: userId === post.userId ? post.likes : [],
-      };
-    });
-
-    return {
-      posts: formattedPosts,
-      nextCursor: hasMore ? result[result.length - 1]?.id : null,
-    };
+    return postPresenter.feed(posts, { nextCursor });
   },
 };
