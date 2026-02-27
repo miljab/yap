@@ -3,18 +3,32 @@ import { Prisma } from "@prisma/client";
 
 type UserPreviewPayload = Prisma.UserGetPayload<{
   include: {
-    avatar: true;
+    avatar: {
+      select: {
+        url: true;
+      };
+    };
+  };
+  omit: {
+    password: true;
   };
 }>;
 
 type UserProfilePayload = Prisma.UserGetPayload<{
   include: {
-    avatar: true;
+    avatar: {
+      select: {
+        url: true;
+      };
+    };
     _count: {
       select: {
         followers: true;
         following: true;
       };
+    };
+    omit: {
+      password: true;
     };
   };
 }>;
