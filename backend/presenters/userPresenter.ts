@@ -22,7 +22,7 @@ type UserProfilePayload = Prisma.UserGetPayload<{
 const DEFAULT_AVATAR = process.env.DEFAULT_AVATAR_URL!;
 
 export const userPresenter = {
-  preview: (user: UserPreviewPayload) => {
+  preview(user: UserPreviewPayload) {
     return {
       id: user.id,
       username: user.username,
@@ -30,7 +30,7 @@ export const userPresenter = {
     };
   },
 
-  profile: (user: UserProfilePayload, ctx: { isFollowed: boolean }) => {
+  profile(user: UserProfilePayload, ctx: { isFollowed: boolean }) {
     return {
       id: user.id,
       username: user.username,
