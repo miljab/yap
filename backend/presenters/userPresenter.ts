@@ -69,7 +69,7 @@ export const userPresenter = {
       username: user.username,
       avatarUrl: user.avatar?.url || DEFAULT_AVATAR,
       bio: user.bio,
-      followerCount: user._count.followers,
+      followersCount: user._count.followers,
       followingCount: user._count.following,
       isFollowed: ctx.isFollowed,
       createdAt: user.createdAt,
