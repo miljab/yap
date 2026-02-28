@@ -4,7 +4,7 @@ import { postService } from "./postService.js";
 import { uploadImages } from "../utils/cloudinaryHelper.js";
 import { commentPresenter } from "../presenters/commentPresenter.js";
 
-const baseCommentInclude = (userId: string) => {
+export const baseCommentInclude = (userId: string) => {
   return {
     images: {
       select: {
