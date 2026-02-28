@@ -3,16 +3,27 @@ import AppError from "../utils/appError.js";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs/promises";
 import { nanoid } from "nanoid";
+import { userPresenter } from "../presenters/userPresenter.js";
+import { basePostInclude } from "./postService.js";
+import { postPresenter } from "../presenters/postPresenter.js";
+import { baseCommentInclude } from "./commentService.js";
+import { commentPresenter } from "../presenters/commentPresenter.js";
 
 const DEFAULT_PAGE_LIMIT = 10;
 
 export const userService = {
-  getUserProfile: async (username: string, requesterId?: string) => {
+  getUserProfile: async (username: string, requesterId: string) => {
     const user = await prisma.user.findUnique({
       where: {
         username: username,
       },
       include: {
+        avatar: {
+          select: {
+            url: true,
+          },
+        },
+
         _count: {
           select: {
             followers: true,
@@ -24,26 +35,17 @@ export const userService = {
 
     if (!user) throw new AppError("User not found", 404);
 
-    const isFollowed = requesterId
-      ? (await prisma.user.findFirst({
-          where: {
-            id: user.id,
-            followers: {
-              some: {
-                id: requesterId,
-              },
-            },
+    const isFollowed =
+      (await prisma.follow.findFirst({
+        where: {
+          followerId: requesterId,
+          following: {
+            username: username,
           },
-        })) !== null
-      : false;
+        },
+      })) !== null;
 
-    return {
-      ...user,
-      followersCount: user._count.followers,
-      followingCount: user._count.following,
-      isFollowed,
-      _count: undefined,
-    };
+    return userPresenter.profile(user, { isFollowed });
   },
 
   getUserPosts: async (
@@ -57,47 +59,14 @@ export const userService = {
       take: limit + 1,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       orderBy: { createdAt: "desc" },
-      include: {
-        images: true,
-        user: true,
-        likes: {
-          include: {
-            user: true,
-          },
-        },
-        history: true,
-        _count: {
-          select: {
-            comments: {
-              where: { parentId: null },
-            },
-          },
-        },
-      },
+      include: basePostInclude(requesterId),
     });
 
     const hasMore = posts.length > limit;
     const result = hasMore ? posts.slice(0, -1) : posts;
+    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
 
-    const formattedPosts = result.map((post) => {
-      const isLiked = post.likes.some((like) => like.userId === requesterId);
-      const likeCount = post.likes.length;
-      const commentCount = post._count.comments;
-
-      return {
-        ...post,
-        isLiked,
-        likeCount,
-        commentCount,
-        likes: userId === requesterId ? post.likes : [],
-        _count: undefined,
-      };
-    });
-
-    return {
-      posts: formattedPosts,
-      nextCursor: hasMore ? result[result.length - 1]?.id : null,
-    };
+    return postPresenter.feed(posts, { nextCursor });
   },
 
   getUserComments: async (
@@ -111,43 +80,14 @@ export const userService = {
       take: limit + 1,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       orderBy: { createdAt: "desc" },
-      include: {
-        images: true,
-        user: true,
-        likes: {
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            replies: true,
-          },
-        },
-      },
+      include: baseCommentInclude(requesterId),
     });
 
     const hasMore = comments.length > limit;
     const result = hasMore ? comments.slice(0, -1) : comments;
+    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
 
-    const formattedComments = result.map((comment) => {
-      const isLiked = comment.likes.some((like) => like.userId === requesterId);
-      const likeCount = comment.likes.length;
-      const commentCount = comment._count.replies;
-
-      return {
-        ...comment,
-        isLiked,
-        likeCount,
-        commentCount,
-        likes: userId === requesterId ? comment.likes : [],
-      };
-    });
-
-    return {
-      comments: formattedComments,
-      nextCursor: hasMore ? result[result.length - 1]?.id : null,
-    };
+    return commentPresenter.feed(comments, { nextCursor });
   },
 
   updateProfile: async (
@@ -155,7 +95,7 @@ export const userService = {
     bio?: string,
     avatarFile?: Express.Multer.File,
   ) => {
-    let avatarUrl: string | undefined;
+    let avatarData;
 
     if (avatarFile) {
       const result = await cloudinary.uploader.upload(avatarFile.path, {
@@ -165,76 +105,75 @@ export const userService = {
           { width: 400, height: 400, crop: "fill", gravity: "center" },
         ],
       });
-      avatarUrl = result.secure_url;
+
+      avatarData = {
+        url: result.secure_url,
+        cloudinaryPublicId: result.public_id,
+      };
+
       await fs.unlink(avatarFile.path);
     }
 
     const updatedUser = await prisma.user.update({
-      where: { id: userId },
+      where: {
+        id: userId,
+      },
       data: {
         ...(bio !== undefined && { bio }),
-        ...(avatarUrl && { avatar: avatarUrl }),
+        ...(avatarData && {
+          avatar: {
+            upsert: {
+              update: avatarData,
+              create: avatarData,
+            },
+          },
+        }),
       },
+
       include: {
+        avatar: { select: { url: true } },
+
         _count: {
           select: {
-            followers: true,
             following: true,
+            followers: true,
           },
         },
       },
     });
 
-    return {
-      ...updatedUser,
-      followersCount: updatedUser._count.followers,
-      followingCount: updatedUser._count.following,
-      isFollowed: false,
-      _count: undefined,
-    };
+    return userPresenter.profile(updatedUser, { isFollowed: false });
   },
 
   followProfile: async (requesterId: string, userId: string) => {
     if (requesterId === userId)
       throw new AppError("Cannot follow yourself", 400);
 
-    const existingFollow = await prisma.user.findFirst({
+    const existingFollow = await prisma.follow.findUnique({
       where: {
-        id: requesterId,
-        following: {
-          some: {
-            id: userId,
-          },
+        followingId_followerId: {
+          followerId: requesterId,
+          followingId: userId,
         },
       },
     });
 
     if (existingFollow) {
-      await prisma.user.update({
+      await prisma.follow.delete({
         where: {
-          id: requesterId,
-        },
-        data: {
-          following: {
-            disconnect: {
-              id: userId,
-            },
+          followingId_followerId: {
+            followerId: requesterId,
+            followingId: userId,
           },
         },
       });
 
       return { isFollowed: false };
     } else {
-      await prisma.user.update({
-        where: {
-          id: requesterId,
-        },
+      await prisma.follow.create({
         data: {
-          following: {
-            connect: {
-              id: userId,
-            },
-          },
+          followerId: requesterId,
+          followingId: userId,
         },
       });
 
@@ -248,48 +187,72 @@ export const userService = {
     cursor?: string,
     limit: number = DEFAULT_PAGE_LIMIT,
   ) => {
-    const targetUser = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        following: {
-          take: limit + 1,
-          ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-          orderBy: { username: "asc" },
-        },
+    const userExist = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
       },
     });
 
-    if (!targetUser) throw new AppError("User not found", 404);
+    if (!userExist) throw new AppError("User not found", 404);
 
-    const following = targetUser.following;
+    const following = await prisma.follow.findMany({
+      where: {
+        followerId: userId,
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      include: {
+        following: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+          select: {
+            id: true,
+            username: true,
+            bio: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
     const hasMore = following.length > limit;
     const result = hasMore ? following.slice(0, -1) : following;
+    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
 
-    const followingIds = result.map((u) => u.id);
+    const followingIds = result.map((f) => f.followingId);
 
-    const requesterFollowing = await prisma.user.findUnique({
-      where: { id: requesterId },
+    const requesterFollowing = await prisma.follow.findMany({
       select: {
-        following: {
-          where: { id: { in: followingIds } },
-          select: { id: true },
+        followingId: true,
+      },
+      where: {
+        followerId: requesterId,
+        followingId: {
+          in: followingIds,
         },
       },
     });
 
     const requesterFollowingSet = new Set(
-      requesterFollowing?.following.map((u) => u.id) || [],
+      requesterFollowing?.map((f) => f.followingId) || [],
     );
 
-    const formattedUsers = result.map((user) => ({
-      ...user,
-      isFollowed: requesterFollowingSet.has(user.id),
-    }));
+    const users = following.map((f) => f.following);
 
-    return {
-      users: formattedUsers,
-      nextCursor: hasMore ? result[result.length - 1]?.id : null,
-    };
+    return userPresenter.followList(users, {
+      followingSet: requesterFollowingSet,
+      nextCursor,
+    });
   },
 
   getFollowers: async (
@@ -298,58 +261,71 @@ export const userService = {
     cursor?: string,
     limit: number = DEFAULT_PAGE_LIMIT,
   ) => {
-    const targetUser = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        followers: {
-          take: limit + 1,
-          ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-          orderBy: { username: "asc" },
-          include: {
-            _count: {
-              select: {
-                followers: true,
-                following: true,
-              },
-            },
-          },
-        },
+    const userExist = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
       },
     });
 
-    if (!targetUser) throw new AppError("User not found", 404);
+    if (!userExist) throw new AppError("User not found", 404);
 
-    const followers = targetUser.followers;
+    const followers = await prisma.follow.findMany({
+      where: {
+        followingId: userId,
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      include: {
+        follower: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+          select: {
+            id: true,
+            username: true,
+            bio: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
     const hasMore = followers.length > limit;
     const result = hasMore ? followers.slice(0, -1) : followers;
+    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
 
-    const followerIds = result.map((u) => u.id);
+    const followerIds = result.map((f) => f.followerId);
 
-    const requesterFollowing = await prisma.user.findUnique({
-      where: { id: requesterId },
+    const requesterFollowing = await prisma.follow.findMany({
       select: {
-        following: {
-          where: { id: { in: followerIds } },
-          select: { id: true },
+        followingId: true,
+      },
+      where: {
+        followerId: requesterId,
+        followingId: {
+          in: followerIds,
         },
       },
     });
 
     const requesterFollowingSet = new Set(
-      requesterFollowing?.following.map((u) => u.id) || [],
+      requesterFollowing?.map((f) => f.followingId) || [],
     );
 
-    const formattedUsers = result.map((user) => ({
-      ...user,
-      followersCount: user._count.followers,
-      followingCount: user._count.following,
-      isFollowed: requesterFollowingSet.has(user.id),
-      _count: undefined,
-    }));
+    const users = followers.map((f) => f.follower);
 
-    return {
-      users: formattedUsers,
-      nextCursor: hasMore ? result[result.length - 1]?.id : null,
-    };
+    return userPresenter.followList(users, {
+      followingSet: requesterFollowingSet,
+      nextCursor,
+    });
   },
 };
