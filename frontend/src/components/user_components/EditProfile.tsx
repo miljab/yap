@@ -93,7 +93,7 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2">
             <UserAvatar
-              avatarUrl={avatarPreview ?? user.avatar}
+              avatarUrl={avatarPreview ?? user.avatarUrl}
               username={user.username}
               className="h-24 w-24"
               redirect={false}

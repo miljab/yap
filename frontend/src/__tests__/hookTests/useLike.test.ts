@@ -20,7 +20,7 @@ const mockUser: User = {
   id: "user-1",
   username: "testuser",
   createdAt: new Date(),
-  avatar: "",
+  avatarUrl: "",
   bio: undefined,
   email: undefined,
   followersCount: 0,

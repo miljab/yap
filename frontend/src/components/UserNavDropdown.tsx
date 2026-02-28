@@ -39,7 +39,7 @@ function UserNavDropdown() {
       <DropdownMenuTrigger asChild>
         <button className="relative cursor-pointer rounded-full">
           <UserAvatar
-            avatarUrl={user.avatar}
+            avatarUrl={user.avatarUrl}
             username={user.username}
             redirect={false}
           />

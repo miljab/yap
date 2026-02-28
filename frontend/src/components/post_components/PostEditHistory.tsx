@@ -34,7 +34,7 @@ function PostEditHistory({ post }: PostHistoryProps) {
               >
                 <div className="flex flex-col items-center">
                   <UserAvatar
-                    avatarUrl={post.user.avatar}
+                    avatarUrl={post.user.avatarUrl}
                     username={post.user.username}
                   />
                 </div>

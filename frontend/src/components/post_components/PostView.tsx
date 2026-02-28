@@ -46,7 +46,7 @@ function PostView({
     >
       <div className="flex items-center gap-1 text-sm">
         <UserAvatar
-          avatarUrl={post.user.avatar}
+          avatarUrl={post.user.avatarUrl}
           username={post.user.username}
         />
 

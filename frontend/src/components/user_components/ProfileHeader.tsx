@@ -17,7 +17,7 @@ function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
     <div className="flex flex-col gap-2 p-2">
       <div className="flex items-end justify-between p-2">
         <UserAvatar
-          avatarUrl={user.avatar}
+          avatarUrl={user.avatarUrl}
           username={user.username}
           className="h-32 w-32"
         />

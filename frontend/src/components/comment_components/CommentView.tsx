@@ -49,7 +49,7 @@ function CommentView({
       >
         <div className="flex items-center gap-1 text-sm">
           <UserAvatar
-            avatarUrl={comment.user.avatar}
+            avatarUrl={comment.user.avatarUrl}
             username={comment.user.username}
           />
 
@@ -103,7 +103,7 @@ function CommentView({
     >
       <div className="flex flex-col items-center">
         <UserAvatar
-          avatarUrl={comment.user.avatar}
+          avatarUrl={comment.user.avatarUrl}
           username={comment.user.username}
         />
 

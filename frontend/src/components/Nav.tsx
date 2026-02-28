@@ -60,7 +60,7 @@ function Nav({ hidden = false }: NavProps) {
             className="hover:bg-accent flex items-center justify-center gap-2 rounded-full p-2"
           >
             <UserAvatar
-              avatarUrl={user.avatar}
+              avatarUrl={user.avatarUrl}
               username={user.username}
               redirect={false}
             />
