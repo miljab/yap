@@ -252,6 +252,6 @@ export const postService = {
     const result = hasMore ? posts.slice(0, -1) : posts;
     const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
 
-    return postPresenter.feed(posts, { nextCursor });
+    return postPresenter.feed(result, { nextCursor });
   },
 };
