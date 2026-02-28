@@ -5,7 +5,7 @@ import { deleteImages, uploadImages } from "../utils/cloudinaryHelper.js";
 
 const DEFAULT_PAGE_LIMIT = 10;
 
-const basePostInclude = (userId: string) => {
+export const basePostInclude = (userId: string) => {
   return {
     images: {
       select: {
