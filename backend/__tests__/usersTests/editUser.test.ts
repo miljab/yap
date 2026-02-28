@@ -24,6 +24,7 @@ vi.mock("../../config/cloudinary.js", () => ({
     uploader: {
       upload: vi.fn().mockResolvedValue({
         secure_url: "https://fake-cloudinary.com/avatar.jpg",
+        public_id: "fake-avatar-public-id",
       }),
     },
   },
@@ -69,7 +70,7 @@ describe("PUT /profile", () => {
       .attach("avatar", Buffer.from(pngImageBase64, "base64"), "avatar.png");
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty("avatar");
+    expect(res.body).toHaveProperty("avatarUrl");
   });
 
   it("should update both bio and avatar", async () => {
@@ -81,7 +82,7 @@ describe("PUT /profile", () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("bio", "New bio with avatar");
-    expect(res.body).toHaveProperty("avatar");
+    expect(res.body).toHaveProperty("avatarUrl");
   });
 
   it("should allow empty bio update", async () => {
