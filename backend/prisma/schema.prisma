@@ -27,13 +27,14 @@ model User {
 }
 
 model Follow {
+  id          String   @id @default(uuid())
   followerId  String
   followingId String
-  follower    User   @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
-  following   User   @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
 
-  @@id([followerId, followingId])
-  @@index([followingId])
+  @@unique([followingId, followerId])
 }
 
 model Avatar {
