@@ -5,6 +5,39 @@ import { deleteImages, uploadImages } from "../utils/cloudinaryHelper.js";
 
 const DEFAULT_PAGE_LIMIT = 10;
 
+const basePostInclude = (userId: string) => {
+  return {
+    images: {
+      select: {
+        url: true,
+        orderIndex: true,
+      },
+    },
+    user: {
+      include: {
+        avatar: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    },
+    likes: {
+      where: { userId },
+      select: {
+        userId: true,
+      },
+    },
+
+    _count: {
+      select: {
+        comments: true,
+        likes: true,
+      },
+    },
+  };
+};
+
 export const postService = {
   createPost: async ({
     userId,
@@ -52,36 +85,7 @@ export const postService = {
       where: {
         id: postId,
       },
-      include: {
-        images: {
-          select: {
-            url: true,
-            orderIndex: true,
-          },
-        },
-        user: {
-          include: {
-            avatar: {
-              select: {
-                url: true,
-              },
-            },
-          },
-        },
-        likes: {
-          where: { userId },
-          select: {
-            userId: true,
-          },
-        },
-
-        _count: {
-          select: {
-            comments: true,
-            likes: true,
-          },
-        },
-      },
+      include: basePostInclude(userId),
     });
 
     if (!post) throw new AppError("Post not found", 404);
@@ -191,37 +195,7 @@ export const postService = {
       data: {
         content: newContent,
       },
-      include: {
-        user: {
-          include: {
-            avatar: {
-              select: {
-                url: true,
-              },
-            },
-          },
-        },
-        images: {
-          select: {
-            url: true,
-            orderIndex: true,
-          },
-        },
-
-        _count: {
-          select: {
-            comments: true,
-            likes: true,
-          },
-        },
-
-        likes: {
-          where: { userId },
-          select: {
-            userId: true,
-          },
-        },
-      },
+      include: basePostInclude(userId),
     });
 
     await prisma.postHistory.create({
@@ -243,36 +217,7 @@ export const postService = {
       take: limit + 1,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       orderBy: { createdAt: "desc" },
-      include: {
-        images: {
-          select: {
-            url: true,
-            orderIndex: true,
-          },
-        },
-        user: {
-          include: {
-            avatar: {
-              select: {
-                url: true,
-              },
-            },
-          },
-        },
-        likes: {
-          where: { userId },
-          select: {
-            userId: true,
-          },
-        },
-
-        _count: {
-          select: {
-            likes: true,
-            comments: true,
-          },
-        },
-      },
+      include: basePostInclude(userId),
     });
 
     const hasMore = posts.length > limit;
@@ -300,39 +245,7 @@ export const postService = {
       take: limit + 1,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       orderBy: { createdAt: "desc" },
-      include: {
-        images: {
-          select: {
-            url: true,
-            orderIndex: true,
-          },
-        },
-        user: {
-          include: {
-            avatar: {
-              select: {
-                url: true,
-              },
-            },
-          },
-        },
-
-        likes: {
-          where: {
-            userId,
-          },
-          select: {
-            userId: true,
-          },
-        },
-
-        _count: {
-          select: {
-            comments: true,
-            likes: true,
-          },
-        },
-      },
+      include: basePostInclude(userId),
     });
 
     const hasMore = posts.length > limit;
