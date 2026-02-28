@@ -80,6 +80,13 @@ export const commentPresenter = {
     return comments.map((comment) => this.single(comment));
   },
 
+  feed(comments: BaseCommentPayload[], ctx: { nextCursor: string | null }) {
+    return {
+      comments: comments.map((comment) => this.single(comment)),
+      nextCursor: ctx.nextCursor,
+    };
+  },
+
   new(comment: NewCommentPayload) {
     return {
       id: comment.id,
