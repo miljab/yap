@@ -86,6 +86,7 @@ export const userPresenter = {
           id: user.id,
           username: user.username,
           avatarUrl: user.avatar?.url || DEFAULT_AVATAR,
+          bio: user.bio,
           isFollowed: ctx.followingSet.has(user.id),
         };
       }),
