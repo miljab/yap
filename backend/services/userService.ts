@@ -66,7 +66,7 @@ export const userService = {
     const result = hasMore ? posts.slice(0, -1) : posts;
     const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
 
-    return postPresenter.feed(posts, { nextCursor });
+    return postPresenter.feed(result, { nextCursor });
   },
 
   getUserComments: async (
@@ -87,7 +87,7 @@ export const userService = {
     const result = hasMore ? comments.slice(0, -1) : comments;
     const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
 
-    return commentPresenter.feed(comments, { nextCursor });
+    return commentPresenter.feed(result, { nextCursor });
   },
 
   updateProfile: async (
@@ -213,11 +213,6 @@ export const userService = {
               },
             },
           },
-          select: {
-            id: true,
-            username: true,
-            bio: true,
-          },
         },
       },
       orderBy: {
@@ -286,11 +281,6 @@ export const userService = {
                 url: true,
               },
             },
-          },
-          select: {
-            id: true,
-            username: true,
-            bio: true,
           },
         },
       },
