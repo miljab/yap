@@ -14,6 +14,24 @@ type UserPreviewPayload = Prisma.UserGetPayload<{
   };
 }>;
 
+type UserFollowListPayload = Prisma.UserGetPayload<{
+  select: {
+    id: true;
+    username: true;
+    bio: true;
+  };
+  include: {
+    avatar: {
+      select: {
+        url: true;
+      };
+    };
+  };
+  omit: {
+    password: true;
+  };
+}>;
+
 type UserProfilePayload = Prisma.UserGetPayload<{
   include: {
     avatar: {
@@ -27,9 +45,10 @@ type UserProfilePayload = Prisma.UserGetPayload<{
         following: true;
       };
     };
-    omit: {
-      password: true;
-    };
+  };
+
+  omit: {
+    password: true;
   };
 }>;
 
@@ -54,6 +73,23 @@ export const userPresenter = {
       followingCount: user._count.following,
       isFollowed: ctx.isFollowed,
       createdAt: user.createdAt,
+    };
+  },
+
+  followList(
+    users: UserFollowListPayload[],
+    ctx: { followingSet: Set<string>; nextCursor: string | null },
+  ) {
+    return {
+      users: users.map((user) => {
+        return {
+          id: user.id,
+          username: user.username,
+          avatarUrl: user.avatar?.url || DEFAULT_AVATAR,
+          isFollowed: ctx.followingSet.has(user.id),
+        };
+      }),
+      nextCursor: ctx.nextCursor,
     };
   },
 };
