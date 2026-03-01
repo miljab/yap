@@ -24,14 +24,12 @@ function UserAvatar({
   }
 
   return (
-    <Avatar className={className}>
-      <Link to={`/profile/${username}`}>
+    <Link to={`/profile/${username}`} className={className}>
+      <Avatar>
         <AvatarImage src={avatarUrl} />
-      </Link>
-      <Link to={`/profile/${username}`}>
         <AvatarFallback>{username[0]}</AvatarFallback>
-      </Link>
-    </Avatar>
+      </Avatar>
+    </Link>
   );
 }
 
