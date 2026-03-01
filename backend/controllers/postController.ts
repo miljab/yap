@@ -190,3 +190,22 @@ export const getFollowingFeed = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getEditHistory = async (req: Request, res: Response) => {
+  const postId = req.params.id;
+
+  try {
+    if (!postId) throw new AppError("Post ID is required", 400);
+
+    const postHistory = postService.getEditHistory(postId);
+
+    return res.status(200).json(postHistory);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
