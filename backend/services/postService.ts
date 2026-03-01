@@ -2,6 +2,7 @@ import { postPresenter } from "../presenters/postPresenter.js";
 import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
 import { deleteImages, uploadImages } from "../utils/cloudinaryHelper.js";
+import { paginate } from "../utils/pagination.js";
 
 const DEFAULT_PAGE_LIMIT = 10;
 
@@ -220,9 +221,7 @@ export const postService = {
       include: basePostInclude(userId),
     });
 
-    const hasMore = posts.length > limit;
-    const result = hasMore ? posts.slice(0, -1) : posts;
-    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
+    const { result, nextCursor } = paginate(posts, limit);
 
     return postPresenter.feed(result, { nextCursor });
   },
@@ -248,9 +247,7 @@ export const postService = {
       include: basePostInclude(userId),
     });
 
-    const hasMore = posts.length > limit;
-    const result = hasMore ? posts.slice(0, -1) : posts;
-    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
+    const { result, nextCursor } = paginate(posts, limit);
 
     return postPresenter.feed(result, { nextCursor });
   },

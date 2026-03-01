@@ -8,6 +8,7 @@ import { basePostInclude } from "./postService.js";
 import { postPresenter } from "../presenters/postPresenter.js";
 import { baseCommentInclude } from "./commentService.js";
 import { commentPresenter } from "../presenters/commentPresenter.js";
+import { paginate } from "../utils/pagination.js";
 
 const DEFAULT_PAGE_LIMIT = 10;
 
@@ -62,9 +63,7 @@ export const userService = {
       include: basePostInclude(requesterId),
     });
 
-    const hasMore = posts.length > limit;
-    const result = hasMore ? posts.slice(0, -1) : posts;
-    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
+    const { result, nextCursor } = paginate(posts, limit);
 
     return postPresenter.feed(result, { nextCursor });
   },
@@ -83,9 +82,7 @@ export const userService = {
       include: baseCommentInclude(requesterId),
     });
 
-    const hasMore = comments.length > limit;
-    const result = hasMore ? comments.slice(0, -1) : comments;
-    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
+    const { result, nextCursor } = paginate(comments, limit);
 
     return commentPresenter.feed(result, { nextCursor });
   },
@@ -220,9 +217,7 @@ export const userService = {
       },
     });
 
-    const hasMore = following.length > limit;
-    const result = hasMore ? following.slice(0, -1) : following;
-    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
+    const { result, nextCursor } = paginate(following, limit);
 
     const followingIds = result.map((f) => f.followingId);
 
@@ -289,9 +284,7 @@ export const userService = {
       },
     });
 
-    const hasMore = followers.length > limit;
-    const result = hasMore ? followers.slice(0, -1) : followers;
-    const nextCursor = hasMore ? (result[result.length - 1]?.id ?? null) : null;
+    const { result, nextCursor } = paginate(followers, limit);
 
     const followerIds = result.map((f) => f.followerId);
 
