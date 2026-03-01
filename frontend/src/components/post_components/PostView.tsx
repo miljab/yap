@@ -22,12 +22,11 @@ function PostView({
   onCommentCreated,
   onPostDelete,
 }: PostViewProps) {
-  const { isLiked, likeCount, isLiking, handleLike, likedBy } = useLike({
+  const { isLiked, likeCount, isLiking, handleLike } = useLike({
     itemId: post.id,
     itemType: "post",
     initialIsLiked: post.isLiked,
     initialLikeCount: post.likeCount,
-    initialLikedBy: post.likes,
   });
   const navigate = useNavigate();
   const location = useLocation();
@@ -90,7 +89,6 @@ function PostView({
           commentCount={post.commentCount}
           isLiking={isLiking}
           onLike={handleLike}
-          likedBy={likedBy}
           postId={post.id}
           target={post}
           onCommentCreated={onCommentCreated}

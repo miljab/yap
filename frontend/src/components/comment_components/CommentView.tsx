@@ -24,12 +24,11 @@ function CommentView({
   onCommentCreated,
   onCommentDelete,
 }: CommentViewProps) {
-  const { isLiked, likeCount, isLiking, handleLike, likedBy } = useLike({
+  const { isLiked, likeCount, isLiking, handleLike } = useLike({
     itemId: comment.id,
     itemType: "comment",
     initialIsLiked: comment.isLiked,
     initialLikeCount: comment.likeCount,
-    initialLikedBy: comment.likes,
   });
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,7 +86,6 @@ function CommentView({
           commentCount={comment.commentCount}
           isLiking={isLiking}
           onLike={handleLike}
-          likedBy={likedBy}
           postId={comment.postId}
           target={comment}
           onCommentCreated={onCommentCreated}
@@ -147,7 +145,6 @@ function CommentView({
             commentCount={comment.commentCount}
             isLiking={isLiking}
             onLike={handleLike}
-            likedBy={likedBy}
             postId={comment.postId}
             target={comment}
             onCommentCreated={onCommentCreated}
