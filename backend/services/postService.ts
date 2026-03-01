@@ -1,4 +1,5 @@
 import { postPresenter } from "../presenters/postPresenter.js";
+import { userPresenter } from "../presenters/userPresenter.js";
 import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
 import { deleteImages, uploadImages } from "../utils/cloudinaryHelper.js";
@@ -271,7 +272,7 @@ export const postService = {
 
     const postHistory = await prisma.postHistory.findMany({
       where: {
-        id: postId,
+        postId: postId,
       },
       orderBy: {
         createdAt: "desc",
@@ -279,5 +280,52 @@ export const postService = {
     });
 
     return postPresenter.history(postHistory);
+  },
+
+  getPostLikes: async (
+    postId: string,
+    requesterId: string,
+    cursor?: string,
+    limit: number = 20,
+  ) => {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      select: {
+        id: true,
+        userId: true,
+      },
+    });
+
+    if (!post) throw new AppError("Post not found", 404);
+
+    if (post.userId !== requesterId) throw new AppError("Forbidden", 403);
+
+    const likes = await prisma.postLike.findMany({
+      where: {
+        postId: postId,
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const { result, nextCursor } = paginate(likes, limit);
+
+    const likers = result.map((liker) => liker.user);
+
+    return userPresenter.likeList(likers, { nextCursor });
   },
 };

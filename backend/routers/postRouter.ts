@@ -9,6 +9,7 @@ import {
   getHomeFeed,
   getFollowingFeed,
   getEditHistory,
+  getPostLikes,
 } from "../controllers/postController.js";
 import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
@@ -48,6 +49,8 @@ const createPostRouter = ({
   router.get("/feed/following", verifyAccessToken, getFollowingFeed);
 
   router.get("/post/:id/history", verifyAccessToken, getEditHistory);
+
+  router.get("/post/:id/likes", verifyAccessToken, getPostLikes);
 
   return router;
 };
