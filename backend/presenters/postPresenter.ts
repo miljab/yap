@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, type PostHistory } from "@prisma/client";
 import { userPresenter } from "./userPresenter.js";
 
 type BasePostPayload = Prisma.PostGetPayload<{
@@ -19,6 +19,12 @@ type BasePostPayload = Prisma.PostGetPayload<{
       select: {
         url: true;
         orderIndex: true;
+      };
+    };
+
+    history: {
+      select: {
+        id: true;
       };
     };
 
@@ -71,6 +77,7 @@ export const postPresenter = {
       commentCount: post._count.comments,
       likeCount: post._count.likes,
       isLiked: post.likes.length > 0,
+      isEdited: post.history.length > 0,
       user: userPresenter.preview(post.user),
     };
   },
@@ -92,7 +99,19 @@ export const postPresenter = {
       commentCount: 0,
       likeCount: 0,
       isLiked: false,
+      isEdited: false,
       user: userPresenter.preview(post.user),
     };
+  },
+
+  history(postHistory: PostHistory[]) {
+    return postHistory.map((h) => {
+      return {
+        id: h.id,
+        postId: h.postId,
+        content: h.content,
+        createdAt: h.createdAt,
+      };
+    });
   },
 };
