@@ -1,4 +1,3 @@
-import type { Post } from "@/types/post";
 import UserAvatar from "../user_components/UserAvatar";
 import {
   Dialog,
@@ -8,11 +7,37 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import type { PostHistory } from "@/types/post";
+import { toast } from "sonner";
 
 type PostHistoryProps = {
-  post: Post;
+  postId: string;
+  user: {
+    avatarUrl: string;
+    username: string;
+  };
 };
-function PostEditHistory({ post }: PostHistoryProps) {
+function PostEditHistory({ postId, user }: PostHistoryProps) {
+  const [history, setHistory] = useState<PostHistory[]>([]);
+  const axiosPrivate = useAxiosPrivate();
+
+  useEffect(() => {
+    const fetchEditHistory = async () => {
+      try {
+        const response = await axiosPrivate.get(`/post/${postId}/history`);
+
+        setHistory(response.data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to fetch edit history. Please try again.");
+      }
+    };
+
+    fetchEditHistory();
+  }, [postId, axiosPrivate]);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -26,26 +51,26 @@ function PostEditHistory({ post }: PostHistoryProps) {
           <DialogTitle>Post edition history</DialogTitle>
         </DialogHeader>
         <div className="flex max-h-[500px] flex-col gap-1 overflow-auto">
-          {post.history.map((h, idx) => {
+          {history.map((h, idx) => {
             return (
               <div
                 key={h.id}
-                className={`flex w-full cursor-pointer gap-2 p-2 ${idx !== post.history.length - 1 && "border-b-1"}`}
+                className={`flex w-full cursor-pointer gap-2 p-2 ${idx !== history.length - 1 && "border-b-1"}`}
               >
                 <div className="flex flex-col items-center">
                   <UserAvatar
-                    avatarUrl={post.user.avatarUrl}
-                    username={post.user.username}
+                    avatarUrl={user.avatarUrl}
+                    username={user.username}
                   />
                 </div>
 
                 <div className="flex grow flex-col justify-start gap-1">
                   <div className="flex gap-1 text-sm">
                     <Link
-                      to={`/profile/${post.user.username}`}
+                      to={`/profile/${user.username}`}
                       className="flex cursor-pointer items-center font-bold hover:underline"
                     >
-                      {post.user.username}
+                      {user.username}
                     </Link>
                     <span className="text-neutral-500">&middot;</span>
                     <span className="text-neutral-500">

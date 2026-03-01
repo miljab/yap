@@ -96,7 +96,12 @@ function PostView({
           onCommentCreated={onCommentCreated}
         />
 
-        {post.history.length > 0 && <PostEditHistory post={post} />}
+        {post.isEdited && (
+          <PostEditHistory
+            postId={post.id}
+            user={{ avatarUrl: user.avatarUrl, username: user.username }}
+          />
+        )}
       </div>
     </div>
   );
