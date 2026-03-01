@@ -198,3 +198,34 @@ export const deleteComment = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getCommentLikes = async (req: Request, res: Response) => {
+  const requesterId = req.user?.id;
+  const commentId = req.params.id;
+  const cursor = req.query.cursor as string | undefined;
+  const limit = req.query.limit
+    ? parseInt(req.query.limit as string)
+    : undefined;
+
+  try {
+    if (!requesterId) throw new AppError("Unauthorized", 401);
+
+    if (!commentId) throw new AppError("Comment ID is required", 400);
+
+    const users = await commentService.getCommentLikes(
+      commentId,
+      requesterId,
+      cursor,
+      limit,
+    );
+
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};

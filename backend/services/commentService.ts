@@ -3,6 +3,8 @@ import AppError from "../utils/appError.js";
 import { postService } from "./postService.js";
 import { uploadImages } from "../utils/cloudinaryHelper.js";
 import { commentPresenter } from "../presenters/commentPresenter.js";
+import { paginate } from "../utils/pagination.js";
+import { userPresenter } from "../presenters/userPresenter.js";
 
 export const baseCommentInclude = (userId: string) => {
   return {
@@ -267,6 +269,53 @@ const commentService = {
     });
 
     return { message: "Comment deleted successfully" };
+  },
+
+  getCommentLikes: async (
+    commentId: string,
+    requesterId: string,
+    cursor?: string,
+    limit: number = 20,
+  ) => {
+    const comment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      select: {
+        id: true,
+        userId: true,
+      },
+    });
+
+    if (!comment) throw new AppError("Post not found", 404);
+
+    if (comment.userId !== requesterId) throw new AppError("Forbidden", 403);
+
+    const likes = await prisma.commentLike.findMany({
+      where: {
+        commentId: commentId,
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const { result, nextCursor } = paginate(likes, limit);
+
+    const likers = result.map((liker) => liker.user);
+
+    return userPresenter.likeList(likers, { nextCursor });
   },
 };
 

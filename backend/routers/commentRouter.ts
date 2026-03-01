@@ -8,6 +8,7 @@ import {
   getThread,
   replyToComment,
   deleteComment,
+  getCommentLikes,
 } from "../controllers/commentController.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
 import { createMulterErrorHandler } from "../middleware/handleMulterError.js";
@@ -49,6 +50,8 @@ const createCommentRouter = ({
   router.get("/comment/:id/thread", verifyAccessToken, getThread);
 
   router.delete("/comment/:id", verifyAccessToken, deleteComment);
+
+  router.get("/comment/:id/likes", verifyAccessToken, getCommentLikes);
 
   return router;
 };
