@@ -287,7 +287,7 @@ const commentService = {
       },
     });
 
-    if (!comment) throw new AppError("Post not found", 404);
+    if (!comment) throw new AppError("Comment not found", 404);
 
     if (comment.userId !== requesterId) throw new AppError("Forbidden", 403);
 

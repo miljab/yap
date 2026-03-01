@@ -5,17 +5,6 @@ import { prisma } from "../../prisma/prismaClient.js";
 
 const app = createApp({ enableRateLimit: false, enableCsrf: false });
 
-vi.mock("../../utils/cloudinaryHelper.js", () => ({
-  uploadImages: vi.fn().mockImplementation(async (images) => {
-    return images.map((_: any, idx: number) => ({
-      url: `https://fake-cloudinary.com/image${idx}.jpg`,
-      cloudinaryPublicId: `fake-public-id-${idx}`,
-      orderIndex: idx,
-    }));
-  }),
-  deleteImages: vi.fn().mockResolvedValue(undefined),
-}));
-
 describe("GET /profile/:username", () => {
   const userData = {
     email: "profileuser@example.com",

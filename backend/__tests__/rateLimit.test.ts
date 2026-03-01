@@ -3,17 +3,6 @@ import { vi, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import request from "supertest";
 import { prisma } from "../prisma/prismaClient.js";
 
-vi.mock("../utils/cloudinaryHelper.js", () => ({
-  uploadImages: vi.fn().mockImplementation(async (images) => {
-    return images.map((_: any, idx: number) => ({
-      url: `https://fake-cloudinary.com/image${idx}.jpg`,
-      cloudinaryPublicId: `fake-public-id-${idx}`,
-      orderIndex: idx,
-    }));
-  }),
-  deleteImages: vi.fn().mockResolvedValue(undefined),
-}));
-
 beforeAll(async () => {
   await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();
