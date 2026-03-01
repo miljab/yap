@@ -7,11 +7,10 @@ export type Post = {
   user: User;
   images: Image[];
   comments: Comment[];
-  likes: Like[];
   isLiked: boolean;
+  isEdited: boolean;
   likeCount: number;
   commentCount: number;
-  history: PostHistory[];
 };
 
 export type PostHistory = {
