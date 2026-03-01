@@ -66,6 +66,19 @@ type UserLikePayload = Prisma.UserGetPayload<{
   };
 }>;
 
+type UserAuthPayload = Prisma.UserGetPayload<{
+  include: {
+    avatar: {
+      select: {
+        url: true;
+      };
+    };
+  };
+  omit: {
+    password: true;
+  };
+}>;
+
 const DEFAULT_AVATAR = process.env.DEFAULT_AVATAR_URL!;
 
 export const userPresenter = {
@@ -118,6 +131,15 @@ export const userPresenter = {
         };
       }),
       nextCursor: ctx.nextCursor,
+    };
+  },
+
+  auth(user: UserAuthPayload) {
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      avatarUrl: user.avatar?.url || DEFAULT_AVATAR,
     };
   },
 };
