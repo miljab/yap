@@ -23,6 +23,11 @@ export const basePostInclude = (userId: string) => {
         },
       },
     },
+    history: {
+      select: {
+        id: true,
+      },
+    },
     likes: {
       where: { userId },
       select: {
@@ -250,5 +255,29 @@ export const postService = {
     const { result, nextCursor } = paginate(posts, limit);
 
     return postPresenter.feed(result, { nextCursor });
+  },
+
+  getEditHistory: async (postId: string) => {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!post) throw new AppError("Post not found", 404);
+
+    const postHistory = await prisma.postHistory.findMany({
+      where: {
+        id: postId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return postPresenter.history(postHistory);
   },
 };
