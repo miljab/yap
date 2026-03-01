@@ -7,10 +7,11 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { Link } from "react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import type { PostHistory } from "@/types/post";
 import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
 
 type PostHistoryProps = {
   postId: string;
@@ -21,22 +22,35 @@ type PostHistoryProps = {
 };
 function PostEditHistory({ postId, user }: PostHistoryProps) {
   const [history, setHistory] = useState<PostHistory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const axiosPrivate = useAxiosPrivate();
 
-  useEffect(() => {
-    const fetchEditHistory = async () => {
-      try {
-        const response = await axiosPrivate.get(`/post/${postId}/history`);
+  const fetchEditHistory = useCallback(async () => {
+    setIsLoading(true);
 
-        setHistory(response.data);
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to fetch edit history. Please try again.");
-      }
-    };
+    try {
+      const response = await axiosPrivate.get(`/post/${postId}/history`);
 
-    fetchEditHistory();
+      setHistory(response.data);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch edit history. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   }, [postId, axiosPrivate]);
+
+  useEffect(() => {
+    fetchEditHistory();
+  }, [fetchEditHistory]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center p-4">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <Dialog>
@@ -78,7 +92,7 @@ function PostEditHistory({ postId, user }: PostHistoryProps) {
                     </span>
                   </div>
 
-                  {h.content ? (
+                  {h.content?.trim() ? (
                     <p className="wrap-break-word contain-inline-size">
                       {h.content}
                     </p>
