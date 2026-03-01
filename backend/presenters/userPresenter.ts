@@ -52,6 +52,20 @@ type UserProfilePayload = Prisma.UserGetPayload<{
   };
 }>;
 
+type UserLikePayload = Prisma.UserGetPayload<{
+  include: {
+    avatar: {
+      select: {
+        url: true;
+      };
+    };
+  };
+
+  omit: {
+    password: true;
+  };
+}>;
+
 const DEFAULT_AVATAR = process.env.DEFAULT_AVATAR_URL!;
 
 export const userPresenter = {
@@ -88,6 +102,19 @@ export const userPresenter = {
           avatarUrl: user.avatar?.url || DEFAULT_AVATAR,
           bio: user.bio,
           isFollowed: ctx.followingSet.has(user.id),
+        };
+      }),
+      nextCursor: ctx.nextCursor,
+    };
+  },
+
+  likeList(users: UserLikePayload[], ctx: { nextCursor: string | null }) {
+    return {
+      users: users.map((u) => {
+        return {
+          id: u.id,
+          username: u.username,
+          avatarUrl: u.avatar?.url || DEFAULT_AVATAR,
         };
       }),
       nextCursor: ctx.nextCursor,
