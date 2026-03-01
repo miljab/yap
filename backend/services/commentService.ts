@@ -1,8 +1,43 @@
 import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
-import type { Comment, CommentLike } from "@prisma/client";
 import { postService } from "./postService.js";
 import { uploadImages } from "../utils/cloudinaryHelper.js";
+import { commentPresenter } from "../presenters/commentPresenter.js";
+import { paginate } from "../utils/pagination.js";
+import { userPresenter } from "../presenters/userPresenter.js";
+
+export const baseCommentInclude = (userId: string) => {
+  return {
+    images: {
+      select: {
+        url: true,
+        orderIndex: true,
+      },
+    },
+    user: {
+      include: {
+        avatar: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    },
+    likes: {
+      where: { userId },
+      select: {
+        userId: true,
+      },
+    },
+
+    _count: {
+      select: {
+        replies: true,
+        likes: true,
+      },
+    },
+  };
+};
 
 const commentService = {
   replyToPost: async (
@@ -31,12 +66,25 @@ const commentService = {
         },
       },
       include: {
-        images: true,
-        user: true,
+        images: {
+          select: {
+            url: true,
+            orderIndex: true,
+          },
+        },
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    return comment;
+    return commentPresenter.new(comment);
   },
 
   replyToComment: async (
@@ -66,15 +114,28 @@ const commentService = {
         },
       },
       include: {
-        images: true,
-        user: true,
+        images: {
+          select: {
+            url: true,
+            orderIndex: true,
+          },
+        },
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    return comment;
+    return commentPresenter.new(comment);
   },
 
-  getComments: async (postId: string, userId?: string) => {
+  getComments: async (postId: string, userId: string) => {
     const post = await prisma.post.findUnique({
       where: {
         id: postId,
@@ -88,15 +149,7 @@ const commentService = {
         postId,
         parentId: null,
       },
-      include: {
-        images: true,
-        user: true,
-        likes: {
-          include: {
-            user: true,
-          },
-        },
-      },
+      include: baseCommentInclude(userId),
       orderBy: [
         {
           createdAt: "desc",
@@ -104,47 +157,7 @@ const commentService = {
       ],
     });
 
-    const commentsWithMeta = await Promise.all(
-      comments.map(async (comment) =>
-        commentService.getCommentMeta(comment, userId),
-      ),
-    );
-
-    return commentsWithMeta;
-  },
-
-  getCommentMeta: async (
-    comment: Comment & { likes?: CommentLike[] },
-    userId?: string,
-  ) => {
-    const [likeCount, commentCount, isLiked] = await Promise.all([
-      prisma.commentLike.count({
-        where: { commentId: comment.id },
-      }),
-      prisma.comment.count({
-        where: { parentId: comment.id },
-      }),
-      userId
-        ? prisma.commentLike
-            .findUnique({
-              where: {
-                userId_commentId: {
-                  userId,
-                  commentId: comment.id,
-                },
-              },
-            })
-            .then((like) => !!like)
-        : Promise.resolve(false),
-    ]);
-
-    return {
-      ...comment,
-      likes: comment.userId === userId ? comment.likes : [],
-      likeCount,
-      commentCount,
-      isLiked,
-    };
+    return commentPresenter.list(comments);
   },
 
   likeComment: async (userId: string, commentId: string) => {
@@ -193,23 +206,10 @@ const commentService = {
       where: {
         id: commentId,
       },
-      include: {
-        images: true,
-        user: true,
-        likes: {
-          include: {
-            user: true,
-          },
-        },
-      },
+      include: baseCommentInclude(userId),
     });
 
     if (!comment) throw new AppError("Comment not found", 404);
-
-    const commentWithMeta = await commentService.getCommentMeta(
-      comment,
-      userId,
-    );
 
     const post = await postService.getPostById(comment.postId, userId);
 
@@ -217,27 +217,13 @@ const commentService = {
       where: {
         parentId: comment.id,
       },
-      include: {
-        images: true,
-        user: true,
-        likes: {
-          include: {
-            user: true,
-          },
-        },
-      },
+      include: baseCommentInclude(userId),
       orderBy: [
         {
           createdAt: "desc",
         },
       ],
     });
-
-    const repliesWithMeta = await Promise.all(
-      replies.map(async (reply) =>
-        commentService.getCommentMeta(reply, userId),
-      ),
-    );
 
     const parentComments = [];
     let currentParentId = comment.parentId;
@@ -247,15 +233,7 @@ const commentService = {
         where: {
           id: currentParentId,
         },
-        include: {
-          images: true,
-          user: true,
-          likes: {
-            include: {
-              user: true,
-            },
-          },
-        },
+        include: baseCommentInclude(userId),
       });
 
       if (!parentComment) break;
@@ -264,15 +242,11 @@ const commentService = {
       currentParentId = parentComment?.parentId;
     }
 
-    const parentCommentsWithMeta = await Promise.all(
-      parentComments.map((com) => commentService.getCommentMeta(com, userId)),
-    );
-
     return {
-      comment: commentWithMeta,
+      comment: commentPresenter.single(comment),
       post,
-      replies: repliesWithMeta,
-      parentComments: parentCommentsWithMeta,
+      replies: commentPresenter.list(replies),
+      parentComments: commentPresenter.list(parentComments),
     };
   },
 
@@ -295,6 +269,53 @@ const commentService = {
     });
 
     return { message: "Comment deleted successfully" };
+  },
+
+  getCommentLikes: async (
+    commentId: string,
+    requesterId: string,
+    cursor?: string,
+    limit: number = 20,
+  ) => {
+    const comment = await prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+      select: {
+        id: true,
+        userId: true,
+      },
+    });
+
+    if (!comment) throw new AppError("Comment not found", 404);
+
+    if (comment.userId !== requesterId) throw new AppError("Forbidden", 403);
+
+    const likes = await prisma.commentLike.findMany({
+      where: {
+        commentId: commentId,
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const { result, nextCursor } = paginate(likes, limit);
+
+    const likers = result.map((liker) => liker.user);
+
+    return userPresenter.likeList(likers, { nextCursor });
   },
 };
 

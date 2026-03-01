@@ -11,9 +11,10 @@ function PostViewPage() {
   const params = useParams();
   const axiosPrivate = useAxiosPrivate();
   const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const [comments, setComments] = useState<Comment[]>([]);
   const isDeleting = useRef(false);
 
   const onCommentCreated = (newComment: Comment) => {
@@ -46,26 +47,32 @@ function PostViewPage() {
   };
 
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchData = async () => {
       if (isDeleting.current) return;
 
       try {
-        const response = await axiosPrivate.get(`/post/${params.id}`);
+        const [postRes, commentsRes] = await Promise.all([
+          axiosPrivate.get(`/post/${params.id}`),
+          axiosPrivate.get(`/post/${params.id}/comments`),
+        ]);
 
-        setPost(response.data);
+        setPost(postRes.data);
+        setComments(commentsRes.data);
       } catch (error) {
         console.error(error);
 
         navigate("/error", {
           state: { error: "Failed to fetch post. Please try again." },
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchPost();
+    fetchData();
   }, [params.id, axiosPrivate, navigate]);
 
-  if (!post) {
+  if (isLoading || !post) {
     return null;
   }
 
@@ -85,7 +92,6 @@ function PostViewPage() {
         <CreateComment postId={post.id} onCommentCreated={onCommentCreated} />
       </div>
       <Comments
-        postId={post.id}
         comments={comments}
         setComments={setComments}
         onCommentCreated={onCommentCreated}

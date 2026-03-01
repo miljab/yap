@@ -1,20 +1,9 @@
-import createApp from "../app.js";
+import createApp from "../../app.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
-import { prisma } from "../prisma/prismaClient.js";
+import { prisma } from "../../prisma/prismaClient.js";
 
 const app = createApp({ enableRateLimit: false, enableCsrf: false });
-
-vi.mock("../utils/cloudinaryHelper.js", () => ({
-  uploadImages: vi.fn().mockImplementation(async (images) => {
-    return images.map((_: any, idx: number) => ({
-      url: `https://fake-cloudinary.com/image${idx}.jpg`,
-      cloudinaryPublicId: `fake-public-id-${idx}`,
-      orderIndex: idx,
-    }));
-  }),
-  deleteImages: vi.fn().mockResolvedValue(undefined),
-}));
 
 describe("POST /post/:id/like", () => {
   const userData = {
@@ -86,7 +75,7 @@ describe("POST /post/:id/like", () => {
   });
 
   it("should handle internal server error", async () => {
-    const { postService } = await import("../services/postService.js");
+    const { postService } = await import("../../services/postService.js");
     const likePostMock = vi
       .spyOn(postService, "likePost")
       .mockRejectedValueOnce(new Error("fail"));
@@ -180,7 +169,7 @@ describe("POST /comment/:id/like", () => {
   });
 
   it("should handle internal server error", async () => {
-    const commentService = (await import("../services/commentService.js"))
+    const commentService = (await import("../../services/commentService.js"))
       .default;
     const likeCommentMock = vi
       .spyOn(commentService, "likeComment")

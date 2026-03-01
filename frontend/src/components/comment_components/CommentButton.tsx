@@ -39,7 +39,7 @@ function CommentButton({
         <div className="flex cursor-pointer gap-2 p-2">
           <div className="flex flex-col items-center">
             <UserAvatar
-              avatarUrl={target.user.avatar}
+              avatarUrl={target.user.avatarUrl}
               username={target.user.username}
             />
           </div>

@@ -8,22 +8,12 @@ const app = createApp({ enableRateLimit: false, enableCsrf: false });
 const pngImageBase64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
-vi.mock("../../utils/cloudinaryHelper.js", () => ({
-  uploadImages: vi.fn().mockImplementation(async (images) => {
-    return images.map((_: any, idx: number) => ({
-      url: `https://fake-cloudinary.com/image${idx}.jpg`,
-      cloudinaryPublicId: `fake-public-id-${idx}`,
-      orderIndex: idx,
-    }));
-  }),
-  deleteImages: vi.fn().mockResolvedValue(undefined),
-}));
-
 vi.mock("../../config/cloudinary.js", () => ({
   default: {
     uploader: {
       upload: vi.fn().mockResolvedValue({
         secure_url: "https://fake-cloudinary.com/avatar.jpg",
+        public_id: "fake-avatar-public-id",
       }),
     },
   },
@@ -69,7 +59,7 @@ describe("PUT /profile", () => {
       .attach("avatar", Buffer.from(pngImageBase64, "base64"), "avatar.png");
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toHaveProperty("avatar");
+    expect(res.body).toHaveProperty("avatarUrl");
   });
 
   it("should update both bio and avatar", async () => {
@@ -81,7 +71,7 @@ describe("PUT /profile", () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("bio", "New bio with avatar");
-    expect(res.body).toHaveProperty("avatar");
+    expect(res.body).toHaveProperty("avatarUrl");
   });
 
   it("should allow empty bio update", async () => {

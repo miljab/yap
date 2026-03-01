@@ -1,8 +1,49 @@
+import { postPresenter } from "../presenters/postPresenter.js";
+import { userPresenter } from "../presenters/userPresenter.js";
 import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
 import { deleteImages, uploadImages } from "../utils/cloudinaryHelper.js";
+import { paginate } from "../utils/pagination.js";
 
 const DEFAULT_PAGE_LIMIT = 10;
+
+export const basePostInclude = (userId: string) => {
+  return {
+    images: {
+      select: {
+        url: true,
+        orderIndex: true,
+      },
+    },
+    user: {
+      include: {
+        avatar: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    },
+    history: {
+      select: {
+        id: true,
+      },
+    },
+    likes: {
+      where: { userId },
+      select: {
+        userId: true,
+      },
+    },
+
+    _count: {
+      select: {
+        comments: true,
+        likes: true,
+      },
+    },
+  };
+};
 
 export const postService = {
   createPost: async ({
@@ -25,19 +66,25 @@ export const postService = {
         },
       },
       include: {
-        images: true,
-        user: true,
+        images: {
+          select: {
+            url: true,
+            orderIndex: true,
+          },
+        },
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    return {
-      ...post,
-      isLiked: false,
-      likeCount: 0,
-      commentCount: 0,
-      likes: [],
-      history: [],
-    };
+    return postPresenter.new(post);
   },
 
   getPostById: async (postId: string, userId: string) => {
@@ -45,35 +92,12 @@ export const postService = {
       where: {
         id: postId,
       },
-      include: {
-        images: true,
-        user: true,
-        likes: {
-          include: {
-            user: true,
-          },
-        },
-        history: true,
-      },
+      include: basePostInclude(userId),
     });
 
     if (!post) throw new AppError("Post not found", 404);
 
-    const isLiked = post.likes.some((like) => like.userId === userId);
-    const likeCount = post.likes.length;
-
-    const commentCount = await prisma.comment.count({
-      where: {
-        postId,
-        parentId: null,
-      },
-    });
-
-    if (userId !== post.user.id) {
-      return { ...post, isLiked, likeCount, commentCount, likes: [] };
-    }
-
-    return { ...post, isLiked, likeCount, commentCount };
+    return postPresenter.single(post);
   },
 
   likePost: async (postId: string, userId: string) => {
@@ -169,15 +193,16 @@ export const postService = {
       throw new AppError("You are not authorized to delete this post", 403);
 
     if (!newContent && post.images.length === 0)
-      throw new AppError("Text or images are required");
+      throw new AppError("Text or images are required", 400);
 
-    await prisma.post.update({
+    const updatedPost = await prisma.post.update({
       where: {
         id: postId,
       },
       data: {
         content: newContent,
       },
+      include: basePostInclude(userId),
     });
 
     await prisma.postHistory.create({
@@ -187,9 +212,7 @@ export const postService = {
       },
     });
 
-    const updatedPost = await postService.getPostById(postId, userId);
-
-    return updatedPost;
+    return postPresenter.single(updatedPost);
   },
 
   getHomeFeed: async (
@@ -201,44 +224,12 @@ export const postService = {
       take: limit + 1,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       orderBy: { createdAt: "desc" },
-      include: {
-        images: true,
-        user: true,
-        history: true,
-        likes: {
-          include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            comments: true,
-          },
-        },
-      },
+      include: basePostInclude(userId),
     });
 
-    const hasMore = posts.length > limit;
-    const result = hasMore ? posts.slice(0, -1) : posts;
+    const { result, nextCursor } = paginate(posts, limit);
 
-    const formattedPosts = result.map((post) => {
-      const isLiked = post.likes.some((like) => like.userId === userId);
-      const likeCount = post.likes.length;
-      const commentCount = post._count.comments;
-
-      return {
-        ...post,
-        isLiked,
-        likeCount,
-        commentCount,
-        likes: userId === post.userId ? post.likes : [],
-      };
-    });
-
-    return {
-      posts: formattedPosts,
-      nextCursor: hasMore ? result[result.length - 1]?.id : null,
-    };
+    return postPresenter.feed(result, { nextCursor });
   },
 
   getFollowingFeed: async (
@@ -251,7 +242,7 @@ export const postService = {
         user: {
           followers: {
             some: {
-              id: userId,
+              followerId: userId,
             },
           },
         },
@@ -259,43 +250,82 @@ export const postService = {
       take: limit + 1,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       orderBy: { createdAt: "desc" },
+      include: basePostInclude(userId),
+    });
+
+    const { result, nextCursor } = paginate(posts, limit);
+
+    return postPresenter.feed(result, { nextCursor });
+  },
+
+  getEditHistory: async (postId: string) => {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!post) throw new AppError("Post not found", 404);
+
+    const postHistory = await prisma.postHistory.findMany({
+      where: {
+        postId: postId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return postPresenter.history(postHistory);
+  },
+
+  getPostLikes: async (
+    postId: string,
+    requesterId: string,
+    cursor?: string,
+    limit: number = 20,
+  ) => {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      select: {
+        id: true,
+        userId: true,
+      },
+    });
+
+    if (!post) throw new AppError("Post not found", 404);
+
+    if (post.userId !== requesterId) throw new AppError("Forbidden", 403);
+
+    const likes = await prisma.postLike.findMany({
+      where: {
+        postId: postId,
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      orderBy: { createdAt: "desc" },
       include: {
-        images: true,
-        user: true,
-        history: true,
-        likes: {
+        user: {
           include: {
-            user: true,
-          },
-        },
-        _count: {
-          select: {
-            comments: true,
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
           },
         },
       },
     });
 
-    const hasMore = posts.length > limit;
-    const result = hasMore ? posts.slice(0, -1) : posts;
+    const { result, nextCursor } = paginate(likes, limit);
 
-    const formattedPosts = result.map((post) => {
-      const isLiked = post.likes.some((like) => like.userId === userId);
-      const likeCount = post.likes.length;
-      const commentCount = post._count.comments;
+    const likers = result.map((liker) => liker.user);
 
-      return {
-        ...post,
-        isLiked,
-        likeCount,
-        commentCount,
-        likes: userId === post.userId ? post.likes : [],
-      };
-    });
-
-    return {
-      posts: formattedPosts,
-      nextCursor: hasMore ? result[result.length - 1]?.id : null,
-    };
+    return userPresenter.likeList(likers, { nextCursor });
   },
 };

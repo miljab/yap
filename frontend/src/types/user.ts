@@ -3,7 +3,7 @@ export type User = {
   username: string;
   email?: string;
   createdAt: Date;
-  avatar: string;
+  avatarUrl: string;
   bio?: string;
   followersCount: number;
   followingCount: number;
@@ -14,5 +14,5 @@ export type OnboardingUser = {
   id: string;
   email?: string;
   createdAt: Date;
-  avatar: string;
+  avatarUrl: string;
 };

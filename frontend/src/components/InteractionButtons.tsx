@@ -1,6 +1,6 @@
 import { Heart } from "lucide-react";
 import CommentButton from "./comment_components/CommentButton";
-import type { Post, Comment, Like } from "@/types/post";
+import type { Post, Comment } from "@/types/post";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 import LikedBy from "./LikedBy";
 
@@ -10,7 +10,6 @@ type InteractionButtonsProps = {
   commentCount: number;
   isLiking: boolean;
   onLike: () => void;
-  likedBy: Like[];
 
   postId: string;
   target: Post | Comment;
@@ -23,7 +22,6 @@ function InteractionButtons({
   commentCount,
   isLiking,
   onLike,
-  likedBy,
   postId,
   target,
   onCommentCreated,
@@ -50,7 +48,11 @@ function InteractionButtons({
           (user.id !== target.user.id ? (
             likeCount
           ) : (
-            <LikedBy likes={likedBy} likeCount={likeCount} />
+            <LikedBy
+              likeCount={likeCount}
+              id={target.id}
+              type={"postId" in target ? "comment" : "post"}
+            />
           ))}
       </div>
 

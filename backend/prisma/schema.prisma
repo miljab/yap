@@ -13,10 +13,10 @@ model User {
   email         String?        @unique
   password      String?
   createdAt     DateTime       @default(now())
-  avatar        String?
+  avatar        Avatar?
   bio           String?
-  following     User[]         @relation("UserFollowing")
-  followers     User[]         @relation("UserFollowing")
+  following     Follow[]       @relation("UserFollowing")
+  followers     Follow[]       @relation("UserFollowers")
   posts         Post[]
   comments      Comment[]
   notifications Notification[]
@@ -24,6 +24,25 @@ model User {
   commentLikes  CommentLike[]
   refreshToken  RefreshToken[]
   account       Account[]
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followingId, followerId])
+}
+
+model Avatar {
+  id                 String @id @default(uuid())
+  cloudinaryPublicId String
+  url                String
+  userId             String @unique
+  user               User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Provider {
@@ -74,21 +93,25 @@ model Comment {
 }
 
 model PostLike {
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  postId String
-  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime @default(now())
 
-  @@id([userId, postId])
+  @@unique([userId, postId])
 }
 
 model CommentLike {
+  id        String   @id @default(uuid())
   userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   commentId String
-  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime @default(now())
 
-  @@id([userId, commentId])
+  @@unique([userId, commentId])
 }
 
 enum NotificationType {

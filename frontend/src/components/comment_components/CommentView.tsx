@@ -24,12 +24,11 @@ function CommentView({
   onCommentCreated,
   onCommentDelete,
 }: CommentViewProps) {
-  const { isLiked, likeCount, isLiking, handleLike, likedBy } = useLike({
+  const { isLiked, likeCount, isLiking, handleLike } = useLike({
     itemId: comment.id,
     itemType: "comment",
     initialIsLiked: comment.isLiked,
     initialLikeCount: comment.likeCount,
-    initialLikedBy: comment.likes,
   });
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,7 +48,7 @@ function CommentView({
       >
         <div className="flex items-center gap-1 text-sm">
           <UserAvatar
-            avatarUrl={comment.user.avatar}
+            avatarUrl={comment.user.avatarUrl}
             username={comment.user.username}
           />
 
@@ -87,7 +86,6 @@ function CommentView({
           commentCount={comment.commentCount}
           isLiking={isLiking}
           onLike={handleLike}
-          likedBy={likedBy}
           postId={comment.postId}
           target={comment}
           onCommentCreated={onCommentCreated}
@@ -103,7 +101,7 @@ function CommentView({
     >
       <div className="flex flex-col items-center">
         <UserAvatar
-          avatarUrl={comment.user.avatar}
+          avatarUrl={comment.user.avatarUrl}
           username={comment.user.username}
         />
 
@@ -147,7 +145,6 @@ function CommentView({
             commentCount={comment.commentCount}
             isLiking={isLiking}
             onLike={handleLike}
-            likedBy={likedBy}
             postId={comment.postId}
             target={comment}
             onCommentCreated={onCommentCreated}

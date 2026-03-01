@@ -190,3 +190,53 @@ export const getFollowingFeed = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getEditHistory = async (req: Request, res: Response) => {
+  const postId = req.params.id;
+
+  try {
+    if (!postId) throw new AppError("Post ID is required", 400);
+
+    const postHistory = await postService.getEditHistory(postId);
+
+    return res.status(200).json(postHistory);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
+
+export const getPostLikes = async (req: Request, res: Response) => {
+  const requesterId = req.user?.id;
+  const postId = req.params.id;
+  const cursor = req.query.cursor as string | undefined;
+  const limit = req.query.limit
+    ? parseInt(req.query.limit as string)
+    : undefined;
+
+  try {
+    if (!requesterId) throw new AppError("Unauthorized", 401);
+
+    if (!postId) throw new AppError("Post ID is required", 400);
+
+    const users = await postService.getPostLikes(
+      postId,
+      requesterId,
+      cursor,
+      limit,
+    );
+
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};

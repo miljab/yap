@@ -79,7 +79,7 @@ function FollowList({ type, count, user }: FollowListProps) {
                 className={`flex items-center gap-2 p-2 ${idx !== follows.length - 1 && "border-b-1"}`}
               >
                 <UserAvatar
-                  avatarUrl={follow.avatar}
+                  avatarUrl={follow.avatarUrl}
                   username={follow.username}
                 />
                 <div className="flex grow flex-col">
