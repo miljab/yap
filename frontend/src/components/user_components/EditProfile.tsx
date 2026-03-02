@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -30,7 +30,16 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const avatarPreviewRef = useRef<string | null>(null);
   const axiosPrivate = useAxiosPrivate();
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreviewRef.current) {
+        URL.revokeObjectURL(avatarPreviewRef.current);
+      }
+    };
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,8 +50,14 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
       return;
     }
 
+    if (avatarPreviewRef.current) {
+      URL.revokeObjectURL(avatarPreviewRef.current);
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    avatarPreviewRef.current = previewUrl;
     setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
+    setAvatarPreview(previewUrl);
   };
 
   const handleSubmit = async () => {
@@ -75,6 +90,10 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
     if (!isOpen) {
       setBio(user.bio ?? "");
       setAvatarFile(null);
+      if (avatarPreviewRef.current) {
+        URL.revokeObjectURL(avatarPreviewRef.current);
+        avatarPreviewRef.current = null;
+      }
       setAvatarPreview(null);
     }
   };
