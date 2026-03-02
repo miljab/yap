@@ -37,7 +37,8 @@ export const replyToPost = async (req: Request, res: Response) => {
           400,
         );
       }
-      if (!validateImageMagicBytes(f)) {
+      const isValidImage = await validateImageMagicBytes(f);
+      if (!isValidImage) {
         throw new AppError(
           "Invalid image file content",
           400,
@@ -91,7 +92,8 @@ export const replyToComment = async (req: Request, res: Response) => {
           400,
         );
       }
-      if (!validateImageMagicBytes(f)) {
+      const isValidImage = await validateImageMagicBytes(f);
+      if (!isValidImage) {
         throw new AppError(
           "Invalid image file content",
           400,

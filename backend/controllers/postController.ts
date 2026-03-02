@@ -32,7 +32,8 @@ export const createNewPost = async (req: Request, res: Response) => {
           400,
         );
       }
-      if (!validateImageMagicBytes(f)) {
+      const isValidImage = await validateImageMagicBytes(f);
+      if (!isValidImage) {
         throw new AppError(
           "Invalid image file content",
           400,

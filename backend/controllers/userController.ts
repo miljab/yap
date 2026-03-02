@@ -104,7 +104,8 @@ export const updateProfile = async (req: Request, res: Response) => {
           400,
         );
       }
-      if (!validateImageMagicBytes(avatarFile)) {
+      const isValidImage = await validateImageMagicBytes(avatarFile);
+      if (!isValidImage) {
         throw new AppError(
           "Invalid image file content",
           400,
