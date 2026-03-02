@@ -5,6 +5,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
 } from "../utils/generateTokens.js";
+import { userPresenter } from "../presenters/userPresenter.js";
 
 export const authService = {
   signup: async ({
@@ -74,14 +75,22 @@ export const authService = {
         revoked: false,
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            avatar: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        },
       },
     });
 
     if (!token) throw new Error("Invalid refresh token");
 
     const accessToken = generateAccessToken(token.userId);
-    return { user: token.user, accessToken };
+    return { user: userPresenter.auth(token.user), accessToken };
   },
 
   logout: async (refreshToken: string) => {

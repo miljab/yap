@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from "express";
 import { MulterError } from "multer";
 
 export const createMulterErrorHandler = (maxFiles: number) => {
-  return (err: Error, req: Request, res: Response, next: NextFunction) => {
+  return (err: Error, _req: Request, res: Response, next: NextFunction) => {
     if (err instanceof MulterError) {
       const message = err.message;
       if (
@@ -22,6 +22,15 @@ export const createMulterErrorHandler = (maxFiles: number) => {
       if (err.code === "LIMIT_FIELD_VALUE") {
         return res.status(400).json({ error: "Invalid field value" });
       }
+      return res.status(400).json({ error: err.message });
+    }
+    if (
+      err.message.includes("Only image files") ||
+      err.message.includes("image files")
+    ) {
+      return res.status(400).json({ error: err.message });
+    }
+    if (err.message.includes("File type")) {
       return res.status(400).json({ error: err.message });
     }
     next(err);

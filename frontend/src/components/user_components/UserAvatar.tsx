@@ -25,7 +25,7 @@ function UserAvatar({
 
   return (
     <Link to={`/profile/${username}`} className={className}>
-      <Avatar>
+      <Avatar className={className}>
         <AvatarImage src={avatarUrl} />
         <AvatarFallback>{username[0]}</AvatarFallback>
       </Avatar>

@@ -16,8 +16,16 @@ vi.mock("../../config/cloudinary.js", () => ({
         public_id: "fake-avatar-public-id",
       }),
     },
+    api: {
+      delete_resources: vi.fn().mockResolvedValue({}),
+    },
   },
 }));
+
+let cloudinaryMock: {
+  uploader: { upload: ReturnType<typeof vi.fn> };
+  api: { delete_resources: ReturnType<typeof vi.fn> };
+};
 
 describe("PUT /profile", () => {
   const userData = {
@@ -60,6 +68,25 @@ describe("PUT /profile", () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty("avatarUrl");
+  });
+
+  it("should delete old avatar when updating to new one", async () => {
+    const cloudinary = (await import("../../config/cloudinary.js")).default;
+
+    await request(app)
+      .put("/profile")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .attach("avatar", Buffer.from(pngImageBase64, "base64"), "avatar.png");
+
+    const updateRes = await request(app)
+      .put("/profile")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .attach("avatar", Buffer.from(pngImageBase64, "base64"), "new-avatar.png");
+
+    expect(updateRes.statusCode).toBe(200);
+    expect(cloudinary.api.delete_resources).toHaveBeenCalledWith([
+      "fake-avatar-public-id",
+    ]);
   });
 
   it("should update both bio and avatar", async () => {

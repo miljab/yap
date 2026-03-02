@@ -18,6 +18,11 @@ type TextEditorProps = {
   existingImagesCount?: number;
 };
 
+type ImageFile = {
+  file: File;
+  previewUrl: string;
+};
+
 function TextEditor({
   onSubmit,
   maxLength = 200,
@@ -32,8 +37,14 @@ function TextEditor({
   const divRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [content, setContent] = useState(initialContent);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<ImageFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      selectedFiles.forEach((f) => URL.revokeObjectURL(f.previewUrl));
+    };
+  }, [selectedFiles]);
 
   useEffect(() => {
     if (divRef.current && initialContent) {
@@ -51,7 +62,8 @@ function TextEditor({
   async function handleSubmit() {
     setIsSubmitting(true);
     try {
-      await onSubmit(content, selectedFiles);
+      const files = selectedFiles.map((f) => f.file);
+      await onSubmit(content, files);
 
       if (divRef.current) {
         divRef.current.innerText = "";
@@ -113,9 +125,20 @@ function TextEditor({
       if (validFiles.length < files.length)
         toast.warning("Max file size is 5MB.");
 
-      const newFiles = [...selectedFiles, ...validFiles];
-      setSelectedFiles(newFiles);
+      const newFiles: ImageFile[] = validFiles.map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }));
+      setSelectedFiles([...selectedFiles, ...newFiles]);
     }
+  }
+
+  function removeFile(index: number) {
+    const removed = selectedFiles[index];
+    URL.revokeObjectURL(removed.previewUrl);
+    setSelectedFiles((prevFiles) =>
+      prevFiles.filter((_, i) => i !== index),
+    );
   }
 
   function displayImages() {
@@ -123,20 +146,16 @@ function TextEditor({
 
     return (
       <div className="flex flex-wrap gap-2">
-        {selectedFiles.map((file, idx) => (
+        {selectedFiles.map((imageFile, idx) => (
           <div key={idx} className="relative w-fit">
             <img
-              src={URL.createObjectURL(file)}
+              src={imageFile.previewUrl}
               alt={`preview-${idx}`}
               className="inline-block h-40 w-40 rounded-md object-cover"
             />
             <button
               className="hover:bg-accent bg-background absolute top-2 right-2 cursor-pointer rounded-full p-1"
-              onClick={() => {
-                setSelectedFiles((prevFiles) =>
-                  prevFiles.filter((_, i) => i !== idx),
-                );
-              }}
+              onClick={() => removeFile(idx)}
             >
               <Trash />
             </button>

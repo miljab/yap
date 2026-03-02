@@ -92,9 +92,18 @@ export const userService = {
     bio?: string,
     avatarFile?: Express.Multer.File,
   ) => {
-    let avatarData;
+    let avatarData, oldAvatar;
 
     if (avatarFile) {
+      oldAvatar = await prisma.avatar.findUnique({
+        where: {
+          userId: userId,
+        },
+        select: {
+          cloudinaryPublicId: true,
+        },
+      });
+
       const result = await cloudinary.uploader.upload(avatarFile.path, {
         folder: "avatars",
         public_id: nanoid(),
@@ -138,6 +147,10 @@ export const userService = {
         },
       },
     });
+
+    if (avatarData && oldAvatar) {
+      await cloudinary.api.delete_resources([oldAvatar.cloudinaryPublicId]);
+    }
 
     return userPresenter.profile(updatedUser, { isFollowed: false });
   },

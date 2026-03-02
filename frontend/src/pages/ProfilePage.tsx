@@ -4,11 +4,23 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import type { User } from "@/types/user";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import useAuth from "@/hooks/useAuth";
 
 function ProfilePage() {
   const params = useParams();
   const [user, setUser] = useState<User | null>(null);
   const axiosPrivate = useAxiosPrivate();
+  const { auth, setAuth } = useAuth();
+
+  const onUserUpdate = (updatedUser: User) => {
+    setUser(updatedUser);
+
+    if (auth.user && auth.user.id === updatedUser.id) {
+      setAuth((prev) => {
+        return { ...prev, user: updatedUser };
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,7 +40,7 @@ function ProfilePage() {
 
   return (
     <div>
-      <ProfileHeader user={user} onUserUpdate={setUser} />
+      <ProfileHeader user={user} onUserUpdate={onUserUpdate} />
       <ProfileFeed userId={user.id} />
     </div>
   );

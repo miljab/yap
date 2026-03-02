@@ -11,6 +11,7 @@ import {
   getCommentLikes,
 } from "../controllers/commentController.js";
 import { MAX_IMAGE_SIZE_BYTES, MAX_IMAGES } from "../utils/constants.js";
+import { imageFileFilter } from "../utils/fileFilter.js";
 import { createMulterErrorHandler } from "../middleware/handleMulterError.js";
 import type { RequestHandler } from "express";
 
@@ -23,6 +24,7 @@ const createCommentRouter = ({
   const upload = multer({
     dest: "uploads/",
     limits: { fileSize: MAX_IMAGE_SIZE_BYTES },
+    fileFilter: imageFileFilter,
   });
 
   router.post(
