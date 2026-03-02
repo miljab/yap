@@ -6,6 +6,7 @@ import {
   MAX_IMAGES,
   MAX_TEXT_LEN,
 } from "../utils/constants.js";
+import { validateImageMagicBytes } from "../utils/fileFilter.js";
 import { handleError } from "../utils/errorUtils.js";
 
 export const replyToPost = async (req: Request, res: Response) => {
@@ -33,6 +34,12 @@ export const replyToPost = async (req: Request, res: Response) => {
       if (!ALLOWED_IMAGE_MIME.test(f.mimetype)) {
         throw new AppError(
           "Only image files (png,jpg,jpeg,webp,gif) are allowed",
+          400,
+        );
+      }
+      if (!validateImageMagicBytes(f)) {
+        throw new AppError(
+          "Invalid image file content",
           400,
         );
       }
@@ -81,6 +88,12 @@ export const replyToComment = async (req: Request, res: Response) => {
       if (!ALLOWED_IMAGE_MIME.test(f.mimetype)) {
         throw new AppError(
           "Only image files (png,jpg,jpeg,webp,gif) are allowed",
+          400,
+        );
+      }
+      if (!validateImageMagicBytes(f)) {
+        throw new AppError(
+          "Invalid image file content",
           400,
         );
       }

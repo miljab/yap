@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 import AppError from "../utils/appError.js";
 import { userService } from "../services/userService.js";
 import { handleError } from "../utils/errorUtils.js";
+import { ALLOWED_IMAGE_MIME } from "../utils/constants.js";
+import { validateImageMagicBytes } from "../utils/fileFilter.js";
 
 export const getUserProfile = async (req: Request, res: Response) => {
   const username = req.params.username;
@@ -9,6 +11,8 @@ export const getUserProfile = async (req: Request, res: Response) => {
 
   try {
     if (!username) throw new AppError("Username is required", 400);
+
+    if (!requesterId) throw new AppError("Unauthorized", 401);
 
     const user = await userService.getUserProfile(username, requesterId);
 
@@ -92,6 +96,21 @@ export const updateProfile = async (req: Request, res: Response) => {
 
   try {
     if (!userId) throw new AppError("Unauthorized", 401);
+
+    if (avatarFile) {
+      if (!ALLOWED_IMAGE_MIME.test(avatarFile.mimetype)) {
+        throw new AppError(
+          "Only image files (png,jpg,jpeg,webp,gif) are allowed",
+          400,
+        );
+      }
+      if (!validateImageMagicBytes(avatarFile)) {
+        throw new AppError(
+          "Invalid image file content",
+          400,
+        );
+      }
+    }
 
     const updatedUser = await userService.updateProfile(
       userId,

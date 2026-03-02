@@ -11,6 +11,7 @@ import {
   getFollowers,
 } from "../controllers/userController.js";
 import { MAX_IMAGE_SIZE_BYTES } from "../utils/constants.js";
+import { imageFileFilter } from "../utils/fileFilter.js";
 import { createMulterErrorHandler } from "../middleware/handleMulterError.js";
 
 const createUserRouter = () => {
@@ -19,6 +20,7 @@ const createUserRouter = () => {
   const upload = multer({
     dest: "uploads/",
     limits: { fileSize: MAX_IMAGE_SIZE_BYTES },
+    fileFilter: imageFileFilter,
   });
 
   router.get("/profile/:username", verifyAccessToken, getUserProfile);
