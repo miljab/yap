@@ -5,6 +5,7 @@ import PostView from "./PostView";
 import { Spinner } from "../ui/spinner";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import CreatePost from "./CreatePost";
+import FetchError from "../FetchError";
 
 type HomeFeedProps = {
   type: "all" | "following";
@@ -40,6 +41,8 @@ function HomeFeed({ type }: HomeFeedProps) {
     isLoading,
     initialLoad,
     loaderRef,
+    error,
+    retry,
   } = useInfiniteScroll<Post>(fetchPosts, []);
 
   const handlePostCreate = (newPost: Post) => {
@@ -71,9 +74,13 @@ function HomeFeed({ type }: HomeFeedProps) {
         <CreatePost
           onPostCreate={type === "all" ? handlePostCreate : undefined}
         />
-        <div className="p-4 text-center text-neutral-500">
-          No posts to display
-        </div>
+        {error ? (
+          <FetchError error={error} onRetry={retry} />
+        ) : (
+          <div className="p-4 text-center text-neutral-500">
+            No posts to display
+          </div>
+        )}
       </div>
     );
   }
@@ -107,7 +114,11 @@ function HomeFeed({ type }: HomeFeedProps) {
       ))}
 
       <div ref={loaderRef} className="flex justify-center p-4">
-        {isLoading && <Spinner />}
+        {isLoading ? (
+          <Spinner />
+        ) : error ? (
+          <FetchError error={error} onRetry={retry} />
+        ) : null}
       </div>
     </div>
   );

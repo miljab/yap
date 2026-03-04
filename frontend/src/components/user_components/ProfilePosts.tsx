@@ -4,6 +4,7 @@ import type { Post } from "@/types/post";
 import { Spinner } from "../ui/spinner";
 import PostView from "../post_components/PostView";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import FetchError from "../FetchError";
 
 type ProfilePostsProps = {
   userId: string;
@@ -33,6 +34,8 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
     isLoading,
     initialLoad,
     loaderRef,
+    error,
+    retry,
   } = useInfiniteScroll<Post>(fetchPosts, [userId]);
 
   const handlePostUpdate = (updatedPost: Post) => {
@@ -50,7 +53,11 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
   }
 
   if (posts.length === 0) {
-    return <div className="p-4 text-center text-neutral-500">No posts yet</div>;
+    return error ? (
+      <FetchError error={error} onRetry={retry} />
+    ) : (
+      <div className="p-4 text-center text-neutral-500">No posts yet</div>
+    );
   }
 
   return (
@@ -79,7 +86,11 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
       ))}
 
       <div ref={loaderRef} className="flex justify-center p-4">
-        {isLoading && <Spinner />}
+        {isLoading ? (
+          <Spinner />
+        ) : error ? (
+          <FetchError error={error} onRetry={retry} />
+        ) : null}
       </div>
     </div>
   );

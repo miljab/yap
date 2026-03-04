@@ -14,6 +14,7 @@ import FollowButton from "./FollowButton";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Link } from "react-router";
+import FetchError from "./FetchError";
 
 type FollowListProps = {
   type: "following" | "followers";
@@ -46,6 +47,8 @@ function FollowList({ type, count, user }: FollowListProps) {
     isLoading,
     initialLoad,
     loaderRef,
+    error,
+    retry,
   } = useInfiniteScroll<User>(fetchFollows, [isOpen, user.id, type]);
 
   return (
@@ -70,7 +73,11 @@ function FollowList({ type, count, user }: FollowListProps) {
             <Spinner />
           </div>
         ) : follows.length === 0 ? (
-          <div className="p-4 text-center text-neutral-500">No {type} yet</div>
+          error ? (
+            <FetchError error={error} onRetry={retry} />
+          ) : (
+            <div className="p-4 text-center text-neutral-500">No {type} yet</div>
+          )
         ) : (
           <div className="flex max-h-[500px] flex-col overflow-auto">
             {follows.map((follow, idx) => (
@@ -105,7 +112,11 @@ function FollowList({ type, count, user }: FollowListProps) {
               </div>
             ))}
             <div ref={loaderRef} className="flex justify-center p-2">
-              {isLoading && <Spinner />}
+              {isLoading ? (
+                <Spinner />
+              ) : error ? (
+                <FetchError error={error} onRetry={retry} />
+              ) : null}
             </div>
           </div>
         )}

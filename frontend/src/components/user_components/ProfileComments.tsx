@@ -4,6 +4,7 @@ import type { Comment } from "@/types/post";
 import CommentView from "@/components/comment_components/CommentView";
 import { Spinner } from "../ui/spinner";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import FetchError from "../FetchError";
 
 type ProfileCommentsProps = {
   userId: string;
@@ -34,6 +35,8 @@ function ProfileComments({ userId }: ProfileCommentsProps) {
     isLoading,
     initialLoad,
     loaderRef,
+    error,
+    retry,
   } = useInfiniteScroll<Comment>(fetchComments, [userId]);
 
   const handleCommentCreated = (newComment: Comment) => {
@@ -55,7 +58,9 @@ function ProfileComments({ userId }: ProfileCommentsProps) {
   }
 
   if (comments.length === 0) {
-    return (
+    return error ? (
+      <FetchError error={error} onRetry={retry} />
+    ) : (
       <div className="p-4 text-center text-neutral-500">No comments yet</div>
     );
   }
@@ -74,7 +79,11 @@ function ProfileComments({ userId }: ProfileCommentsProps) {
       ))}
 
       <div ref={loaderRef} className="flex justify-center p-4">
-        {isLoading && <Spinner />}
+        {isLoading ? (
+          <Spinner />
+        ) : error ? (
+          <FetchError error={error} onRetry={retry} />
+        ) : null}
       </div>
     </div>
   );
