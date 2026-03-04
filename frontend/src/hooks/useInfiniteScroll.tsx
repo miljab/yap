@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { type FetchErrorState, getErrorState } from "@/lib/fetchError";
 
 type FetcherResult<T> = {
   items: T[];
@@ -16,6 +17,8 @@ type UseInfiniteScrollReturn<T> = {
   initialLoad: boolean;
   loaderRef: React.RefObject<HTMLDivElement | null>;
   reset: () => void;
+  error: FetchErrorState | null;
+  retry: () => Promise<void>;
 };
 
 export function useInfiniteScroll<T>(
@@ -27,6 +30,7 @@ export function useInfiniteScroll<T>(
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [error, setError] = useState<FetchErrorState | null>(null);
 
   const loaderRef = useRef<HTMLDivElement>(null);
   const isFetchingRef = useRef(false);
@@ -39,6 +43,7 @@ export function useInfiniteScroll<T>(
 
     isFetchingRef.current = true;
     setIsLoading(true);
+    setError(null);
 
     try {
       const result = await fetcherRef.current(cursor ?? undefined);
@@ -46,8 +51,9 @@ export function useInfiniteScroll<T>(
       setItems((prev) => (cursor ? [...prev, ...result.items] : result.items));
       setCursor(result.nextCursor);
       setHasMore(result.nextCursor !== null);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      setError(getErrorState(err));
     } finally {
       isFetchingRef.current = false;
       setIsLoading(false);
@@ -60,6 +66,7 @@ export function useInfiniteScroll<T>(
     setCursor(null);
     setHasMore(true);
     setInitialLoad(true);
+    setError(null);
     isFetchingRef.current = false;
   }, []);
 
@@ -82,7 +89,7 @@ export function useInfiniteScroll<T>(
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading && !initialLoad)
+        if (entries[0].isIntersecting && hasMore && !isLoading && !initialLoad && !error)
           fetchNext();
       },
       { threshold: 0.1 },
@@ -90,7 +97,7 @@ export function useInfiniteScroll<T>(
 
     observer.observe(loader);
     return () => observer.disconnect();
-  }, [hasMore, isLoading, initialLoad, fetchNext]);
+  }, [hasMore, isLoading, initialLoad, error, fetchNext]);
 
   return {
     items,
@@ -101,5 +108,7 @@ export function useInfiniteScroll<T>(
     initialLoad,
     loaderRef,
     reset,
+    error,
+    retry: fetchNext,
   };
 }
