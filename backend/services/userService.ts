@@ -250,7 +250,7 @@ export const userService = {
       requesterFollowing?.map((f) => f.followingId) || [],
     );
 
-    const users = following.map((f) => f.following);
+    const users = result.map((f) => f.following);
 
     return userPresenter.followList(users, {
       followingSet: requesterFollowingSet,
@@ -317,7 +317,7 @@ export const userService = {
       requesterFollowing?.map((f) => f.followingId) || [],
     );
 
-    const users = followers.map((f) => f.follower);
+    const users = result.map((f) => f.follower);
 
     return userPresenter.followList(users, {
       followingSet: requesterFollowingSet,
