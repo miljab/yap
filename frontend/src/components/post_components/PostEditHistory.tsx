@@ -10,8 +10,9 @@ import { Link } from "react-router";
 import { useCallback, useEffect, useState } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import type { PostHistory } from "@/types/post";
-import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
+import FetchError from "../FetchError";
+import { type FetchErrorState, getErrorState } from "@/lib/fetchError";
 
 type PostHistoryProps = {
   postId: string;
@@ -23,18 +24,19 @@ type PostHistoryProps = {
 function PostEditHistory({ postId, user }: PostHistoryProps) {
   const [history, setHistory] = useState<PostHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<FetchErrorState | null>(null);
   const axiosPrivate = useAxiosPrivate();
 
   const fetchEditHistory = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
 
     try {
       const response = await axiosPrivate.get(`/post/${postId}/history`);
 
       setHistory(response.data);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to fetch edit history. Please try again.");
+    } catch (err) {
+      setError(getErrorState(err));
     } finally {
       setIsLoading(false);
     }
@@ -43,14 +45,6 @@ function PostEditHistory({ postId, user }: PostHistoryProps) {
   useEffect(() => {
     fetchEditHistory();
   }, [fetchEditHistory]);
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center p-4">
-        <Spinner />
-      </div>
-    );
-  }
 
   return (
     <Dialog>
@@ -64,48 +58,56 @@ function PostEditHistory({ postId, user }: PostHistoryProps) {
         <DialogHeader>
           <DialogTitle>Post edition history</DialogTitle>
         </DialogHeader>
-        <div className="flex max-h-[500px] flex-col gap-1 overflow-auto">
-          {history.map((h, idx) => {
-            return (
-              <div
-                key={h.id}
-                className={`flex w-full cursor-pointer gap-2 p-2 ${idx !== history.length - 1 && "border-b-1"}`}
-              >
-                <div className="flex flex-col items-center">
-                  <UserAvatar
-                    avatarUrl={user.avatarUrl}
-                    username={user.username}
-                  />
-                </div>
-
-                <div className="flex grow flex-col justify-start gap-1">
-                  <div className="flex gap-1 text-sm">
-                    <Link
-                      to={`/profile/${user.username}`}
-                      className="flex cursor-pointer items-center font-bold hover:underline"
-                    >
-                      {user.username}
-                    </Link>
-                    <span className="text-neutral-500">&middot;</span>
-                    <span className="text-neutral-500">
-                      {new Date(h.createdAt).toLocaleString()}
-                    </span>
+        {isLoading ? (
+          <div className="flex justify-center p-4">
+            <Spinner />
+          </div>
+        ) : error ? (
+          <FetchError error={error} onRetry={fetchEditHistory} />
+        ) : (
+          <div className="flex max-h-[500px] flex-col gap-1 overflow-auto">
+            {history.map((h, idx) => {
+              return (
+                <div
+                  key={h.id}
+                  className={`flex w-full cursor-pointer gap-2 p-2 ${idx !== history.length - 1 && "border-b-1"}`}
+                >
+                  <div className="flex flex-col items-center">
+                    <UserAvatar
+                      avatarUrl={user.avatarUrl}
+                      username={user.username}
+                    />
                   </div>
 
-                  {h.content?.trim() ? (
-                    <p className="wrap-break-word contain-inline-size">
-                      {h.content}
-                    </p>
-                  ) : (
-                    <span className="text-neutral-500 italic">
-                      (No caption)
-                    </span>
-                  )}
+                  <div className="flex grow flex-col justify-start gap-1">
+                    <div className="flex gap-1 text-sm">
+                      <Link
+                        to={`/profile/${user.username}`}
+                        className="flex cursor-pointer items-center font-bold hover:underline"
+                      >
+                        {user.username}
+                      </Link>
+                      <span className="text-neutral-500">&middot;</span>
+                      <span className="text-neutral-500">
+                        {new Date(h.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+
+                    {h.content?.trim() ? (
+                      <p className="wrap-break-word contain-inline-size">
+                        {h.content}
+                      </p>
+                    ) : (
+                      <span className="text-neutral-500 italic">
+                        (No caption)
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
