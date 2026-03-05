@@ -70,13 +70,11 @@ export function useInfiniteScroll<T>(
     isFetchingRef.current = false;
   }, []);
 
-  // Reset when deps change
   useEffect(() => {
     reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
-  // Initial fetch when in initialLoad state
   useEffect(() => {
     if (initialLoad && !isLoading) {
       fetchNext();
@@ -89,7 +87,13 @@ export function useInfiniteScroll<T>(
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading && !initialLoad && !error)
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          !isLoading &&
+          !initialLoad &&
+          !error
+        )
           fetchNext();
       },
       { threshold: 0.1 },
