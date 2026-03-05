@@ -7,19 +7,10 @@ import {
 } from "./ui/dropdown-menu";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
 import type { Post } from "@/types/post";
-import TextEditor from "./ui/TextEditor";
 import { useState } from "react";
+import DeleteConfirmDialog from "./DeleteConfirmDialog";
+import EditPostDialog from "./EditPostDialog";
 
 type OptionsButtonCommentProps = {
   itemType: "comment";
@@ -41,8 +32,12 @@ type OptionsButtonProps = OptionsButtonPostProps | OptionsButtonCommentProps;
 function OptionsButton(props: OptionsButtonProps) {
   const axiosPrivate = useAxiosPrivate();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
     const apiUrl = `/${props.itemType}/${props.itemId}`;
 
     try {
@@ -54,6 +49,8 @@ function OptionsButton(props: OptionsButtonProps) {
     } catch (error) {
       toast.error(`Failed to delete ${props.itemType}. Please try again.`);
       console.error(error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -72,8 +69,6 @@ function OptionsButton(props: OptionsButtonProps) {
       throw error;
     }
   };
-
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   return (
     <>
@@ -106,45 +101,22 @@ function OptionsButton(props: OptionsButtonProps) {
       </DropdownMenu>
 
       {props.itemType === "post" && (
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="p-4" data-no-navigate>
-            <DialogHeader>
-              <DialogTitle>Edit Post</DialogTitle>
-            </DialogHeader>
-            <div className="rounded-md border">
-              <TextEditor
-                onSubmit={handlePostEdit}
-                initialContent={props.content}
-                submitButtonText="Save"
-                allowImages={false}
-                placeholder="Edit post content"
-                existingImagesCount={props.images.length}
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
+        <EditPostDialog
+          isOpen={editDialogOpen}
+          setIsOpen={setEditDialogOpen}
+          content={props.content}
+          images={props.images}
+          handleEdit={handlePostEdit}
+        />
       )}
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent data-no-navigate>
-          <DialogHeader>
-            <DialogTitle>
-              Are you sure you want to delete this {props.itemType}?
-            </DialogTitle>
-            <DialogDescription>This action cannot be undone.</DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button>Cancel</Button>
-            </DialogClose>
-
-            <Button variant="destructive" onClick={handleDelete}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        isOpen={deleteDialogOpen}
+        setIsOpen={setDeleteDialogOpen}
+        itemType={props.itemType}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+      />
     </>
   );
 }
