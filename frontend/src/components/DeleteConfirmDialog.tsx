@@ -38,13 +38,16 @@ function DeleteConfirmDialog({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button disabled={isDeleting}>Cancel</Button>
+            <Button disabled={isDeleting} className="min-w-20">
+              Cancel
+            </Button>
           </DialogClose>
 
           <Button
             disabled={isDeleting}
             variant="destructive"
             onClick={onConfirm}
+            className="min-w-20"
           >
             {isDeleting ? <Spinner /> : "Delete"}
           </Button>
