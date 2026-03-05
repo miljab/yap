@@ -9,12 +9,14 @@ import {
   DialogFooter,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
+import { Spinner } from "./ui/spinner";
 
 type DeleteConfirmDialogProps = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<SetStateAction<boolean>>;
   itemType: "post" | "comment";
   onConfirm: () => void;
+  isDeleting: boolean;
 };
 
 function DeleteConfirmDialog({
@@ -22,6 +24,7 @@ function DeleteConfirmDialog({
   setIsOpen,
   itemType,
   onConfirm,
+  isDeleting,
 }: DeleteConfirmDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -35,11 +38,15 @@ function DeleteConfirmDialog({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button>Cancel</Button>
+            <Button disabled={isDeleting}>Cancel</Button>
           </DialogClose>
 
-          <Button variant="destructive" onClick={onConfirm}>
-            Delete
+          <Button
+            disabled={isDeleting}
+            variant="destructive"
+            onClick={onConfirm}
+          >
+            {isDeleting ? <Spinner /> : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

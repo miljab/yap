@@ -33,8 +33,11 @@ function OptionsButton(props: OptionsButtonProps) {
   const axiosPrivate = useAxiosPrivate();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
     const apiUrl = `/${props.itemType}/${props.itemId}`;
 
     try {
@@ -46,6 +49,8 @@ function OptionsButton(props: OptionsButtonProps) {
     } catch (error) {
       toast.error(`Failed to delete ${props.itemType}. Please try again.`);
       console.error(error);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -110,6 +115,7 @@ function OptionsButton(props: OptionsButtonProps) {
         setIsOpen={setDeleteDialogOpen}
         itemType={props.itemType}
         onConfirm={handleDelete}
+        isDeleting={isDeleting}
       />
     </>
   );
