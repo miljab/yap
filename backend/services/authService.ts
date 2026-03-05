@@ -43,6 +43,13 @@ export const authService = {
       omit: {
         password: false,
       },
+      include: {
+        avatar: {
+          select: {
+            url: true,
+          },
+        },
+      },
     });
 
     if (!user || !user.password) throw new Error("Invalid credentials");
@@ -64,7 +71,11 @@ export const authService = {
 
     const { password: _, ...userWithoutPassword } = user;
 
-    return { user: userWithoutPassword, accessToken, refreshToken };
+    return {
+      user: userPresenter.auth(userWithoutPassword),
+      accessToken,
+      refreshToken,
+    };
   },
 
   refresh: async (refreshToken: string) => {
