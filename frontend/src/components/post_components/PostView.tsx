@@ -8,6 +8,7 @@ import OptionsButton from "../OptionsButton";
 import UserAvatar from "../user_components/UserAvatar";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 import PostEditHistory from "./PostEditHistory";
+import UserHoverCard from "../user_components/UserHoverCard";
 
 type PostViewProps = {
   post: Post;
@@ -50,12 +51,14 @@ function PostView({
         />
 
         <div className="flex flex-col">
-          <Link
-            to={`/profile/${post.user.username}`}
-            className="w-fit cursor-pointer font-bold hover:underline"
-          >
-            {post.user.username}
-          </Link>
+          <UserHoverCard username={post.user.username}>
+            <Link
+              to={`/profile/${post.user.username}`}
+              className="w-fit cursor-pointer font-bold hover:underline"
+            >
+              {post.user.username}
+            </Link>
+          </UserHoverCard>
           <span className="text-neutral-500">
             {new Date(post.createdAt).toLocaleString()}
           </span>
@@ -97,7 +100,10 @@ function PostView({
         {post.isEdited && (
           <PostEditHistory
             postId={post.id}
-            user={{ avatarUrl: user.avatarUrl, username: user.username }}
+            user={{
+              avatarUrl: post.user.avatarUrl,
+              username: post.user.username,
+            }}
           />
         )}
       </div>
