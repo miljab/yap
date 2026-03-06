@@ -6,9 +6,14 @@ import { toast } from "sonner";
 type FollowButtonProps = {
   initialIsFollowed: boolean;
   userId: string;
+  onFollowChange?: (isFollowed: boolean) => void;
 };
 
-function FollowButton({ initialIsFollowed, userId }: FollowButtonProps) {
+function FollowButton({
+  initialIsFollowed,
+  userId,
+  onFollowChange,
+}: FollowButtonProps) {
   const [isFollowed, setIsFollowed] = useState(initialIsFollowed);
   const [isSubmiting, setIsSubmiting] = useState(false);
   const axiosPrivate = useAxiosPrivate();
@@ -21,6 +26,8 @@ function FollowButton({ initialIsFollowed, userId }: FollowButtonProps) {
       const response = await axiosPrivate.put(`/users/${userId}/follow`);
 
       setIsFollowed(response.data.isFollowed);
+
+      if (onFollowChange) onFollowChange(response.data.isFollowed);
     } catch (error) {
       console.error(error);
       setIsFollowed((prev) => !prev);

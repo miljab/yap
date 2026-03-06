@@ -9,6 +9,7 @@ import {
   HoverCardTrigger,
 } from "../ui/hover-card";
 import axios from "axios";
+import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 
 type UserHoverCardProps = {
   username: string;
@@ -20,6 +21,7 @@ function UserHoverCard({ username, children }: UserHoverCardProps) {
   const [open, setOpen] = useState(false);
   const axiosPrivate = useAxiosPrivate();
   const controllerRef = useRef<AbortController | null>(null);
+  const authUser = useAuthenticatedUser();
 
   const fetchData = async () => {
     controllerRef.current?.abort();
@@ -56,6 +58,12 @@ function UserHoverCard({ username, children }: UserHoverCardProps) {
     return () => controllerRef.current?.abort();
   }, []);
 
+  const handleFollowChange = (isFollowed: boolean) => {
+    setUser((prev) => {
+      return prev ? { ...prev, isFollowed: isFollowed } : null;
+    });
+  };
+
   return (
     <HoverCard open={open} onOpenChange={onOpenChange}>
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
@@ -69,10 +77,13 @@ function UserHoverCard({ username, children }: UserHoverCardProps) {
                 avatarUrl={user.avatarUrl}
               />
 
-              <FollowButton
-                initialIsFollowed={user.isFollowed}
-                userId={user.id}
-              />
+              {user.id !== authUser.id && (
+                <FollowButton
+                  initialIsFollowed={user.isFollowed}
+                  userId={user.id}
+                  onFollowChange={handleFollowChange}
+                />
+              )}
             </div>
 
             <div className="flex flex-col">
