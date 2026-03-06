@@ -79,7 +79,7 @@ function UserHoverCard({ username, children }: UserHoverCardProps) {
               <span className="truncate font-bold contain-inline-size">
                 {user.username}
               </span>
-              <p className="truncate">{user.bio}</p>
+              <p className="wrap-break-word">{user.bio}</p>
               <span className="text-sm text-neutral-500">
                 Joined {new Date(user.createdAt).toLocaleDateString()}
               </span>
