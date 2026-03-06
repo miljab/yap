@@ -61,26 +61,25 @@ function UserHoverCard({ username, children }: UserHoverCardProps) {
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
       <HoverCardContent>
         {user ? (
-          <div>
-            <div className="flex justify-between">
-              <div className="flex flex-col">
-                <UserAvatar
-                  username={user.username}
-                  avatarUrl={user.avatarUrl}
-                />
-                <span className="font-bold">{user.username}</span>
-              </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-start justify-between">
+              <UserAvatar
+                className="h-16 w-16"
+                username={user.username}
+                avatarUrl={user.avatarUrl}
+              />
 
-              <div>
-                <FollowButton
-                  initialIsFollowed={user.isFollowed}
-                  userId={user.id}
-                />
-              </div>
+              <FollowButton
+                initialIsFollowed={user.isFollowed}
+                userId={user.id}
+              />
             </div>
 
             <div className="flex flex-col">
-              <p>{user.bio}</p>
+              <span className="truncate font-bold contain-inline-size">
+                {user.username}
+              </span>
+              <p className="truncate">{user.bio}</p>
               <span className="text-sm text-neutral-500">
                 Joined {new Date(user.createdAt).toLocaleDateString()}
               </span>
