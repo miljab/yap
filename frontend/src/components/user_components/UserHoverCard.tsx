@@ -1,4 +1,4 @@
-import { useState, useRef, type ReactNode, useEffect } from "react";
+import { useState, type ReactNode } from "react";
 import type { User } from "@/types/user";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import UserAvatar from "./UserAvatar";
@@ -8,8 +8,9 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "../ui/hover-card";
-import axios from "axios";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
+
+const usersMap = new Map<string, User>();
 
 type UserHoverCardProps = {
   username: string;
@@ -20,48 +21,43 @@ function UserHoverCard({ username, children }: UserHoverCardProps) {
   const [user, setUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
   const axiosPrivate = useAxiosPrivate();
-  const controllerRef = useRef<AbortController | null>(null);
   const authUser = useAuthenticatedUser();
 
   const fetchData = async () => {
-    controllerRef.current?.abort();
-    controllerRef.current = new AbortController();
+    const cached = usersMap.get(username);
+
+    if (cached) {
+      setUser(cached);
+      setOpen(true);
+      return;
+    }
 
     try {
-      const response = await axiosPrivate.get(`/profile/${username}`, {
-        signal: controllerRef.current.signal,
-      });
+      const response = await axiosPrivate.get(`/profile/${username}`);
 
       setUser(response.data);
+      usersMap.set(username, response.data);
       setOpen(true);
     } catch (error) {
-      if (axios.isCancel(error)) return;
       console.error(error);
     }
   };
 
   const onOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
-      controllerRef.current?.abort();
       setOpen(false);
       return;
     }
 
-    if (user) {
-      setOpen(true);
-    } else {
-      fetchData();
-    }
+    fetchData();
   };
 
-  useEffect(() => {
-    return () => controllerRef.current?.abort();
-  }, []);
-
   const handleFollowChange = (isFollowed: boolean) => {
-    setUser((prev) => {
-      return prev ? { ...prev, isFollowed: isFollowed } : null;
-    });
+    if (!user) return;
+
+    const updatedUser = { ...user, isFollowed: isFollowed };
+    usersMap.set(username, updatedUser);
+    setUser(updatedUser);
   };
 
   return (
