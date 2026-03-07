@@ -28,7 +28,7 @@ function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
         )}
       </div>
 
-      <span className="truncate text-xl font-bold">{user.username}</span>
+      <span className="text-xl font-bold wrap-break-word">{user.username}</span>
 
       {user.bio && (
         <p className="wrap-break-word contain-inline-size">{user.bio}</p>
