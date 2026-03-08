@@ -45,10 +45,14 @@ function PostView({
       onClick={(e) => handleContainerClick(e)}
     >
       <div className="flex items-center gap-1 text-sm">
-        <UserAvatar
-          avatarUrl={post.user.avatarUrl}
-          username={post.user.username}
-        />
+        <UserHoverCard username={post.user.username}>
+          <span>
+            <UserAvatar
+              avatarUrl={post.user.avatarUrl}
+              username={post.user.username}
+            />
+          </span>
+        </UserHoverCard>
 
         <div className="flex flex-col">
           <UserHoverCard username={post.user.username}>
