@@ -73,10 +73,12 @@ function FollowList({ type, count, user }: FollowListProps) {
           <div className="flex justify-center p-4">
             <Spinner />
           </div>
-        ) : error ? (
-          <FetchError error={error} onRetry={retry} />
         ) : follows.length === 0 ? (
-          <div className="p-4 text-center text-neutral-500">No {type} yet</div>
+          error ? (
+            <FetchError error={error} onRetry={retry} />
+          ) : (
+            <div className="p-4 text-center text-neutral-500">No {type} yet</div>
+          )
         ) : (
           <div className="flex max-h-[500px] flex-col overflow-auto">
             {follows.map((follow, idx) => (
@@ -119,6 +121,7 @@ function FollowList({ type, count, user }: FollowListProps) {
             ))}
             <div ref={loaderRef} className="flex justify-center p-2">
               {isLoading && <Spinner />}
+              {error && !initialLoad && <FetchError error={error} onRetry={retry} />}
             </div>
           </div>
         )}
