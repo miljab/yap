@@ -15,6 +15,7 @@ import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Link } from "react-router";
 import FetchError from "./FetchError";
+import UserHoverCard from "./user_components/UserHoverCard";
 
 type FollowListProps = {
   type: "following" | "followers";
@@ -72,12 +73,10 @@ function FollowList({ type, count, user }: FollowListProps) {
           <div className="flex justify-center p-4">
             <Spinner />
           </div>
+        ) : error ? (
+          <FetchError error={error} onRetry={retry} />
         ) : follows.length === 0 ? (
-          error ? (
-            <FetchError error={error} onRetry={retry} />
-          ) : (
-            <div className="p-4 text-center text-neutral-500">No {type} yet</div>
-          )
+          <div className="p-4 text-center text-neutral-500">No {type} yet</div>
         ) : (
           <div className="flex max-h-[500px] flex-col overflow-auto">
             {follows.map((follow, idx) => (
@@ -85,26 +84,33 @@ function FollowList({ type, count, user }: FollowListProps) {
                 key={follow.id}
                 className={`flex items-center gap-2 p-2 ${idx !== follows.length - 1 && "border-b-1"}`}
               >
-                <UserAvatar
-                  avatarUrl={follow.avatarUrl}
-                  username={follow.username}
-                />
+                <UserHoverCard username={follow.username}>
+                  <span>
+                    <UserAvatar
+                      avatarUrl={follow.avatarUrl}
+                      username={follow.username}
+                    />
+                  </span>
+                </UserHoverCard>
+
                 <div className="flex grow flex-col">
-                  <Link
-                    to={`/profile/${follow.username}`}
-                    className="cursor-pointer wrap-break-word contain-inline-size hover:underline"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {follow.username}
-                  </Link>
+                  <UserHoverCard username={follow.username}>
+                    <Link
+                      to={`/profile/${follow.username}`}
+                      className="cursor-pointer wrap-break-word contain-inline-size hover:underline"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {follow.username}
+                    </Link>
+                  </UserHoverCard>
                   <p className="truncate wrap-break-word text-neutral-500 contain-inline-size">
                     {follow.bio}
                   </p>
                 </div>
+
                 {authenticatedUser.id !== follow.id && (
                   <div className="flex justify-end">
                     <FollowButton
-                      initialIsFollowed={follow.isFollowed}
                       userId={follow.id}
                     />
                   </div>
@@ -112,11 +118,7 @@ function FollowList({ type, count, user }: FollowListProps) {
               </div>
             ))}
             <div ref={loaderRef} className="flex justify-center p-2">
-              {isLoading ? (
-                <Spinner />
-              ) : error ? (
-                <FetchError error={error} onRetry={retry} />
-              ) : null}
+              {isLoading && <Spinner />}
             </div>
           </div>
         )}

@@ -75,7 +75,6 @@ function UserHoverCard({ username, children }: UserHoverCardProps) {
 
               {user.id !== authUser.id && (
                 <FollowButton
-                  initialIsFollowed={user.isFollowed}
                   userId={user.id}
                   onFollowChange={handleFollowChange}
                 />
