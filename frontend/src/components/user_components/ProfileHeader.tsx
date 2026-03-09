@@ -20,6 +20,7 @@ function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
           avatarUrl={user.avatarUrl}
           username={user.username}
           className="h-32 w-32"
+          redirect={false}
         />
         {user.id === authUser.id ? (
           <EditProfile user={user} onProfileUpdate={onUserUpdate} />
