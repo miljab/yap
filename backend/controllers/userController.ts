@@ -213,3 +213,22 @@ export const getFollowers = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getMyFollowingIds = async (req: Request, res: Response) => {
+  const requesterId = req.user?.id;
+
+  try {
+    if (!requesterId) throw new AppError("Unauthorized", 401);
+
+    const result = await userService.getFollowingIds(requesterId);
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};

@@ -324,4 +324,19 @@ export const userService = {
       nextCursor,
     });
   },
+
+  getFollowingIds: async (userId: string) => {
+    const following = await prisma.follow.findMany({
+      where: {
+        followerId: userId,
+      },
+      select: {
+        followingId: true,
+      },
+    });
+
+    return {
+      followingIds: following.map((f) => f.followingId),
+    };
+  },
 };
