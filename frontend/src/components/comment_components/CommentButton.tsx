@@ -7,6 +7,7 @@ import formatTimeAgoOrDate from "@/utils/formatTimeAgoOrDate";
 import ImagePreview from "../ImagePreview";
 import { useState } from "react";
 import { Link } from "react-router";
+import UserHoverCard from "../user_components/UserHoverCard";
 
 type CommentButtonProps = {
   commentCount: number;
@@ -37,21 +38,25 @@ function CommentButton({
       </DialogTrigger>
       <DialogContent data-no-navigate>
         <div className="flex cursor-pointer gap-2 p-2">
-          <div className="flex flex-col items-center">
-            <UserAvatar
-              avatarUrl={target.user.avatarUrl}
-              username={target.user.username}
-            />
-          </div>
+          <UserHoverCard username={target.user.username}>
+            <span>
+              <UserAvatar
+                avatarUrl={target.user.avatarUrl}
+                username={target.user.username}
+              />
+            </span>
+          </UserHoverCard>
 
           <div className="flex w-full flex-col justify-start gap-1">
             <div className="flex gap-1 text-sm">
-              <Link
-                to={`/profile/${target.user.username}`}
-                className="flex cursor-pointer items-center font-bold hover:underline"
-              >
-                {target.user.username}
-              </Link>
+              <UserHoverCard username={target.user.username}>
+                <Link
+                  to={`/profile/${target.user.username}`}
+                  className="flex cursor-pointer items-center font-bold hover:underline"
+                >
+                  {target.user.username}
+                </Link>
+              </UserHoverCard>
               <span className="text-neutral-500">&middot;</span>
               <span className="text-neutral-500">
                 {formatTimeAgoOrDate(target.createdAt)}
