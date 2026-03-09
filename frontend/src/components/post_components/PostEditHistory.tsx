@@ -13,6 +13,7 @@ import type { PostHistory } from "@/types/post";
 import { Spinner } from "../ui/spinner";
 import FetchError from "../FetchError";
 import { type FetchErrorState, getErrorState } from "@/lib/fetchError";
+import UserHoverCard from "../user_components/UserHoverCard";
 
 type PostHistoryProps = {
   postId: string;
@@ -72,21 +73,25 @@ function PostEditHistory({ postId, user }: PostHistoryProps) {
                   key={h.id}
                   className={`flex w-full cursor-pointer gap-2 p-2 ${idx !== history.length - 1 && "border-b-1"}`}
                 >
-                  <div className="flex flex-col items-center">
-                    <UserAvatar
-                      avatarUrl={user.avatarUrl}
-                      username={user.username}
-                    />
-                  </div>
+                  <UserHoverCard username={user.username}>
+                    <span>
+                      <UserAvatar
+                        avatarUrl={user.avatarUrl}
+                        username={user.username}
+                      />
+                    </span>
+                  </UserHoverCard>
 
                   <div className="flex grow flex-col justify-start gap-1">
                     <div className="flex gap-1 text-sm">
-                      <Link
-                        to={`/profile/${user.username}`}
-                        className="flex cursor-pointer items-center font-bold hover:underline"
-                      >
-                        {user.username}
-                      </Link>
+                      <UserHoverCard username={user.username}>
+                        <Link
+                          to={`/profile/${user.username}`}
+                          className="flex cursor-pointer items-center font-bold hover:underline"
+                        >
+                          {user.username}
+                        </Link>
+                      </UserHoverCard>
                       <span className="text-neutral-500">&middot;</span>
                       <span className="text-neutral-500">
                         {new Date(h.createdAt).toLocaleString()}
