@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, type ReactNode } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
+import useAuth from "@/hooks/useAuth";
 import { FollowContext } from "./FollowContext";
 
 type FollowProviderProps = {
@@ -10,7 +10,8 @@ type FollowProviderProps = {
 export const FollowProvider = ({ children }: FollowProviderProps) => {
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
   const axiosPrivate = useAxiosPrivate();
-  const authUser = useAuthenticatedUser();
+  const { auth } = useAuth();
+  const authUser = auth?.user;
 
   useEffect(() => {
     const fetchFollowing = async () => {
@@ -30,6 +31,12 @@ export const FollowProvider = ({ children }: FollowProviderProps) => {
     fetchFollowing();
   }, [authUser?.id, axiosPrivate]);
 
+  useEffect(() => {
+    if (!authUser?.id) {
+      setFollowingIds(new Set());
+    }
+  }, [authUser?.id]);
+
   const isFollowing = useCallback(
     (userId: string) => followingIds.has(userId),
     [followingIds],
@@ -37,6 +44,10 @@ export const FollowProvider = ({ children }: FollowProviderProps) => {
 
   const toggleFollow = useCallback(
     async (userId: string) => {
+      if (!authUser?.id) {
+        return;
+      }
+
       const wasFollowing = followingIds.has(userId);
 
       setFollowingIds((prev) => {
@@ -73,7 +84,7 @@ export const FollowProvider = ({ children }: FollowProviderProps) => {
         });
       }
     },
-    [followingIds, axiosPrivate],
+    [followingIds, axiosPrivate, authUser],
   );
 
   return (
