@@ -8,6 +8,7 @@ import preventNavigation from "@/utils/preventNavigation";
 import UserAvatar from "../user_components/UserAvatar";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 import OptionsButton from "../OptionsButton";
+import UserHoverCard from "../user_components/UserHoverCard";
 
 type CommentViewProps = {
   comment: Comment;
@@ -47,18 +48,24 @@ function CommentView({
         onClick={(e) => handleContainerClick(e)}
       >
         <div className="flex items-center gap-1 text-sm">
-          <UserAvatar
-            avatarUrl={comment.user.avatarUrl}
-            username={comment.user.username}
-          />
+          <UserHoverCard username={comment.user.username}>
+            <span>
+              <UserAvatar
+                avatarUrl={comment.user.avatarUrl}
+                username={comment.user.username}
+              />
+            </span>
+          </UserHoverCard>
 
           <div className="flex flex-col">
-            <Link
-              to={`/profile/${comment.user.username}`}
-              className="w-fit cursor-pointer font-bold hover:underline"
-            >
-              {comment.user.username}
-            </Link>
+            <UserHoverCard username={comment.user.username}>
+              <Link
+                to={`/profile/${comment.user.username}`}
+                className="w-fit cursor-pointer font-bold hover:underline"
+              >
+                {comment.user.username}
+              </Link>
+            </UserHoverCard>
             <span className="text-neutral-500">
               {new Date(comment.createdAt).toLocaleString()}
             </span>
@@ -100,22 +107,28 @@ function CommentView({
       onClick={(e) => handleContainerClick(e)}
     >
       <div className="flex flex-col items-center">
-        <UserAvatar
-          avatarUrl={comment.user.avatarUrl}
-          username={comment.user.username}
-        />
+        <UserHoverCard username={comment.user.username}>
+          <span>
+            <UserAvatar
+              avatarUrl={comment.user.avatarUrl}
+              username={comment.user.username}
+            />
+          </span>
+        </UserHoverCard>
 
         {isParent && <div className="mt-3 h-full w-[2px] bg-gray-500"></div>}
       </div>
 
       <div className="flex w-full flex-col justify-start gap-1">
         <div className="flex items-center gap-1 text-sm">
-          <Link
-            to={`/profile/${comment.user.username}`}
-            className="flex cursor-pointer items-center font-bold hover:underline"
-          >
-            {comment.user.username}
-          </Link>
+          <UserHoverCard username={comment.user.username}>
+            <Link
+              to={`/profile/${comment.user.username}`}
+              className="flex cursor-pointer items-center font-bold hover:underline"
+            >
+              {comment.user.username}
+            </Link>
+          </UserHoverCard>
           <span className="text-neutral-500">&middot;</span>
           <span className="text-neutral-500">
             {formatTimeAgoOrDate(comment.createdAt)}

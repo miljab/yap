@@ -13,6 +13,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Spinner } from "./ui/spinner";
 import FetchError from "./FetchError";
+import UserHoverCard from "./user_components/UserHoverCard";
 
 type LikedByProps = {
   likeCount: number;
@@ -79,16 +80,22 @@ function LikedBy({ likeCount, type, id }: LikedByProps) {
                   key={user.id}
                   className={`flex items-center gap-2 p-1 ${idx !== items.length - 1 && "border-b-1"}`}
                 >
-                  <UserAvatar
-                    avatarUrl={user.avatarUrl}
-                    username={user.username}
-                  />
-                  <Link
-                    to={`/profile/${user.username}`}
-                    className="cursor-pointer hover:underline"
-                  >
-                    {user.username}
-                  </Link>
+                  <UserHoverCard username={user.username}>
+                    <span>
+                      <UserAvatar
+                        avatarUrl={user.avatarUrl}
+                        username={user.username}
+                      />
+                    </span>
+                  </UserHoverCard>
+                  <UserHoverCard username={user.username}>
+                    <Link
+                      to={`/profile/${user.username}`}
+                      className="cursor-pointer truncate hover:underline"
+                    >
+                      {user.username}
+                    </Link>
+                  </UserHoverCard>
                 </div>
               );
             })}

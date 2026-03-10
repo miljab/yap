@@ -1,37 +1,22 @@
-import { createContext, useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect } from "react";
 import axios from "../api/axios";
 import { fetchCsrfToken } from "../api/axios";
-import type { User } from "@/types/user";
+import { AuthContext } from "./AuthContext";
 import { Spinner } from "@/components/ui/spinner";
 
-type AuthState = {
-  accessToken?: string;
-  user?: User;
-};
-
-type AuthContextType = {
-  auth: AuthState;
-  setAuth: React.Dispatch<React.SetStateAction<AuthState>>;
-};
-
-const AuthContext = createContext<AuthContextType>({
-  auth: {},
-  setAuth: () => {},
-});
-
 type AuthProviderProps = {
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [auth, setAuth] = useState<AuthState>({});
+  const [auth, setAuth] = useState<{ accessToken?: string; user?: import("@/types/user").User }>({});
   const [isLoading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const initApp = async () => {
       await fetchCsrfToken();
       try {
-        const response = await axios.get<AuthState>("/auth/refresh", {
+        const response = await axios.get<{ user?: import("@/types/user").User; accessToken?: string }>("/auth/refresh", {
           withCredentials: true,
         });
 
@@ -62,5 +47,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     </AuthContext.Provider>
   );
 };
-
-export default AuthContext;

@@ -20,15 +20,16 @@ function ProfileHeader({ user, onUserUpdate }: ProfileHeaderProps) {
           avatarUrl={user.avatarUrl}
           username={user.username}
           className="h-32 w-32"
+          redirect={false}
         />
         {user.id === authUser.id ? (
           <EditProfile user={user} onProfileUpdate={onUserUpdate} />
         ) : (
-          <FollowButton initialIsFollowed={user.isFollowed} userId={user.id} />
+          <FollowButton userId={user.id} />
         )}
       </div>
 
-      <span className="truncate text-xl font-bold">{user.username}</span>
+      <span className="text-xl font-bold wrap-break-word">{user.username}</span>
 
       {user.bio && (
         <p className="wrap-break-word contain-inline-size">{user.bio}</p>
