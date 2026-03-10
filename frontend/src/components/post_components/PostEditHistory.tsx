@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { Link } from "react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import type { PostHistory } from "@/types/post";
 import { Spinner } from "../ui/spinner";
@@ -26,6 +26,7 @@ function PostEditHistory({ postId, user }: PostHistoryProps) {
   const [history, setHistory] = useState<PostHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<FetchErrorState | null>(null);
+  const [open, setOpen] = useState(false);
   const axiosPrivate = useAxiosPrivate();
 
   const fetchEditHistory = useCallback(async () => {
@@ -43,12 +44,13 @@ function PostEditHistory({ postId, user }: PostHistoryProps) {
     }
   }, [postId, axiosPrivate]);
 
-  useEffect(() => {
-    fetchEditHistory();
-  }, [fetchEditHistory]);
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen && history.length === 0) fetchEditHistory();
+  };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <button className="w-fit cursor-pointer text-sm text-neutral-500 underline">
           Edited
