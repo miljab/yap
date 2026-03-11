@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router";
 import PostView from "../components/post_components/PostView";
 import type { Post, Comment } from "@/types/post";
+import type { NavigationState } from "@/types/navigation";
 import CommentView from "../components/comment_components/CommentView";
 import CreateComment from "../components/comment_components/CreateComment";
 import BackButton from "@/components/BackButton";
@@ -88,7 +89,7 @@ function ThreadViewPage() {
         onCommentCreated={onPostCommentCreated}
         onPostDelete={() => {
           isDeleting.current = true;
-          navigate(location.state?.from || "/home");
+          navigate((location.state as NavigationState)?.origin || "/home");
         }}
       />
 
@@ -101,7 +102,7 @@ function ThreadViewPage() {
             onCommentCreated={onParentCommentCreated}
             onCommentDelete={() => {
               if (com.parentId) {
-                navigate(`/comment/${com.parentId}/`, {
+                navigate(`/comment/${com.parentId}`, {
                   state: location.state,
                 });
               } else {
@@ -120,7 +121,7 @@ function ThreadViewPage() {
           onCommentCreated={onSelectedCommentCreated}
           onCommentDelete={() => {
             if (comment.parentId) {
-              navigate(`/comment/${comment.parentId}/`, {
+              navigate(`/comment/${comment.parentId}`, {
                 state: location.state,
               });
             } else {

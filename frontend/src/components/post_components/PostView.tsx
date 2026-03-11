@@ -34,9 +34,14 @@ function PostView({
   const user = useAuthenticatedUser();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    preventNavigation(e, navigate, "post", post.id, {
-      from: location.state?.from || location.pathname,
-    });
+    preventNavigation(
+      e,
+      navigate,
+      "post",
+      post.id,
+      location.pathname,
+      location.state,
+    );
   };
 
   return (
