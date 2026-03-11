@@ -1,14 +1,41 @@
+import type { NavigationState } from "@/types/navigation";
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 function BackButton() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBack = () => {
+    const { origin, historyStack } = (location.state as NavigationState) || {};
+
+    if (Array.isArray(historyStack) && historyStack.length > 0) {
+      const newStack = [...historyStack];
+      const prevPath = newStack.pop();
+
+      if (prevPath) {
+        navigate(prevPath, {
+          state: {
+            origin,
+            historyStack: newStack,
+          },
+        });
+        return;
+      }
+    }
+
+    if (origin) {
+      navigate(origin);
+    } else {
+      navigate(-1);
+    }
+  };
 
   return (
     <div className="sticky top-0 flex h-12 items-center justify-start border-b">
       <button
         className="h-full cursor-pointer p-2 px-4"
-        onClick={() => navigate(-1)}
+        onClick={handleBack}
       >
         <ArrowLeft />
       </button>
