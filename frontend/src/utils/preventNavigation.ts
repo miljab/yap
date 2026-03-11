@@ -1,3 +1,4 @@
+import type { NavigationState } from "@/types/navigation";
 import type { NavigateFunction } from "react-router";
 
 const preventNavigation = (
@@ -5,7 +6,8 @@ const preventNavigation = (
   navigate: NavigateFunction,
   itemType: "post" | "comment",
   itemId: string,
-  state?: Record<string, unknown>,
+  currentPath: string,
+  currentState?: NavigationState,
 ) => {
   const selection = window.getSelection();
 
@@ -27,7 +29,27 @@ const preventNavigation = (
     return;
   }
 
-  navigate(`/${itemType}/${itemId}`, { state });
+  const targetPath = `/${itemType}/${itemId}`;
+
+  const origin = currentState?.origin || currentState?.from || currentPath;
+  let historyStack = Array.isArray(currentState?.historyStack)
+    ? [...currentState.historyStack]
+    : [];
+
+  const targetIndex = historyStack.indexOf(targetPath);
+
+  if (targetIndex !== -1) {
+    historyStack = historyStack.slice(0, targetIndex);
+  } else {
+    historyStack.push(currentPath);
+  }
+
+  navigate(targetPath, {
+    state: {
+      origin,
+      historyStack,
+    },
+  });
 };
 
 export default preventNavigation;
