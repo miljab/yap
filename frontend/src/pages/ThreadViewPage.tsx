@@ -78,6 +78,30 @@ function ThreadViewPage() {
     );
   };
 
+  const onParentCommentDelete = (com: Comment) => {
+    isDeleting.current = true;
+    const pathnameToDelete = `/comment/${com.id}`;
+    const index = location.state.historyStack.indexOf(pathnameToDelete);
+
+    if (index !== -1) {
+      const newStack = location.state.historyStack.slice(0, index);
+
+      if (newStack.length > 0) {
+        navigate(newStack.pop(), {
+          state: {
+            origin: location.state.origin,
+            historyStack: newStack,
+          },
+        });
+      } else {
+        navigate(location.state.origin);
+      }
+      return;
+    }
+
+    navigate(location.state.origin);
+  };
+
   if (!post || !comment) return null;
 
   return (
@@ -101,14 +125,7 @@ function ThreadViewPage() {
             isParent={true}
             onCommentCreated={onParentCommentCreated}
             onCommentDelete={() => {
-              if (com.parentId) {
-                navigate(`/comment/${com.parentId}`, {
-                  state: location.state,
-                });
-              } else {
-                isDeleting.current = true;
-                navigate(`/post/${post.id}`, { state: location.state });
-              }
+              onParentCommentDelete(com);
             }}
           />
         );
@@ -120,14 +137,13 @@ function ThreadViewPage() {
           comment={comment}
           onCommentCreated={onSelectedCommentCreated}
           onCommentDelete={() => {
-            if (comment.parentId) {
-              navigate(`/comment/${comment.parentId}`, {
-                state: location.state,
-              });
-            } else {
-              isDeleting.current = true;
-              navigate(`/post/${post.id}`, { state: location.state });
-            }
+            isDeleting.current = true;
+            navigate(location.state.historyStack.pop(), {
+              state: {
+                historyStack: location.state.historyStack,
+                origin: location.state.origin,
+              },
+            });
           }}
         />
       </div>

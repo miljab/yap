@@ -41,7 +41,7 @@ const preventNavigation = (
   if (targetIndex !== -1) {
     historyStack = historyStack.slice(0, targetIndex);
   } else {
-    historyStack.push(currentPath);
+    if (targetPath !== currentPath) historyStack.push(currentPath);
   }
 
   navigate(targetPath, {
