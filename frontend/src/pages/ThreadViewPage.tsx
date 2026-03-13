@@ -1,5 +1,5 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router";
 import PostView from "../components/post_components/PostView";
 import type { Post, Comment } from "@/types/post";
@@ -17,12 +17,9 @@ function ThreadViewPage() {
   const [parentComments, setParentComments] = useState<Comment[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const isDeleting = useRef(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (isDeleting.current) return;
-
       try {
         const response = await axiosPrivate.get(`/comment/${params.id}/thread`);
 
@@ -79,27 +76,39 @@ function ThreadViewPage() {
   };
 
   const onParentCommentDelete = (com: Comment) => {
-    isDeleting.current = true;
-    const pathnameToDelete = `/comment/${com.id}`;
-    const index = location.state.historyStack.indexOf(pathnameToDelete);
+    const { historyStack, origin } = location.state as NavigationState;
 
-    if (index !== -1) {
-      const newStack = location.state.historyStack.slice(0, index);
+    if (
+      historyStack &&
+      Array.isArray(historyStack) &&
+      historyStack.length > 0
+    ) {
+      const pathnameToDelete = `/comment/${com.id}`;
+      const index = historyStack.indexOf(pathnameToDelete);
 
-      if (newStack.length > 0) {
-        navigate(newStack.pop(), {
-          state: {
-            origin: location.state.origin,
-            historyStack: newStack,
-          },
-        });
-      } else {
-        navigate(location.state.origin);
+      if (index !== -1) {
+        const newStack = historyStack.slice(0, index);
+
+        const url = newStack.pop();
+
+        if (url) {
+          navigate(url, {
+            state: {
+              origin: origin,
+              historyStack: newStack,
+            },
+          });
+          return;
+        }
       }
-      return;
     }
 
-    navigate(location.state.origin);
+    navigate(post ? `/post/${post.id}` : location.state?.origin || "/home", {
+      state: {
+        historyStack: historyStack || [],
+        origin: origin,
+      },
+    });
   };
 
   if (!post || !comment) return null;
@@ -112,7 +121,6 @@ function ThreadViewPage() {
         handlePostUpdate={handlePostUpdate}
         onCommentCreated={onPostCommentCreated}
         onPostDelete={() => {
-          isDeleting.current = true;
           navigate((location.state as NavigationState)?.origin || "/home");
         }}
       />
@@ -137,11 +145,31 @@ function ThreadViewPage() {
           comment={comment}
           onCommentCreated={onSelectedCommentCreated}
           onCommentDelete={() => {
-            isDeleting.current = true;
-            navigate(location.state.historyStack.pop(), {
+            const { historyStack, origin } = location.state as NavigationState;
+
+            if (
+              historyStack &&
+              Array.isArray(historyStack) &&
+              historyStack.length > 0
+            ) {
+              const newStack = [...historyStack];
+              const url = newStack.pop();
+
+              if (url) {
+                navigate(url, {
+                  state: {
+                    historyStack: newStack,
+                    origin: origin,
+                  },
+                });
+
+                return;
+              }
+            }
+            navigate(`/post/${post.id}`, {
               state: {
-                historyStack: location.state.historyStack,
-                origin: location.state.origin,
+                historyStack: historyStack || [],
+                origin: origin,
               },
             });
           }}
