@@ -27,16 +27,13 @@ function BackButton() {
     if (origin) {
       navigate(origin);
     } else {
-      navigate(-1);
+      navigate("/home");
     }
   };
 
   return (
     <div className="sticky top-0 flex h-12 items-center justify-start border-b">
-      <button
-        className="h-full cursor-pointer p-2 px-4"
-        onClick={handleBack}
-      >
+      <button className="h-full cursor-pointer p-2 px-4" onClick={handleBack}>
         <ArrowLeft />
       </button>
       <span className="font-[Roboto_mono] text-2xl">Post</span>
