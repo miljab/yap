@@ -1,8 +1,9 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router";
 import PostView from "../components/post_components/PostView";
 import type { Post, Comment } from "@/types/post";
+import type { NavigationState } from "@/types/navigation";
 import CommentView from "../components/comment_components/CommentView";
 import CreateComment from "../components/comment_components/CreateComment";
 import BackButton from "@/components/BackButton";
@@ -16,12 +17,9 @@ function ThreadViewPage() {
   const [parentComments, setParentComments] = useState<Comment[]>([]);
   const navigate = useNavigate();
   const location = useLocation();
-  const isDeleting = useRef(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (isDeleting.current) return;
-
       try {
         const response = await axiosPrivate.get(`/comment/${params.id}/thread`);
 
@@ -77,6 +75,42 @@ function ThreadViewPage() {
     );
   };
 
+  const onParentCommentDelete = (com: Comment) => {
+    const { historyStack, origin } = location.state as NavigationState;
+
+    if (
+      historyStack &&
+      Array.isArray(historyStack) &&
+      historyStack.length > 0
+    ) {
+      const pathnameToDelete = `/comment/${com.id}`;
+      const index = historyStack.indexOf(pathnameToDelete);
+
+      if (index !== -1) {
+        const newStack = historyStack.slice(0, index);
+
+        const url = newStack.pop();
+
+        if (url) {
+          navigate(url, {
+            state: {
+              origin: origin,
+              historyStack: newStack,
+            },
+          });
+          return;
+        }
+      }
+    }
+
+    navigate(post ? `/post/${post.id}` : location.state?.origin || "/home", {
+      state: {
+        historyStack: historyStack || [],
+        origin: origin,
+      },
+    });
+  };
+
   if (!post || !comment) return null;
 
   return (
@@ -87,8 +121,7 @@ function ThreadViewPage() {
         handlePostUpdate={handlePostUpdate}
         onCommentCreated={onPostCommentCreated}
         onPostDelete={() => {
-          isDeleting.current = true;
-          navigate(location.state?.from || "/home");
+          navigate((location.state as NavigationState)?.origin || "/home");
         }}
       />
 
@@ -100,14 +133,7 @@ function ThreadViewPage() {
             isParent={true}
             onCommentCreated={onParentCommentCreated}
             onCommentDelete={() => {
-              if (com.parentId) {
-                navigate(`/comment/${com.parentId}/`, {
-                  state: location.state,
-                });
-              } else {
-                isDeleting.current = true;
-                navigate(`/post/${post.id}`, { state: location.state });
-              }
+              onParentCommentDelete(com);
             }}
           />
         );
@@ -119,14 +145,33 @@ function ThreadViewPage() {
           comment={comment}
           onCommentCreated={onSelectedCommentCreated}
           onCommentDelete={() => {
-            if (comment.parentId) {
-              navigate(`/comment/${comment.parentId}/`, {
-                state: location.state,
-              });
-            } else {
-              isDeleting.current = true;
-              navigate(`/post/${post.id}`, { state: location.state });
+            const { historyStack, origin } = location.state as NavigationState;
+
+            if (
+              historyStack &&
+              Array.isArray(historyStack) &&
+              historyStack.length > 0
+            ) {
+              const newStack = [...historyStack];
+              const url = newStack.pop();
+
+              if (url) {
+                navigate(url, {
+                  state: {
+                    historyStack: newStack,
+                    origin: origin,
+                  },
+                });
+
+                return;
+              }
             }
+            navigate(`/post/${post.id}`, {
+              state: {
+                historyStack: historyStack || [],
+                origin: origin,
+              },
+            });
           }}
         />
       </div>

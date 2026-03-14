@@ -2,6 +2,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router";
 import type { Comment, Post } from "@/types/post";
+import type { NavigationState } from "@/types/navigation";
 import PostView from "../components/post_components/PostView";
 import CreateComment from "@/components/comment_components/CreateComment";
 import Comments from "../components/comment_components/Comments";
@@ -113,7 +114,7 @@ function PostViewPage() {
         onCommentCreated={onCommentCreated}
         onPostDelete={() => {
           isDeleting.current = true;
-          navigate(location.state?.from || "/home");
+          navigate((location.state as NavigationState)?.origin || "/home");
         }}
       />
       <div className="border-b">

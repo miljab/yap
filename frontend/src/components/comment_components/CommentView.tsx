@@ -36,9 +36,14 @@ function CommentView({
   const user = useAuthenticatedUser();
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    preventNavigation(e, navigate, "comment", comment.id, {
-      from: location.state?.from || location.pathname,
-    });
+    preventNavigation(
+      e,
+      navigate,
+      "comment",
+      comment.id,
+      location.pathname,
+      location.state,
+    );
   };
 
   if (isSelected) {
