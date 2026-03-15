@@ -1,5 +1,5 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router";
 import PostView from "../components/post_components/PostView";
 import type { Post, Comment } from "@/types/post";
@@ -7,6 +7,9 @@ import type { NavigationState } from "@/types/navigation";
 import CommentView from "../components/comment_components/CommentView";
 import CreateComment from "../components/comment_components/CreateComment";
 import BackButton from "@/components/BackButton";
+import FetchError from "@/components/FetchError";
+import { type FetchErrorState, getErrorState } from "@/lib/fetchError";
+import { Spinner } from "@/components/ui/spinner";
 
 function ThreadViewPage() {
   const params = useParams();
@@ -15,26 +18,41 @@ function ThreadViewPage() {
   const [comment, setComment] = useState<Comment | null>(null);
   const [replies, setReplies] = useState<Comment[]>([]);
   const [parentComments, setParentComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<FetchErrorState | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axiosPrivate.get(`/comment/${params.id}/thread`);
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
 
-        setPost(response.data.post);
-        setComment(response.data.comment);
-        setReplies(response.data.replies);
-        setParentComments(response.data.parentComments);
-      } catch (error) {
-        console.error(error);
-        // TODO error handling
+    try {
+      const response = await axiosPrivate.get(`/comment/${params.id}/thread`);
+
+      setPost(response.data.post);
+      setComment(response.data.comment);
+      setReplies(response.data.replies);
+      setParentComments(response.data.parentComments);
+    } catch (err) {
+      const errorState = getErrorState(err);
+
+      if (errorState.type === "not_found") {
+        navigate("/error", {
+          state: { error: "Thread not found." },
+        });
+        return;
       }
-    };
 
+      setError(errorState);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [axiosPrivate, params.id, navigate]);
+
+  useEffect(() => {
     fetchData();
-  }, [params, axiosPrivate]);
+  }, [fetchData]);
 
   const handlePostUpdate = (updatedPost: Post) => {
     setPost(updatedPost);
@@ -111,7 +129,31 @@ function ThreadViewPage() {
     });
   };
 
-  if (!post || !comment) return null;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full">
+        <BackButton />
+        <div className="flex min-h-[50vh] flex-col items-center justify-center">
+          <Spinner />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen w-full">
+        <BackButton />
+        <div className="flex min-h-[50vh] flex-col items-center justify-center">
+          <FetchError error={error} onRetry={fetchData} />
+        </div>
+      </div>
+    );
+  }
+
+  if (!post || !comment) {
+    return null;
+  }
 
   return (
     <div>

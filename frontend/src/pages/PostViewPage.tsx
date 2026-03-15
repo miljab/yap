@@ -87,16 +87,22 @@ function PostViewPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Spinner />
+      <div className="min-h-screen w-full">
+        <BackButton />
+        <div className="flex min-h-[50vh] flex-col items-center justify-center">
+          <Spinner />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <FetchError error={error} onRetry={fetchData} />
+      <div className="min-h-screen w-full">
+        <BackButton />
+        <div className="flex min-h-[50vh] flex-col items-center justify-center">
+          <FetchError error={error} onRetry={fetchData} />
+        </div>
       </div>
     );
   }
