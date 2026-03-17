@@ -1,5 +1,5 @@
 import createApp from "../app.js";
-import { vi, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import request from "supertest";
 import { prisma } from "../prisma/prismaClient.js";
 

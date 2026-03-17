@@ -8,14 +8,18 @@ app.use(express.json());
 
 app.get(
   "/test-oauth-login",
-  (req, res, next) => {
+  (req, _res, next) => {
     req.user = {
-      id: 123,
+      id: "123",
+      username: null,
+      password: null,
+      bio: null,
       email: "testuser@example.com",
+      createdAt: new Date(),
     };
     next();
   },
-  oAuthLogin
+  oAuthLogin,
 );
 
 describe("oAuthLogin", () => {
@@ -32,7 +36,7 @@ describe("oAuthLogin", () => {
     expect(response.headers["set-cookie"]).toEqual(
       expect.arrayContaining([
         expect.stringContaining("refreshToken=mock-refresh-token"),
-      ])
+      ]),
     );
     expect(response.headers["location"]).toContain("/auth/processing");
   });

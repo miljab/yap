@@ -1,6 +1,5 @@
 import express from "express";
 import request from "supertest";
-import cookieParser from "cookie-parser";
 import { prisma } from "../../prisma/prismaClient.js";
 import createApp from "../../app.js";
 import { generateOnboardingToken } from "../../utils/generateTokens.js";
@@ -70,13 +69,13 @@ describe("Onboarding Routes", () => {
     expect(
       Array.isArray(res.headers["set-cookie"]) &&
         res.headers["set-cookie"].some((cookie: string) =>
-          cookie.startsWith("refreshToken=")
-        )
+          cookie.startsWith("refreshToken="),
+        ),
     ).toBe(true);
   });
 
   test("POST /onboarding fails if email already exists", async () => {
-    const existingUser = await prisma.user.create({
+    await prisma.user.create({
       data: {
         username: "takenUsername",
         email: "taken@example.com",
@@ -99,7 +98,7 @@ describe("Onboarding Routes", () => {
           path: "email",
           error: "Email already in use",
         }),
-      ])
+      ]),
     );
   });
 
@@ -116,12 +115,12 @@ describe("Onboarding Routes", () => {
     expect(res.body.errors).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: "email", error: expect.any(String) }),
-      ])
+      ]),
     );
   });
 
   test("POST /onboarding fails if username already exists", async () => {
-    const existingUser = await prisma.user.create({
+    await prisma.user.create({
       data: {
         username: "takenUsername",
         email: "taken@example.com",
@@ -144,7 +143,7 @@ describe("Onboarding Routes", () => {
           path: "username",
           error: "Username already in use",
         }),
-      ])
+      ]),
     );
   });
 

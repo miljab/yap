@@ -123,6 +123,8 @@ function SignupCard() {
                   <FormControl>
                     <Input
                       {...field}
+                      minLength={5}
+                      maxLength={32}
                       onFocus={() => setIsUsernameFocused(true)}
                       onBlur={() => {
                         field.onBlur();
@@ -141,7 +143,12 @@ function SignupCard() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input
+                      type="password"
+                      minLength={8}
+                      maxLength={64}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,7 +161,12 @@ function SignupCard() {
                 <FormItem>
                   <FormLabel>Confirm password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input
+                      type="password"
+                      minLength={8}
+                      maxLength={64}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

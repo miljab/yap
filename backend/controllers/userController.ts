@@ -106,12 +106,11 @@ export const updateProfile = async (req: Request, res: Response) => {
       }
       const isValidImage = await validateImageMagicBytes(avatarFile);
       if (!isValidImage) {
-        throw new AppError(
-          "Invalid image file content",
-          400,
-        );
+        throw new AppError("Invalid image file content", 400);
       }
     }
+
+    if (bio.length > 160) throw new AppError("Max 160 characters allowed");
 
     const updatedUser = await userService.updateProfile(
       userId,

@@ -20,7 +20,7 @@ describe("Google oAuth authentication", () => {
       "accessToken",
       "refreshToken",
       mockProfile as Profile,
-      mockDone
+      mockDone,
     );
 
     const user = await prisma.user.findUnique({
@@ -29,12 +29,12 @@ describe("Google oAuth authentication", () => {
     expect(user).not.toBeNull();
     expect(mockDone).toHaveBeenCalledWith(
       null,
-      expect.objectContaining({ email: "googleuser@example.com" })
+      expect.objectContaining({ email: "googleuser@example.com" }),
     );
   });
 
   it("should return existing user if email is already linked to google", async () => {
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email: "linked@example.com",
         password: null,
@@ -57,12 +57,12 @@ describe("Google oAuth authentication", () => {
       "accessToken",
       "refreshToken",
       mockProfile as Profile,
-      mockDone
+      mockDone,
     );
 
     expect(mockDone).toHaveBeenCalledWith(
       null,
-      expect.objectContaining({ email: "linked@example.com" })
+      expect.objectContaining({ email: "linked@example.com" }),
     );
   });
 
@@ -90,12 +90,12 @@ describe("Google oAuth authentication", () => {
       "accessToken",
       "refreshToken",
       mockProfile as Profile,
-      mockDone
+      mockDone,
     );
 
     expect(mockDone).toHaveBeenCalledWith(expect.any(Error));
     expect(mockDone.mock.calls[0]?.[0]?.message).toMatch(
-      /Email already linked to another provider/
+      /Email already linked to another provider/,
     );
   });
 
@@ -118,17 +118,17 @@ describe("Google oAuth authentication", () => {
       "accessToken",
       "refreshToken",
       mockProfile as Profile,
-      mockDone
+      mockDone,
     );
 
     expect(mockDone).toHaveBeenCalledWith(expect.any(Error));
     expect(mockDone.mock.calls[0]?.[0]?.message).toMatch(
-      /Email not linked to any provider/
+      /Email not linked to any provider/,
     );
   });
 
   it("should return user if found by providerAccountId when email is not provided", async () => {
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email: "customemail@example.com",
         password: null,
@@ -151,12 +151,12 @@ describe("Google oAuth authentication", () => {
       "accessToken",
       "refreshToken",
       mockProfile as Profile,
-      mockDone
+      mockDone,
     );
 
     expect(mockDone).toHaveBeenCalledWith(
       null,
-      expect.objectContaining({ email: "customemail@example.com" })
+      expect.objectContaining({ email: "customemail@example.com" }),
     );
   });
 });
