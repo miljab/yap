@@ -22,11 +22,6 @@ vi.mock("../../config/cloudinary.js", () => ({
   },
 }));
 
-let cloudinaryMock: {
-  uploader: { upload: ReturnType<typeof vi.fn> };
-  api: { delete_resources: ReturnType<typeof vi.fn> };
-};
-
 describe("PUT /profile", () => {
   const userData = {
     email: "profileedituser@example.com",
@@ -81,7 +76,11 @@ describe("PUT /profile", () => {
     const updateRes = await request(app)
       .put("/profile")
       .set("Authorization", `Bearer ${accessToken}`)
-      .attach("avatar", Buffer.from(pngImageBase64, "base64"), "new-avatar.png");
+      .attach(
+        "avatar",
+        Buffer.from(pngImageBase64, "base64"),
+        "new-avatar.png",
+      );
 
     expect(updateRes.statusCode).toBe(200);
     expect(cloudinary.api.delete_resources).toHaveBeenCalledWith([
@@ -116,10 +115,18 @@ describe("PUT /profile", () => {
     expect(res.body).toHaveProperty("bio", "");
   });
 
-  it("should return 401 without auth", async () => {
+  it("should not allow too long bio", async () => {
     const res = await request(app)
       .put("/profile")
-      .field("bio", "New bio");
+      .set("Authorization", `Bearer ${accessToken}`)
+      .field("bio", "a".repeat(200));
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty("error", "Max 160 characters allowed");
+  });
+
+  it("should return 401 without auth", async () => {
+    const res = await request(app).put("/profile").field("bio", "New bio");
 
     expect(res.statusCode).toBe(401);
   });
