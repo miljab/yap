@@ -27,7 +27,7 @@ function SearchBar({ setQuery }: SearchBarProps) {
 
   return (
     <div
-      className={`border-input flex border border-t-0 p-2 ${isInputFocused && "outline-1"}`}
+      className={`border-input m-2 flex rounded-3xl border p-2 ${isInputFocused && "outline-1"}`}
     >
       <Search />
       <input
