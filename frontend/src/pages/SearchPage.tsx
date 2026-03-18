@@ -7,14 +7,14 @@ function SearchPage() {
   const [query, setQuery] = useState("");
 
   return (
-    <>
+    <div className="flex flex-col">
       <SearchBar setQuery={setQuery} />
       <SearchTabs
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         query={query}
       />
-    </>
+    </div>
   );
 }
 
