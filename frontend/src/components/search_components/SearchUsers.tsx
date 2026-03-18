@@ -17,6 +17,10 @@ function SearchUsers({ query }: SearchUsersProps) {
 
   const fetchUsers = useCallback(
     async (currentCursor?: string) => {
+      if (!query?.trim()) {
+        return { items: [], nextCursor: undefined };
+      }
+
       const params = new URLSearchParams({ q: query });
       if (currentCursor) params.append("cursor", currentCursor);
 
@@ -60,7 +64,11 @@ function SearchUsers({ query }: SearchUsersProps) {
     <div>
       {items.map((user) => {
         return (
-          <div key={user.id} className="flex items-center gap-2 border-b-1 p-2">
+          <Link
+            to={`/profile/${user.username}`}
+            key={user.id}
+            className="hover:bg-accent hover:border-border border-b-border flex cursor-pointer items-center gap-1 border border-transparent p-2"
+          >
             <UserHoverCard username={user.username}>
               <span>
                 <UserAvatar
@@ -72,18 +80,20 @@ function SearchUsers({ query }: SearchUsersProps) {
 
             <div className="flex grow flex-col">
               <UserHoverCard username={user.username}>
-                <Link
-                  to={`/profile/${user.username}`}
-                  className="cursor-pointer wrap-break-word contain-inline-size hover:underline"
-                >
-                  {user.username}
-                </Link>
+                <div className="w-fit">
+                  <Link
+                    to={`/profile/${user.username}`}
+                    className="cursor-pointer wrap-break-word contain-inline-size hover:underline"
+                  >
+                    {user.username}
+                  </Link>
+                </div>
               </UserHoverCard>
               <p className="truncate wrap-break-word text-neutral-500 contain-inline-size">
                 {user.bio}
               </p>
             </div>
-          </div>
+          </Link>
         );
       })}
       <div ref={loaderRef} className="flex justify-center p-4">
