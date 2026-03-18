@@ -2,19 +2,19 @@ import { type KeyboardEvent, useState, useRef, useEffect } from "react";
 import { Search } from "lucide-react";
 
 type SearchBarProps = {
-  fetchData: () => void;
+  setQuery: (query: string) => void;
 };
 
-function SearchBar({ fetchData }: SearchBarProps) {
+function SearchBar({ setQuery }: SearchBarProps) {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => fetchData(), 300);
+    const timer = setTimeout(() => setQuery(inputValue.trim()), 300);
 
     return () => clearTimeout(timer);
-  }, [inputValue, fetchData]);
+  }, [inputValue, setQuery]);
 
   const handleInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (!inputRef.current) return;
