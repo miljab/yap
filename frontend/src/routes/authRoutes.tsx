@@ -6,6 +6,7 @@ import PostViewPage from "@/pages/PostViewPage";
 import ThreadViewPage from "@/pages/ThreadViewPage";
 import ProfilePage from "@/pages/ProfilePage";
 import PostViewLayout from "@/layouts/PostViewLayout";
+import SearchPage from "@/pages/SearchPage";
 
 const authRoutes = () => {
   return (
@@ -13,6 +14,7 @@ const authRoutes = () => {
       <Route element={<AuthLayout />}>
         <Route path="/home" element={<HomePage />} />
         <Route path="/profile/:username" element={<ProfilePage />} />
+        <Route path="/search" element={<SearchPage />} />
       </Route>
       <Route element={<PostViewLayout />}>
         <Route path="/post/:id" element={<PostViewPage />} />
