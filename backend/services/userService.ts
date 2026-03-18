@@ -339,4 +339,28 @@ export const userService = {
       followingIds: following.map((f) => f.followingId),
     };
   },
+
+  searchUsers: async (query: string, cursor?: string, limit: number = 20) => {
+    const users = await prisma.user.findMany({
+      where: {
+        username: { contains: query },
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      include: {
+        avatar: {
+          select: {
+            url: true,
+          },
+        },
+      },
+      orderBy: {
+        username: "asc",
+      },
+    });
+
+    const { result, nextCursor } = paginate(users, limit);
+
+    return userPresenter.search(result, { nextCursor: nextCursor });
+  },
 };
