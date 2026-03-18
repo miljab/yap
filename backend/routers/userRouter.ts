@@ -10,6 +10,7 @@ import {
   getFollowingUsers,
   getFollowers,
   getMyFollowingIds,
+  searchUsers,
 } from "../controllers/userController.js";
 import { MAX_IMAGE_SIZE_BYTES } from "../utils/constants.js";
 import { imageFileFilter } from "../utils/fileFilter.js";
@@ -45,6 +46,8 @@ const createUserRouter = () => {
   router.get("/users/:userId/followers", verifyAccessToken, getFollowers);
 
   router.get("/users/me/following-ids", verifyAccessToken, getMyFollowingIds);
+
+  router.get("/search/users", verifyAccessToken, searchUsers);
 
   return router;
 };
