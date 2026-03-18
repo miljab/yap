@@ -67,7 +67,7 @@ function SearchUsers({ query }: SearchUsersProps) {
           <Link
             to={`/profile/${user.username}`}
             key={user.id}
-            className="hover:bg-accent hover:border-border border-b-border flex cursor-pointer items-center gap-1 border border-transparent p-2"
+            className="hover:bg-accent flex cursor-pointer items-center gap-1 border-b p-2 dark:border-neutral-800 dark:hover:bg-[#1f1f1f]"
           >
             <UserHoverCard username={user.username}>
               <span>
