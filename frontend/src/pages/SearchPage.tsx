@@ -1,19 +1,20 @@
 import SearchBar from "@/components/search_components/SearchBar";
 import SearchTabs from "@/components/search_components/SearchTabs";
-import type { Post } from "@/types/post";
-import type { User } from "@/types/user";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 function SearchPage() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
   const [activeTab, setActiveTab] = useState("users");
+  const [query, setQuery] = useState("");
 
   return (
-    <div>
-      <SearchBar />
-      <SearchTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-    </div>
+    <>
+      <SearchBar setQuery={setQuery} />
+      <SearchTabs
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        query={query}
+      />
+    </>
   );
 }
 
