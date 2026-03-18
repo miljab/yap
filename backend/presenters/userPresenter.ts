@@ -142,4 +142,18 @@ export const userPresenter = {
       avatarUrl: user.avatar?.url || DEFAULT_AVATAR,
     };
   },
+
+  search(users: UserPreviewPayload[], ctx: { nextCursor: string | null }) {
+    return {
+      users: users.map((u) => {
+        return {
+          id: u.id,
+          username: u.username,
+          avatarUrl: u.avatar?.url || DEFAULT_AVATAR,
+          bio: u.bio,
+        };
+      }),
+      nextCursor: ctx.nextCursor,
+    };
+  },
 };
