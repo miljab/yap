@@ -231,3 +231,26 @@ export const getMyFollowingIds = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const searchUsers = async (req: Request, res: Response) => {
+  const cursor = req.query.cursor as string | undefined;
+  const limit = req.query.limit
+    ? parseInt(req.query.limit as string)
+    : undefined;
+  const query = req.query.q as string | undefined;
+
+  try {
+    if (!query) throw new AppError("Search query is required", 400);
+
+    const result = await userService.searchUsers(query, cursor, limit);
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
