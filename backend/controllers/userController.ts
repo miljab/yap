@@ -240,7 +240,8 @@ export const searchUsers = async (req: Request, res: Response) => {
   const query = req.query.q as string | undefined;
 
   try {
-    if (!query) throw new AppError("Search query is required", 400);
+    if (!query || !query.trim())
+      throw new AppError("Search query is required", 400);
 
     const result = await userService.searchUsers(query, cursor, limit);
 
