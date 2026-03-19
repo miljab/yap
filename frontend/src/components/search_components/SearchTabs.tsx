@@ -1,6 +1,7 @@
 import type { SetStateAction } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
 import SearchUsers from "./SearchUsers";
+import SearchPosts from "./SearchPosts";
 
 type SearchTabsProps = {
   activeTab: string;
@@ -30,7 +31,9 @@ function SearchTabs({ activeTab, setActiveTab, query }: SearchTabsProps) {
       <TabsContent
         value="posts"
         className={activeTab !== "posts" ? "hidden" : ""}
-      ></TabsContent>
+      >
+        <SearchPosts query={query} />
+      </TabsContent>
     </Tabs>
   );
 }
