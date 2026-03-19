@@ -34,10 +34,7 @@ export const createNewPost = async (req: Request, res: Response) => {
       }
       const isValidImage = await validateImageMagicBytes(f);
       if (!isValidImage) {
-        throw new AppError(
-          "Invalid image file content",
-          400,
-        );
+        throw new AppError("Invalid image file content", 400);
       }
     }
 
@@ -239,6 +236,38 @@ export const getPostLikes = async (req: Request, res: Response) => {
     );
 
     return res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    const { message, statusCode } = handleError(error);
+
+    return res.status(statusCode).json({
+      error: message,
+    });
+  }
+};
+
+export const searchPosts = async (req: Request, res: Response) => {
+  const requesterId = req.user?.id;
+  const query = req.query.q as string | undefined;
+  const cursor = req.query.cursor as string | undefined;
+  const limit = req.query.limit
+    ? parseInt(req.query.limit as string)
+    : undefined;
+
+  try {
+    if (!requesterId) throw new AppError("Unauthorized", 401);
+
+    if (!query || !query.trim())
+      throw new AppError("Search query is required", 400);
+
+    const posts = await postService.searchPosts(
+      requesterId,
+      query,
+      cursor,
+      limit,
+    );
+
+    return res.status(200).json(posts);
   } catch (error) {
     console.error(error);
     const { message, statusCode } = handleError(error);

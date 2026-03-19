@@ -328,4 +328,26 @@ export const postService = {
 
     return userPresenter.likeList(likers, { nextCursor });
   },
+
+  searchPosts: async (
+    requesterId: string,
+    query: string,
+    cursor?: string,
+    limit: number = DEFAULT_PAGE_LIMIT,
+  ) => {
+    const posts = await prisma.post.findMany({
+      where: {
+        content: {
+          contains: query,
+        },
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      include: basePostInclude(requesterId),
+    });
+
+    const { result, nextCursor } = paginate(posts, limit);
+
+    return postPresenter.feed(result, { nextCursor });
+  },
 };
