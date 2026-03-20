@@ -344,6 +344,9 @@ export const postService = {
       take: limit + 1,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       include: basePostInclude(requesterId),
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     const { result, nextCursor } = paginate(posts, limit);
