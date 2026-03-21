@@ -74,6 +74,7 @@ function SearchUsers({ query }: SearchUsersProps) {
                 <UserAvatar
                   avatarUrl={user.avatarUrl}
                   username={user.username}
+                  redirect={false}
                 />
               </span>
             </UserHoverCard>
@@ -81,12 +82,9 @@ function SearchUsers({ query }: SearchUsersProps) {
             <div className="flex grow flex-col">
               <UserHoverCard username={user.username}>
                 <div className="w-fit">
-                  <Link
-                    to={`/profile/${user.username}`}
-                    className="cursor-pointer wrap-break-word contain-inline-size hover:underline"
-                  >
+                  <span className="cursor-pointer wrap-break-word contain-inline-size hover:underline">
                     {user.username}
-                  </Link>
+                  </span>
                 </div>
               </UserHoverCard>
               <p className="truncate wrap-break-word text-neutral-500 contain-inline-size">
