@@ -55,7 +55,9 @@ function SearchUsers({ query }: SearchUsersProps) {
   }
 
   if (items.length === 0) {
-    return (
+    return error ? (
+      <FetchError error={error} onRetry={retry} />
+    ) : (
       <div className="p-4 text-center text-neutral-500">No results found</div>
     );
   }

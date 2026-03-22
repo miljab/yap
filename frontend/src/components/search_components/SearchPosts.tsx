@@ -62,7 +62,7 @@ function SearchPosts({ query }: SearchPostsProps) {
     return error ? (
       <FetchError error={error} onRetry={retry} />
     ) : (
-      <div className="p-4 text-center text-neutral-500">No posts yet</div>
+      <div className="p-4 text-center text-neutral-500">No results found</div>
     );
   }
 
