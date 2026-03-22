@@ -339,6 +339,7 @@ export const postService = {
       where: {
         content: {
           contains: query,
+          mode: "insensitive",
         },
       },
       take: limit + 1,

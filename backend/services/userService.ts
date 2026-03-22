@@ -343,7 +343,7 @@ export const userService = {
   searchUsers: async (query: string, cursor?: string, limit: number = 20) => {
     const users = await prisma.user.findMany({
       where: {
-        username: { contains: query },
+        username: { contains: query, mode: "insensitive" },
       },
       take: limit + 1,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
