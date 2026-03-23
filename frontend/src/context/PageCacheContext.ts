@@ -1,13 +1,13 @@
 import { createContext } from "react";
 
-type PageCacheEntry = {
+export type PageCacheEntry = {
   items: unknown[];
   cursor: string | null;
   scrollTop: number;
   activeTab?: string;
 };
 
-type PageCacheContextType = {
+export type PageCacheContextType = {
   saveCache: (key: string, entry: PageCacheEntry) => void;
   restoreCache: (key: string) => PageCacheEntry | null;
   clearCache: (key: string) => void;
