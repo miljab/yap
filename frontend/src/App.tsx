@@ -5,17 +5,20 @@ import authRoutes from "./routes/authRoutes";
 import { AuthProvider } from "./context/AuthProvider";
 import { FollowProvider } from "./context/FollowProvider";
 import ErrorPage from "./pages/ErrorPage";
+import { PageCacheProvider } from "./context/PageCacheProvider";
 
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="uiTheme">
       <AuthProvider>
         <FollowProvider>
-          <Routes>{publicRoutes()}</Routes>
-          <Routes>{authRoutes()}</Routes>
-          <Routes>
-            <Route path="/error" element={<ErrorPage />} />
-          </Routes>
+          <PageCacheProvider>
+            <Routes>{publicRoutes()}</Routes>
+            <Routes>{authRoutes()}</Routes>
+            <Routes>
+              <Route path="/error" element={<ErrorPage />} />
+            </Routes>
+          </PageCacheProvider>
         </FollowProvider>
       </AuthProvider>
     </ThemeProvider>
