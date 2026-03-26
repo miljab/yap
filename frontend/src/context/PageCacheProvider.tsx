@@ -1,4 +1,4 @@
-import { useRef, useCallback, type ReactNode } from "react";
+import { useMemo, useRef, useCallback, type ReactNode } from "react";
 import type { PageCacheEntry, PageCacheContextType } from "./PageCacheContext";
 import { PageCacheContext } from "./PageCacheContext";
 
@@ -24,12 +24,10 @@ export const PageCacheProvider = ({ children }: PageCacheProviderProps) => {
     cacheRef.current.clear();
   }, []);
 
-  const value: PageCacheContextType = {
-    saveCache,
-    restoreCache,
-    clearCache,
-    clearAllCache,
-  };
+  const value = useMemo<PageCacheContextType>(
+    () => ({ saveCache, restoreCache, clearCache, clearAllCache }),
+    [saveCache, restoreCache, clearCache, clearAllCache],
+  );
 
   return (
     <PageCacheContext.Provider value={value}>
