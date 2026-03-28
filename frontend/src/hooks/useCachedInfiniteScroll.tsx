@@ -32,6 +32,22 @@ export function useCachedInfiniteScroll<T>(
 
   const restoredDataRef = useRef<RestoredData<T> | null>(null);
   const hasCheckedCacheRef = useRef(false);
+  const hasRestoredScrollRef = useRef(false);
+  const shouldResetRef = useRef(false);
+
+  const locationKeyRef = useRef(location.key);
+
+  if (location.key !== locationKeyRef.current) {
+    locationKeyRef.current = location.key;
+
+    if (!isBackNavigation) {
+      pageCache.clearCache(cacheKey);
+      hasCheckedCacheRef.current = false;
+      restoredDataRef.current = null;
+      hasRestoredScrollRef.current = false;
+      shouldResetRef.current = true;
+    }
+  }
 
   if (!hasCheckedCacheRef.current) {
     hasCheckedCacheRef.current = true;
@@ -56,6 +72,7 @@ export function useCachedInfiniteScroll<T>(
     items,
     setItems,
     cursor,
+    reset,
     isLoading,
     initialLoad,
     loaderRef,
@@ -63,7 +80,13 @@ export function useCachedInfiniteScroll<T>(
     retry,
   } = useInfiniteScroll<T>(fetcher, deps, initialData);
 
-  const hasRestoredScrollRef = useRef(false);
+  useEffect(() => {
+    if (shouldResetRef.current) {
+      shouldResetRef.current = false;
+      reset();
+    }
+  });
+
   const scrollTopToRestore = restoredDataRef.current?.scrollTop ?? 0;
 
   useEffect(() => {
