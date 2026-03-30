@@ -1,14 +1,14 @@
-import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfilePosts from "./ProfilePosts";
 import ProfileComments from "./ProfileComments";
+import { useCachedTab } from "@/hooks/useCachedTab";
 
-type ProfileFeedProps = {
+type ProfileTabsProps = {
   userId: string;
 };
 
-function ProfileFeed({ userId }: ProfileFeedProps) {
-  const [activeTab, setActiveTab] = useState("posts");
+function ProfileTabs({ userId }: ProfileTabsProps) {
+  const [activeTab, setActiveTab] = useCachedTab(`profile:${userId}`, "posts");
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -40,4 +40,4 @@ function ProfileFeed({ userId }: ProfileFeedProps) {
   );
 }
 
-export default ProfileFeed;
+export default ProfileTabs;

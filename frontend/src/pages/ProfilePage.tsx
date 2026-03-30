@@ -1,5 +1,5 @@
 import ProfileHeader from "@/components/user_components/ProfileHeader";
-import ProfileFeed from "@/components/user_components/ProfileFeed";
+import ProfileTabs from "@/components/user_components/ProfileTabs";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import type { User } from "@/types/user";
@@ -49,7 +49,7 @@ function ProfilePage() {
   return (
     <div>
       <ProfileHeader user={user} onUserUpdate={onUserUpdate} />
-      <ProfileFeed userId={user.id} />
+      <ProfileTabs userId={user.id} />
     </div>
   );
 }
