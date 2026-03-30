@@ -1,9 +1,10 @@
 import SearchBar from "@/components/search_components/SearchBar";
 import SearchTabs from "@/components/search_components/SearchTabs";
 import { useState } from "react";
+import { useCachedTab } from "@/hooks/useCachedTab";
 
 function SearchPage() {
-  const [activeTab, setActiveTab] = useState("users");
+  const [activeTab, setActiveTab] = useCachedTab("search", "users");
   const [query, setQuery] = useState("");
 
   return (

@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HomeFeed from "./HomeFeed";
+import { useCachedTab } from "@/hooks/useCachedTab";
 
 function HomeTabs() {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useCachedTab("home", "all");
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
