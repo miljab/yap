@@ -3,7 +3,7 @@ import type { Post } from "@/types/post";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import PostView from "./PostView";
 import { Spinner } from "../ui/spinner";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useCachedInfiniteScroll } from "@/hooks/useCachedInfiniteScroll";
 import CreatePost from "./CreatePost";
 import FetchError from "../FetchError";
 
@@ -43,7 +43,7 @@ function HomeFeed({ type }: HomeFeedProps) {
     loaderRef,
     error,
     retry,
-  } = useInfiniteScroll<Post>(fetchPosts, []);
+  } = useCachedInfiniteScroll<Post>(fetchPosts, [type], `home:${type}`);
 
   const handlePostCreate = (newPost: Post) => {
     setPosts((prev) => [newPost, ...prev]);
