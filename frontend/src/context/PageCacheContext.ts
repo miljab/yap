@@ -4,7 +4,6 @@ export type PageCacheEntry = {
   items: unknown[];
   cursor: string | null;
   scrollTop: number;
-  activeTab?: string;
 };
 
 export type PageCacheContextType = {
