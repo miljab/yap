@@ -1,9 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HomeFeed from "./HomeFeed";
-import { useCachedTab } from "@/hooks/useCachedTab";
+import { useCachedValue } from "@/hooks/useCachedValue";
 
 function HomeTabs() {
-  const [activeTab, setActiveTab] = useCachedTab("home", "all");
+  const [activeTab, setActiveTab] = useCachedValue("home:tab", "all");
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

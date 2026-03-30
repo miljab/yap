@@ -1,14 +1,14 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfilePosts from "./ProfilePosts";
 import ProfileComments from "./ProfileComments";
-import { useCachedTab } from "@/hooks/useCachedTab";
+import { useCachedValue } from "@/hooks/useCachedValue";
 
 type ProfileTabsProps = {
   userId: string;
 };
 
 function ProfileTabs({ userId }: ProfileTabsProps) {
-  const [activeTab, setActiveTab] = useCachedTab(`profile:${userId}`, "posts");
+  const [activeTab, setActiveTab] = useCachedValue(`profile:${userId}:tab`, "posts");
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
