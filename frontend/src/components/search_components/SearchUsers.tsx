@@ -1,5 +1,5 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useCachedInfiniteScroll } from "@/hooks/useCachedInfiniteScroll";
 import { useCallback } from "react";
 import type { User } from "@/types/user";
 import { Spinner } from "../ui/spinner";
@@ -36,7 +36,7 @@ function SearchUsers({ query }: SearchUsersProps) {
   );
 
   const { items, isLoading, initialLoad, loaderRef, error, retry } =
-    useInfiniteScroll<User>(fetchUsers, [query]);
+    useCachedInfiniteScroll<User>(fetchUsers, [query], `search:users`);
 
   if (query.length === 0) {
     return (
