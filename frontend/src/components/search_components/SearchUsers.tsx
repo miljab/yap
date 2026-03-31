@@ -36,7 +36,7 @@ function SearchUsers({ query }: SearchUsersProps) {
   );
 
   const { items, isLoading, initialLoad, loaderRef, error, retry } =
-    useCachedInfiniteScroll<User>(fetchUsers, [query], `search:users`);
+    useCachedInfiniteScroll<User>(fetchUsers, [query], `search:users:${query}`);
 
   if (query.length === 0) {
     return (
