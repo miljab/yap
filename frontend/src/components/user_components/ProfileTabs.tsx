@@ -23,7 +23,6 @@ function ProfileTabs({ userId }: ProfileTabsProps) {
 
       <TabsContent
         value="posts"
-        forceMount
         className={activeTab !== "posts" ? "hidden" : ""}
       >
         <ProfilePosts userId={userId} />
@@ -31,7 +30,6 @@ function ProfileTabs({ userId }: ProfileTabsProps) {
 
       <TabsContent
         value="comments"
-        forceMount
         className={activeTab !== "comments" ? "hidden" : ""}
       >
         <ProfileComments userId={userId} />

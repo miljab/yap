@@ -3,7 +3,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import type { Comment } from "@/types/post";
 import CommentView from "@/components/comment_components/CommentView";
 import { Spinner } from "../ui/spinner";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useCachedInfiniteScroll } from "@/hooks/useCachedInfiniteScroll";
 import FetchError from "../FetchError";
 
 type ProfileCommentsProps = {
@@ -37,7 +37,7 @@ function ProfileComments({ userId }: ProfileCommentsProps) {
     loaderRef,
     error,
     retry,
-  } = useInfiniteScroll<Comment>(fetchComments, [userId]);
+  } = useCachedInfiniteScroll<Comment>(fetchComments, [userId], `profile:${userId}:comments`);
 
   const handleCommentCreated = (newComment: Comment) => {
     setComments((prev) =>
