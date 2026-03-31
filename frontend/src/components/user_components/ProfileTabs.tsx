@@ -8,10 +8,17 @@ type ProfileTabsProps = {
 };
 
 function ProfileTabs({ userId }: ProfileTabsProps) {
-  const [activeTab, setActiveTab] = useCachedValue(`profile:${userId}:tab`, "posts");
+  const [activeTab, setActiveTab] = useCachedValue<"posts" | "comments">(
+    `profile:${userId}:tab`,
+    "posts",
+  );
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <Tabs
+      value={activeTab}
+      onValueChange={(value) => setActiveTab(value as "posts" | "comments")}
+      className="w-full"
+    >
       <TabsList variant="line" className="w-full border-b">
         <TabsTrigger value="posts" className="flex-1 cursor-pointer">
           Posts
