@@ -34,19 +34,14 @@ export function useCachedInfiniteScroll<T>(
   const hasCheckedCacheRef = useRef(false);
   const hasRestoredScrollRef = useRef(false);
   const shouldResetRef = useRef(false);
+  const prevDepsRef = useRef<string>(JSON.stringify(deps));
 
-  const locationKeyRef = useRef(location.key);
-
-  if (location.key !== locationKeyRef.current) {
-    locationKeyRef.current = location.key;
-
-    if (!isBackNavigation) {
-      pageCache.clearCache(cacheKey);
-      hasCheckedCacheRef.current = false;
-      restoredDataRef.current = null;
-      hasRestoredScrollRef.current = false;
-      shouldResetRef.current = true;
-    }
+  if (JSON.stringify(deps) !== prevDepsRef.current) {
+    prevDepsRef.current = JSON.stringify(deps);
+    restoredDataRef.current = null;
+    hasCheckedCacheRef.current = false;
+    hasRestoredScrollRef.current = false;
+    shouldResetRef.current = true;
   }
 
   if (!hasCheckedCacheRef.current) {
