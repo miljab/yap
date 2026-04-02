@@ -80,7 +80,8 @@ export function useCachedInfiniteScroll<T>(
       shouldResetRef.current = false;
       reset();
     }
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const scrollTopToRestore = restoredDataRef.current?.scrollTop ?? 0;
 
