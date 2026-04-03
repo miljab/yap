@@ -1,17 +1,20 @@
 import SearchBar from "@/components/search_components/SearchBar";
 import SearchTabs from "@/components/search_components/SearchTabs";
-import { useState } from "react";
+import { useCachedValue } from "@/hooks/useCachedValue";
 
 function SearchPage() {
-  const [activeTab, setActiveTab] = useState("users");
-  const [query, setQuery] = useState("");
+  const [activeTab, setActiveTab] = useCachedValue<"users" | "posts">(
+    "search:tab",
+    "users",
+  );
+  const [query, setQuery] = useCachedValue<string>("search:query", "");
 
   return (
     <div className="flex flex-col">
-      <SearchBar setQuery={setQuery} />
+      <SearchBar query={query} setQuery={setQuery} />
       <SearchTabs
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={(value) => setActiveTab(value as "users" | "posts")}
         query={query}
       />
     </div>

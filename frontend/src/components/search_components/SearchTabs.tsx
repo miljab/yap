@@ -1,11 +1,10 @@
-import type { SetStateAction } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
 import SearchUsers from "./SearchUsers";
 import SearchPosts from "./SearchPosts";
 
 type SearchTabsProps = {
   activeTab: string;
-  setActiveTab: React.Dispatch<SetStateAction<string>>;
+  setActiveTab: (value: string) => void;
   query: string;
 };
 

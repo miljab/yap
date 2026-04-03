@@ -3,7 +3,7 @@ import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import type { Post } from "@/types/post";
 import { Spinner } from "../ui/spinner";
 import PostView from "../post_components/PostView";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useCachedInfiniteScroll } from "@/hooks/useCachedInfiniteScroll";
 import FetchError from "../FetchError";
 
 type ProfilePostsProps = {
@@ -36,7 +36,7 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
     loaderRef,
     error,
     retry,
-  } = useInfiniteScroll<Post>(fetchPosts, [userId]);
+  } = useCachedInfiniteScroll<Post>(fetchPosts, [userId], `profile:${userId}:posts`);
 
   const handlePostUpdate = (updatedPost: Post) => {
     setPosts((prev) =>

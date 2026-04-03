@@ -12,6 +12,7 @@ type UseInfiniteScrollReturn<T> = {
   items: T[];
   setItems: React.Dispatch<React.SetStateAction<T[]>>;
   cursor: string | null;
+  setCursor: React.Dispatch<React.SetStateAction<string | null>>;
   hasMore: boolean;
   isLoading: boolean;
   initialLoad: boolean;
@@ -24,12 +25,15 @@ type UseInfiniteScrollReturn<T> = {
 export function useInfiniteScroll<T>(
   fetcher: Fetcher<T>,
   deps: React.DependencyList = [],
+  initialData?: { items: T[]; cursor: string | null } | null,
 ): UseInfiniteScrollReturn<T> {
-  const [items, setItems] = useState<T[]>([]);
-  const [cursor, setCursor] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(true);
+  const [items, setItems] = useState<T[]>(() => initialData?.items ?? []);
+  const [cursor, setCursor] = useState<string | null>(
+    () => initialData?.cursor ?? null,
+  );
+  const [hasMore, setHasMore] = useState(() => initialData?.cursor !== null);
   const [isLoading, setIsLoading] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(() => !initialData);
   const [error, setError] = useState<FetchErrorState | null>(null);
 
   const loaderRef = useRef<HTMLDivElement>(null);
@@ -37,6 +41,15 @@ export function useInfiniteScroll<T>(
   const fetcherRef = useRef(fetcher);
 
   fetcherRef.current = fetcher;
+
+  const reset = useCallback(() => {
+    setItems([]);
+    setCursor(null);
+    setHasMore(true);
+    setInitialLoad(true);
+    setError(null);
+    isFetchingRef.current = false;
+  }, []);
 
   const fetchNext = useCallback(async () => {
     if (isFetchingRef.current || !hasMore) return;
@@ -61,25 +74,23 @@ export function useInfiniteScroll<T>(
     }
   }, [cursor, hasMore]);
 
-  const reset = useCallback(() => {
+  useEffect(() => {
+    if (initialData) return;
+
     setItems([]);
     setCursor(null);
     setHasMore(true);
     setInitialLoad(true);
     setError(null);
     isFetchingRef.current = false;
-  }, []);
-
-  useEffect(() => {
-    reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   useEffect(() => {
-    if (initialLoad && !isLoading) {
-      fetchNext();
-    }
-  }, [initialLoad, isLoading, fetchNext]);
+    if (!initialLoad || isLoading) return;
+    fetchNext();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialLoad, isLoading]);
 
   useEffect(() => {
     const loader = loaderRef.current;
@@ -107,6 +118,7 @@ export function useInfiniteScroll<T>(
     items,
     setItems,
     cursor,
+    setCursor,
     hasMore,
     isLoading,
     initialLoad,

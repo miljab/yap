@@ -1,6 +1,6 @@
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import { useCallback } from "react";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useCachedInfiniteScroll } from "@/hooks/useCachedInfiniteScroll";
 import type { Post } from "@/types/post";
 import { Spinner } from "../ui/spinner";
 import PostView from "../post_components/PostView";
@@ -34,7 +34,7 @@ function SearchPosts({ query }: SearchPostsProps) {
   );
 
   const { items, setItems, isLoading, initialLoad, loaderRef, error, retry } =
-    useInfiniteScroll<Post>(fetchPosts, [query]);
+    useCachedInfiniteScroll<Post>(fetchPosts, [query], `search:posts:${query}`);
 
   const handlePostUpdate = (updatedPost: Post) => {
     setItems((prev) =>

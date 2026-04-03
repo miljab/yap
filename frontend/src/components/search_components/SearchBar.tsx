@@ -2,13 +2,18 @@ import { type KeyboardEvent, useState, useRef, useEffect } from "react";
 import { Search } from "lucide-react";
 
 type SearchBarProps = {
+  query: string;
   setQuery: (query: string) => void;
 };
 
-function SearchBar({ setQuery }: SearchBarProps) {
+function SearchBar({ query, setQuery }: SearchBarProps) {
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(query);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setInputValue(query);
+  }, [query]);
 
   useEffect(() => {
     const timer = setTimeout(() => setQuery(inputValue.trim()), 300);

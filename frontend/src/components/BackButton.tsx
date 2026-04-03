@@ -18,6 +18,7 @@ function BackButton() {
           state: {
             origin,
             historyStack: newStack,
+            restoreCache: true,
           },
         });
         return;
@@ -25,9 +26,9 @@ function BackButton() {
     }
 
     if (origin) {
-      navigate(origin);
+      navigate(origin, { state: { restoreCache: true } });
     } else {
-      navigate("/home");
+      navigate("/home", { state: { restoreCache: true } });
     }
   };
 

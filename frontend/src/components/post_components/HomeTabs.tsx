@@ -1,12 +1,19 @@
-import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HomeFeed from "./HomeFeed";
+import { useCachedValue } from "@/hooks/useCachedValue";
 
 function HomeTabs() {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useCachedValue<"all" | "following">(
+    "home:tab",
+    "all",
+  );
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <Tabs
+      value={activeTab}
+      onValueChange={(value) => setActiveTab(value as "all" | "following")}
+      className="w-full"
+    >
       <TabsList
         variant="line"
         className="bg-background sticky top-[73px] z-40 w-full border-b md:top-0"
