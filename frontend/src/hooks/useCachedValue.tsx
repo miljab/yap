@@ -2,10 +2,6 @@ import { useState } from "react";
 import { useNavigationType, useLocation, NavigationType } from "react-router";
 import type { NavigationState } from "@/types/navigation";
 
-/**
- * Hook for managing state with sessionStorage persistence.
- * Restores value on back navigation (Pop or BackButton), resets to default on forward navigation.
- */
 export function useCachedValue<T extends string>(
   key: string,
   defaultValue: T,
