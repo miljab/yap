@@ -23,6 +23,24 @@ type LikedByProps = {
 
 function LikedBy({ likeCount, type, id }: LikedByProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <button className="cursor-pointer hover:underline">{likeCount}</button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Liked by</DialogTitle>
+        </DialogHeader>
+
+        {isOpen && <LikersList id={id} type={type} />}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function LikersList({ id, type }: { id: string; type: "post" | "comment" }) {
   const axiosPrivate = useAxiosPrivate();
 
   const fetchLikers = useCallback(
@@ -50,67 +68,58 @@ function LikedBy({ likeCount, type, id }: LikedByProps) {
   );
 
   const { items, isLoading, initialLoad, loaderRef, error, retry } =
-    useInfiniteScroll<User>(fetchLikers, [isOpen, id, type]);
+    useInfiniteScroll<User>(fetchLikers, [id, type]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <button className="cursor-pointer hover:underline">{likeCount}</button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Liked by</DialogTitle>
-        </DialogHeader>
-
-        {initialLoad ? (
-          <div className="flex justify-center p-4">
-            <Spinner />
-          </div>
-        ) : items.length === 0 ? (
-          error ? (
-            <FetchError error={error} onRetry={retry} />
-          ) : (
-            <div className="p-4 text-center text-neutral-500">No likes yet</div>
-          )
+    <>
+      {initialLoad ? (
+        <div className="flex justify-center p-4">
+          <Spinner />
+        </div>
+      ) : items.length === 0 ? (
+        error ? (
+          <FetchError error={error} onRetry={retry} />
         ) : (
-          <div className="flex max-h-[500px] flex-col gap-2 overflow-auto">
-            {items.map((user, idx) => {
-              return (
-                <div
-                  key={user.id}
-                  className={`flex items-center gap-2 p-1 ${idx !== items.length - 1 && "border-b-1"}`}
-                >
-                  <UserHoverCard username={user.username}>
-                    <span>
-                      <UserAvatar
-                        avatarUrl={user.avatarUrl}
-                        username={user.username}
-                      />
-                    </span>
-                  </UserHoverCard>
-                  <UserHoverCard username={user.username}>
-                    <Link
-                      to={`/profile/${user.username}`}
-                      className="cursor-pointer truncate hover:underline"
-                    >
-                      {user.username}
-                    </Link>
-                  </UserHoverCard>
-                </div>
-              );
-            })}
+          <div className="p-4 text-center text-neutral-500">No likes yet</div>
+        )
+      ) : (
+        <div className="flex max-h-[500px] flex-col gap-2 overflow-auto">
+          {items.map((user, idx) => {
+            return (
+              <div
+                key={user.id}
+                className={`flex items-center gap-2 p-1 ${idx !== items.length - 1 && "border-b-1"}`}
+              >
+                <UserHoverCard username={user.username}>
+                  <span>
+                    <UserAvatar
+                      avatarUrl={user.avatarUrl}
+                      username={user.username}
+                    />
+                  </span>
+                </UserHoverCard>
+                <UserHoverCard username={user.username}>
+                  <Link
+                    to={`/profile/${user.username}`}
+                    className="cursor-pointer truncate hover:underline"
+                  >
+                    {user.username}
+                  </Link>
+                </UserHoverCard>
+              </div>
+            );
+          })}
 
-            <div ref={loaderRef} className="flex justify-center p-4">
-              {isLoading ? (
-                <Spinner />
-              ) : error ? (
-                <FetchError error={error} onRetry={retry} />
-              ) : null}
-            </div>
+          <div ref={loaderRef} className="flex justify-center p-4">
+            {isLoading ? (
+              <Spinner />
+            ) : error ? (
+              <FetchError error={error} onRetry={retry} />
+            ) : null}
           </div>
-        )}
-      </DialogContent>
-    </Dialog>
+        </div>
+      )}
+    </>
   );
 }
 
