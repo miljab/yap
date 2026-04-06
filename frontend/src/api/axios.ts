@@ -17,12 +17,22 @@ export const axiosPrivate = axios.create({
 });
 
 let csrfToken: string | null = null;
+let accessToken: string | null = null;
+let refreshCallback: (() => Promise<string>) | null = null;
 
 export const fetchCsrfToken = async () => {
   if (csrfToken) return;
 
   const res = await axiosInstance.get("/api/csrf-token");
   csrfToken = res.data.csrfToken;
+};
+
+export const setAccessToken = (token: string | null) => {
+  accessToken = token;
+};
+
+export const setRefreshCallback = (fn: (() => Promise<string>) | null) => {
+  refreshCallback = fn;
 };
 
 const addCsrfToken = (config: InternalAxiosRequestConfig) => {
@@ -37,5 +47,30 @@ const addCsrfToken = (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
+const addAuthHeader = (config: InternalAxiosRequestConfig) => {
+  if (accessToken && !config.headers["Authorization"]) {
+    config.headers["Authorization"] = `Bearer ${accessToken}`;
+  }
+  return config;
+};
+
 axiosInstance.interceptors.request.use(addCsrfToken);
+
+axiosPrivate.interceptors.request.use(addAuthHeader);
 axiosPrivate.interceptors.request.use(addCsrfToken);
+
+axiosPrivate.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const prevRequest = error.config;
+    if (error.response?.status === 403 && !prevRequest._retry) {
+      prevRequest._retry = true;
+      if (refreshCallback) {
+        const newAccessToken = await refreshCallback();
+        prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+        return axiosPrivate(prevRequest);
+      }
+    }
+    return Promise.reject(error);
+  },
+);
