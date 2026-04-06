@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { useState, useCallback } from "react";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import UserAvatar from "./user_components/UserAvatar";
 import { Spinner } from "./ui/spinner";
 import FollowButton from "./FollowButton";
@@ -25,7 +25,6 @@ type FollowListProps = {
 
 function FollowList({ type, count, user }: FollowListProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const axiosPrivate = useAxiosPrivate();
   const authenticatedUser = useAuthenticatedUser();
 
   const fetchFollows = useCallback(
@@ -40,7 +39,7 @@ function FollowList({ type, count, user }: FollowListProps) {
         nextCursor: response.data.nextCursor,
       };
     },
-    [axiosPrivate, user.id, type],
+    [user.id, type],
   );
 
   const {

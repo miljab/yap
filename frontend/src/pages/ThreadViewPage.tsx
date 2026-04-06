@@ -1,4 +1,4 @@
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router";
 import PostView from "../components/post_components/PostView";
@@ -13,7 +13,6 @@ import { Spinner } from "@/components/ui/spinner";
 
 function ThreadViewPage() {
   const params = useParams();
-  const axiosPrivate = useAxiosPrivate();
   const [post, setPost] = useState<Post | null>(null);
   const [comment, setComment] = useState<Comment | null>(null);
   const [replies, setReplies] = useState<Comment[]>([]);
@@ -48,7 +47,7 @@ function ThreadViewPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [axiosPrivate, params.id, navigate]);
+  }, [params.id, navigate]);
 
   useEffect(() => {
     fetchData();

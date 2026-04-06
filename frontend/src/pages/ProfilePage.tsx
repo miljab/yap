@@ -3,14 +3,13 @@ import ProfileTabs from "@/components/user_components/ProfileTabs";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import type { User } from "@/types/user";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import useAuth from "@/hooks/useAuth";
 import type { AxiosError } from "axios";
 
 function ProfilePage() {
   const params = useParams();
   const [user, setUser] = useState<User | null>(null);
-  const axiosPrivate = useAxiosPrivate();
   const { auth, setAuth } = useAuth();
   const navigate = useNavigate();
 
@@ -42,7 +41,7 @@ function ProfilePage() {
     };
 
     fetchData();
-  }, [axiosPrivate, params.username, navigate]);
+  }, [params.username, navigate]);
 
   if (!user) return null;
 

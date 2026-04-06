@@ -10,11 +10,10 @@ import useAuth from "@/hooks/useAuth";
 import { ChevronDown, LogOut, Moon, Sun, User } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import useTheme from "@/hooks/useTheme";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import useAuthenticatedUser from "@/hooks/useAuthenticatedUser";
 
 function UserNavDropdown() {
-  const axiosPrivate = useAxiosPrivate();
   const { setAuth } = useAuth();
   const user = useAuthenticatedUser();
   const { theme, setTheme } = useTheme();

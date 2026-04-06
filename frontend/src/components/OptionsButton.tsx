@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import { toast } from "sonner";
 import type { Post } from "@/types/post";
 import { useState } from "react";
@@ -30,7 +30,6 @@ type OptionsButtonPostProps = {
 type OptionsButtonProps = OptionsButtonPostProps | OptionsButtonCommentProps;
 
 function OptionsButton(props: OptionsButtonProps) {
-  const axiosPrivate = useAxiosPrivate();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);

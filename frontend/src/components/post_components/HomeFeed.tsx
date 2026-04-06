@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import type { Post } from "@/types/post";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import PostView from "./PostView";
 import { Spinner } from "../ui/spinner";
 import { useCachedInfiniteScroll } from "@/hooks/useCachedInfiniteScroll";
@@ -12,8 +12,6 @@ type HomeFeedProps = {
 };
 
 function HomeFeed({ type }: HomeFeedProps) {
-  const axiosPrivate = useAxiosPrivate();
-
   const fetchPosts = useCallback(
     async (currentCursor?: string) => {
       let url;
@@ -32,7 +30,7 @@ function HomeFeed({ type }: HomeFeedProps) {
         nextCursor: response.data.nextCursor,
       };
     },
-    [axiosPrivate, type],
+    [type],
   );
 
   const {

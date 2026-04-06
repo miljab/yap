@@ -1,4 +1,4 @@
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import { useCachedInfiniteScroll } from "@/hooks/useCachedInfiniteScroll";
 import { useCallback } from "react";
 import type { User } from "@/types/user";
@@ -13,8 +13,6 @@ type SearchUsersProps = {
 };
 
 function SearchUsers({ query }: SearchUsersProps) {
-  const axiosPrivate = useAxiosPrivate();
-
   const fetchUsers = useCallback(
     async (currentCursor?: string) => {
       if (!query?.trim()) {
@@ -32,7 +30,7 @@ function SearchUsers({ query }: SearchUsersProps) {
         nextCursor: response.data.nextCursor,
       };
     },
-    [query, axiosPrivate],
+    [query],
   );
 
   const { items, isLoading, initialLoad, loaderRef, error, retry } =

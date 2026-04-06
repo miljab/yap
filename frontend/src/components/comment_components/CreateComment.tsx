@@ -1,4 +1,4 @@
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import { toast } from "sonner";
 import type { Comment } from "@/types/post";
 import TextEditor from "../ui/TextEditor";
@@ -18,7 +18,6 @@ function CreateComment({
   closeDialog,
   autoFocus,
 }: CreateCommentProps) {
-  const axiosPrivate = useAxiosPrivate();
 
   async function handleCreateComment(content: string, files?: File[]) {
     try {

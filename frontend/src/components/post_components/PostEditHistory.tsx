@@ -8,7 +8,7 @@ import {
 } from "../ui/dialog";
 import { Link } from "react-router";
 import { useCallback, useState } from "react";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import type { PostHistory } from "@/types/post";
 import { Spinner } from "../ui/spinner";
 import FetchError from "../FetchError";
@@ -27,7 +27,6 @@ function PostEditHistory({ postId, user }: PostHistoryProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<FetchErrorState | null>(null);
   const [open, setOpen] = useState(false);
-  const axiosPrivate = useAxiosPrivate();
 
   const fetchEditHistory = useCallback(async () => {
     setIsLoading(true);
@@ -42,7 +41,7 @@ function PostEditHistory({ postId, user }: PostHistoryProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [postId, axiosPrivate]);
+  }, [postId]);
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import { toast } from "sonner";
 
 type UseLikeProps = {
@@ -18,7 +18,6 @@ export function useLike({
   const [isLiking, setLiking] = useState(false);
   const [isLiked, setLiked] = useState(initialIsLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
-  const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
     setLiked(initialIsLiked);

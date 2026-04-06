@@ -9,7 +9,7 @@ import UserAvatar from "./user_components/UserAvatar";
 import { Link } from "react-router";
 import { useState, useCallback } from "react";
 import type { User } from "@/types/user";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Spinner } from "./ui/spinner";
 import FetchError from "./FetchError";
@@ -41,8 +41,6 @@ function LikedBy({ likeCount, type, id }: LikedByProps) {
 }
 
 function LikersList({ id, type }: { id: string; type: "post" | "comment" }) {
-  const axiosPrivate = useAxiosPrivate();
-
   const fetchLikers = useCallback(
     async (currentCursor?: string) => {
       let url: string;
@@ -64,7 +62,7 @@ function LikersList({ id, type }: { id: string; type: "post" | "comment" }) {
         nextCursor: response.data.nextCursor,
       };
     },
-    [axiosPrivate, id, type],
+    [id, type],
   );
 
   const { items, isLoading, initialLoad, loaderRef, error, retry } =
