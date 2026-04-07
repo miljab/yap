@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { User } from "@/types/user";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import UserAvatar from "./UserAvatar";
 import FollowButton from "../FollowButton";
 import {
@@ -20,7 +20,6 @@ type UserHoverCardProps = {
 function UserHoverCard({ username, children }: UserHoverCardProps) {
   const [user, setUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
-  const axiosPrivate = useAxiosPrivate();
   const authUser = useAuthenticatedUser();
 
   const fetchData = async () => {

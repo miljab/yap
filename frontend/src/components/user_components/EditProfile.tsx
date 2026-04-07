@@ -10,7 +10,7 @@ import {
   DialogClose,
 } from "../ui/dialog";
 import { Label } from "../ui/label";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import UserAvatar from "./UserAvatar";
 import type { User } from "@/types/user";
 import { toast } from "sonner";
@@ -31,7 +31,6 @@ function EditProfile({ user, onProfileUpdate }: EditProfileProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const avatarPreviewRef = useRef<string | null>(null);
-  const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
     return () => {

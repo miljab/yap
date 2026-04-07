@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import TextEditor from "../ui/TextEditor";
 import type { Post } from "@/types/post";
 
@@ -8,7 +8,6 @@ type CreatePostProps = {
 };
 
 function CreatePost({ onPostCreate }: CreatePostProps) {
-  const axiosPrivate = useAxiosPrivate();
 
   async function handleCreatePost(content: string, files?: File[]) {
     try {

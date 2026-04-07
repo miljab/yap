@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "../api/axios";
-import { fetchCsrfToken } from "../api/axios";
+import axios, { fetchCsrfToken, setAccessToken, setRefreshCallback } from "../api/axios";
 import { AuthContext } from "./AuthContext";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -22,6 +21,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         const { user, accessToken } = response.data;
         setAuth({ user, accessToken });
+        if (accessToken) setAccessToken(accessToken);
+
+        setRefreshCallback(async () => {
+          const res = await axios.get("/auth/refresh", { withCredentials: true });
+          const newToken = res.data.accessToken;
+          setAuth((prev) => ({ ...prev, accessToken: newToken }));
+          setAccessToken(newToken);
+          return newToken;
+        });
       } catch (error) {
         console.error("Session validation failed: ", error);
         setAuth({});

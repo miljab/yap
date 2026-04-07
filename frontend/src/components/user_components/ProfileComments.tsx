@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import type { Comment } from "@/types/post";
 import CommentView from "@/components/comment_components/CommentView";
 import { Spinner } from "../ui/spinner";
@@ -11,8 +11,6 @@ type ProfileCommentsProps = {
 };
 
 function ProfileComments({ userId }: ProfileCommentsProps) {
-  const axiosPrivate = useAxiosPrivate();
-
   const fetchComments = useCallback(
     async (currentCursor?: string) => {
       const url = currentCursor
@@ -26,7 +24,7 @@ function ProfileComments({ userId }: ProfileCommentsProps) {
         nextCursor: response.data.nextCursor,
       };
     },
-    [axiosPrivate, userId],
+    [userId],
   );
 
   const {

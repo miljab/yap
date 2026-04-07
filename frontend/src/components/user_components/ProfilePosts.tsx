@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import type { Post } from "@/types/post";
 import { Spinner } from "../ui/spinner";
 import PostView from "../post_components/PostView";
@@ -11,8 +11,6 @@ type ProfilePostsProps = {
 };
 
 function ProfilePosts({ userId }: ProfilePostsProps) {
-  const axiosPrivate = useAxiosPrivate();
-
   const fetchPosts = useCallback(
     async (currentCursor?: string) => {
       const url = currentCursor
@@ -25,7 +23,7 @@ function ProfilePosts({ userId }: ProfilePostsProps) {
         nextCursor: response.data.nextCursor,
       };
     },
-    [axiosPrivate, userId],
+    [userId],
   );
 
   const {

@@ -1,11 +1,10 @@
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate, setAccessToken } from "@/api/axios";
 import { Button } from "./button";
 import useAuth from "@/hooks/useAuth";
 import { useNavigate } from "react-router";
 import { LogOut } from "lucide-react";
 
 function LogoutButton() {
-  const axiosPrivate = useAxiosPrivate();
   const { setAuth } = useAuth();
   const navigate = useNavigate();
 
@@ -13,6 +12,7 @@ function LogoutButton() {
     try {
       await axiosPrivate.get("/auth/logout");
 
+      setAccessToken(null);
       setAuth({});
       navigate("/");
     } catch (error) {

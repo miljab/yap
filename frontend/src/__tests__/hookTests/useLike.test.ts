@@ -2,12 +2,16 @@ import { useLike } from "@/hooks/useLike";
 import { describe, vi, beforeEach, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { toast } from "sonner";
-import type { Like } from "@/types/post";
-import type { User } from "@/types/user";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import * as axiosModule from "@/api/axios";
 
-vi.mock("@/hooks/useAxiosPrivate", () => ({
-  default: vi.fn(),
+vi.mock("@/api/axios", () => ({
+  axiosPrivate: {
+    post: vi.fn(),
+  },
+  setAccessToken: vi.fn(),
+  setRefreshCallback: vi.fn(),
+  fetchCsrfToken: vi.fn(),
+  default: { get: vi.fn() },
 }));
 
 vi.mock("sonner", () => ({
@@ -16,38 +20,9 @@ vi.mock("sonner", () => ({
   },
 }));
 
-const mockUser: User = {
-  id: "user-1",
-  username: "testuser",
-  createdAt: new Date(),
-  avatarUrl: "",
-  bio: undefined,
-  email: undefined,
-  followersCount: 0,
-  followingCount: 0,
-  isFollowed: false,
-};
-
-const createMockLike = (overrides: Partial<Like> = {}): Like => ({
-  id: "like-1",
-  createdAt: new Date(),
-  user: mockUser,
-  ...overrides,
-});
-
-const createMockAxiosPrivate = () => ({
-  post: vi.fn(),
-});
-
 describe("useLike", () => {
-  let mockAxiosPrivate: ReturnType<typeof createMockAxiosPrivate>;
-
   beforeEach(() => {
     vi.clearAllMocks();
-    mockAxiosPrivate = createMockAxiosPrivate();
-    vi.mocked(useAxiosPrivate).mockReturnValue(
-      mockAxiosPrivate as unknown as ReturnType<typeof useAxiosPrivate>,
-    );
   });
 
   const initialProps = {
@@ -55,7 +30,6 @@ describe("useLike", () => {
     itemType: "post" as const,
     initialIsLiked: false,
     initialLikeCount: 5,
-    initialLikedBy: [createMockLike()],
   };
 
   it("initializes with correct initial values", () => {
@@ -67,7 +41,7 @@ describe("useLike", () => {
   });
 
   it("optimistically likes a post when not already liked", async () => {
-    mockAxiosPrivate.post.mockResolvedValueOnce({ data: { likeCount: 6 } });
+    vi.mocked(axiosModule.axiosPrivate.post).mockResolvedValueOnce({ data: { likeCount: 6 } });
 
     const { result } = renderHook(() => useLike(initialProps));
 
@@ -85,7 +59,7 @@ describe("useLike", () => {
       initialIsLiked: true,
       initialLikeCount: 5,
     };
-    mockAxiosPrivate.post.mockResolvedValueOnce({ data: { likeCount: 4 } });
+    vi.mocked(axiosModule.axiosPrivate.post).mockResolvedValueOnce({ data: { likeCount: 4 } });
 
     const { result } = renderHook(() => useLike(likedProps));
 
@@ -98,7 +72,7 @@ describe("useLike", () => {
   });
 
   it("prevents double-clicking while request is in progress", async () => {
-    mockAxiosPrivate.post.mockImplementation(
+    vi.mocked(axiosModule.axiosPrivate.post).mockImplementation(
       () =>
         new Promise((resolve) =>
           setTimeout(() => resolve({ data: { likeCount: 6 } }), 10),
@@ -117,11 +91,11 @@ describe("useLike", () => {
       result.current.handleLike();
     });
 
-    expect(mockAxiosPrivate.post).toHaveBeenCalledTimes(1);
+    expect(axiosModule.axiosPrivate.post).toHaveBeenCalledTimes(1);
   });
 
   it("reverts state on API error when liking", async () => {
-    mockAxiosPrivate.post.mockRejectedValueOnce(new Error("Network error"));
+    vi.mocked(axiosModule.axiosPrivate.post).mockRejectedValueOnce(new Error("Network error"));
 
     const { result } = renderHook(() => useLike(initialProps));
 
@@ -138,7 +112,7 @@ describe("useLike", () => {
 
   it("reverts state on API error when unliking", async () => {
     const likedProps = { ...initialProps, initialIsLiked: true };
-    mockAxiosPrivate.post.mockRejectedValueOnce(new Error("Network error"));
+    vi.mocked(axiosModule.axiosPrivate.post).mockRejectedValueOnce(new Error("Network error"));
 
     const { result } = renderHook(() => useLike(likedProps));
 
@@ -154,7 +128,7 @@ describe("useLike", () => {
   });
 
   it("makes API call with correct endpoint for post", async () => {
-    mockAxiosPrivate.post.mockResolvedValueOnce({ data: { likeCount: 6 } });
+    vi.mocked(axiosModule.axiosPrivate.post).mockResolvedValueOnce({ data: { likeCount: 6 } });
 
     const { result } = renderHook(() => useLike(initialProps));
 
@@ -162,12 +136,12 @@ describe("useLike", () => {
       await result.current.handleLike();
     });
 
-    expect(mockAxiosPrivate.post).toHaveBeenCalledWith("/post/post-123/like");
+    expect(axiosModule.axiosPrivate.post).toHaveBeenCalledWith("/post/post-123/like");
   });
 
   it("makes API call with correct endpoint for comment", async () => {
     const commentProps = { ...initialProps, itemType: "comment" as const };
-    mockAxiosPrivate.post.mockResolvedValueOnce({ data: { likeCount: 6 } });
+    vi.mocked(axiosModule.axiosPrivate.post).mockResolvedValueOnce({ data: { likeCount: 6 } });
 
     const { result } = renderHook(() => useLike(commentProps));
 
@@ -175,27 +149,25 @@ describe("useLike", () => {
       await result.current.handleLike();
     });
 
-    expect(mockAxiosPrivate.post).toHaveBeenCalledWith(
+    expect(axiosModule.axiosPrivate.post).toHaveBeenCalledWith(
       "/comment/post-123/like",
     );
   });
 
   it("syncs state when props change", async () => {
     const { result, rerender } = renderHook(
-      ({ itemId, initialIsLiked, initialLikeCount, initialLikedBy }) =>
+      ({ itemId, initialIsLiked, initialLikeCount }) =>
         useLike({
           itemId,
           itemType: "post",
           initialIsLiked,
           initialLikeCount,
-          initialLikedBy,
         }),
       {
         initialProps: {
           itemId: "post-1",
           initialIsLiked: false,
           initialLikeCount: 5,
-          initialLikedBy: [] as Like[],
         },
       },
     );
@@ -207,7 +179,6 @@ describe("useLike", () => {
       itemId: "post-2",
       initialIsLiked: true,
       initialLikeCount: 10,
-      initialLikedBy: [createMockLike()],
     });
 
     expect(result.current.isLiked).toBe(true);

@@ -1,4 +1,4 @@
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { axiosPrivate } from "@/api/axios";
 import { useCallback } from "react";
 import { useCachedInfiniteScroll } from "@/hooks/useCachedInfiniteScroll";
 import type { Post } from "@/types/post";
@@ -11,8 +11,6 @@ type SearchPostsProps = {
 };
 
 function SearchPosts({ query }: SearchPostsProps) {
-  const axiosPrivate = useAxiosPrivate();
-
   const fetchPosts = useCallback(
     async (currentCursor?: string) => {
       if (!query?.trim()) {
@@ -30,7 +28,7 @@ function SearchPosts({ query }: SearchPostsProps) {
         nextCursor: response.data.nextCursor,
       };
     },
-    [query, axiosPrivate],
+    [query],
   );
 
   const { items, setItems, isLoading, initialLoad, loaderRef, error, retry } =
