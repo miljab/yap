@@ -13,9 +13,9 @@ function App() {
       <AuthProvider>
         <FollowProvider>
           <PageCacheProvider>
-            <Routes>{publicRoutes()}</Routes>
-            <Routes>{authRoutes()}</Routes>
             <Routes>
+              {publicRoutes()}
+              {authRoutes()}
               <Route path="/error" element={<ErrorPage />} />
             </Routes>
           </PageCacheProvider>
