@@ -22,6 +22,7 @@ export function createApp({ enableRateLimit = true, enableCsrf = true } = {}) {
     cors({
       origin: process.env.CLIENT_URL,
       credentials: true,
+      exposedHeaders: ["Content-Type"],
     }),
   );
 
