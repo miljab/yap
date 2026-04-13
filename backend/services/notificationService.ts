@@ -1,5 +1,6 @@
 import { notificationPresenter } from "../presenters/notificationPresenter.js";
 import { prisma } from "../prisma/prismaClient.js";
+import { paginate } from "../utils/pagination.js";
 import { sseManager } from "./sseManager.js";
 
 type NotificationType =
@@ -103,5 +104,31 @@ export const notificationService = {
       notificationPresenter.single(notification),
     );
     return notification;
+  },
+
+  getNotifications: async (
+    requesterId: string,
+    cursor: string,
+    limit: number = 20,
+  ) => {
+    const notifications = await prisma.notification.findMany({
+      where: {
+        userId: requesterId,
+      },
+      take: limit + 1,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      orderBy: {
+        updatedAt: "desc",
+      },
+      include: {
+        actor: { select: { id: true, username: true, avatar: true } },
+        post: { select: { id: true } },
+        comment: { select: { id: true } },
+      },
+    });
+
+    const { result, nextCursor } = paginate(notifications, limit);
+
+    return notificationPresenter.list(result, { nextCursor });
   },
 };
