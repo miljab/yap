@@ -1,5 +1,6 @@
 import { notificationPresenter } from "../presenters/notificationPresenter.js";
 import { prisma } from "../prisma/prismaClient.js";
+import AppError from "../utils/appError.js";
 import { paginate } from "../utils/pagination.js";
 import { sseManager } from "./sseManager.js";
 
@@ -130,5 +131,30 @@ export const notificationService = {
     const { result, nextCursor } = paginate(notifications, limit);
 
     return notificationPresenter.list(result, { nextCursor });
+  },
+
+  markAsRead: async (userId: string, notificationId: string) => {
+    const notification = await prisma.notification.findUnique({
+      where: {
+        id: notificationId,
+        userId: userId,
+      },
+    });
+
+    if (!notification) throw new AppError("Notification not found", 404);
+
+    await prisma.notification.update({
+      where: { id: notificationId },
+      data: { isRead: true },
+    });
+  },
+
+  markAllAsRead: async (userId: string) => {
+    await prisma.notification.updateMany({
+      where: { userId: userId },
+      data: {
+        isRead: true,
+      },
+    });
   },
 };
