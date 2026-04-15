@@ -14,6 +14,7 @@ import {
   createGlobalLimiter,
   createWriteLimiter,
 } from "./middleware/rateLimiter.js";
+import createNotificationRouter from "./routers/notificationRouter.js";
 
 export function createApp({ enableRateLimit = true, enableCsrf = true } = {}) {
   const app = express();
@@ -58,6 +59,7 @@ export function createApp({ enableRateLimit = true, enableCsrf = true } = {}) {
   app.use(createPostRouter({ writeLimiter }));
   app.use(createCommentRouter({ writeLimiter }));
   app.use(createUserRouter());
+  app.use(createNotificationRouter());
 
   return app;
 }
