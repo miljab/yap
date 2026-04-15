@@ -109,7 +109,7 @@ export const notificationService = {
 
   getNotifications: async (
     requesterId: string,
-    cursor: string,
+    cursor?: string,
     limit: number = 20,
   ) => {
     const notifications = await prisma.notification.findMany({
