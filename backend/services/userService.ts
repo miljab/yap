@@ -9,6 +9,7 @@ import { postPresenter } from "../presenters/postPresenter.js";
 import { baseCommentInclude } from "./commentService.js";
 import { commentPresenter } from "../presenters/commentPresenter.js";
 import { paginate } from "../utils/pagination.js";
+import { notificationService } from "./notificationService.js";
 
 const DEFAULT_PAGE_LIMIT = 10;
 
@@ -186,6 +187,12 @@ export const userService = {
           followingId: userId,
         },
       });
+
+      await notificationService.createNotification(
+        userId,
+        requesterId,
+        "FOLLOW",
+      );
 
       return { isFollowed: true };
     }

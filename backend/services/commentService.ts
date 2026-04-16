@@ -5,6 +5,7 @@ import { uploadImages } from "../utils/cloudinaryHelper.js";
 import { commentPresenter } from "../presenters/commentPresenter.js";
 import { paginate } from "../utils/pagination.js";
 import { userPresenter } from "../presenters/userPresenter.js";
+import { notificationService } from "./notificationService.js";
 
 export const baseCommentInclude = (userId: string) => {
   return {
@@ -84,6 +85,14 @@ const commentService = {
       },
     });
 
+    await notificationService.createNotification(
+      post.userId,
+      userId,
+      "COMMENT_ON_POST",
+      postId,
+      comment.id,
+    );
+
     return commentPresenter.new(comment);
   },
 
@@ -131,6 +140,14 @@ const commentService = {
         },
       },
     });
+
+    await notificationService.createNotification(
+      parentComment.userId,
+      userId,
+      "REPLY_TO_COMMENT",
+      undefined,
+      commentId,
+    );
 
     return commentPresenter.new(comment);
   },
@@ -197,6 +214,14 @@ const commentService = {
     const likeCount = await prisma.commentLike.count({
       where: { commentId },
     });
+
+    await notificationService.createNotification(
+      comment.userId,
+      userId,
+      "LIKE_COMMENT",
+      undefined,
+      commentId,
+    );
 
     return likeCount;
   },

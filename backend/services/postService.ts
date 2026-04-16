@@ -4,6 +4,7 @@ import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
 import { deleteImages, uploadImages } from "../utils/cloudinaryHelper.js";
 import { paginate } from "../utils/pagination.js";
+import { notificationService } from "./notificationService.js";
 
 const DEFAULT_PAGE_LIMIT = 10;
 
@@ -141,6 +142,13 @@ export const postService = {
         postId,
       },
     });
+
+    await notificationService.createNotification(
+      post.userId,
+      userId,
+      "LIKE_POST",
+      postId,
+    );
 
     return likeCount;
   },
