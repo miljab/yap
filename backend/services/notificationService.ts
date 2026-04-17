@@ -133,6 +133,53 @@ export const notificationService = {
     return notificationPresenter.list(result, { nextCursor });
   },
 
+  removeActorFromNotification: async (
+    recipientId: string,
+    actorId: string,
+    type: NotificationType,
+    postId?: string,
+    commentId?: string,
+  ) => {
+    const whereClause = getAggregationWhereClause(
+      recipientId,
+      actorId,
+      type,
+      postId,
+      commentId,
+    );
+
+    if (whereClause) {
+      const notification = await prisma.notification.findFirst({
+        where: whereClause,
+      });
+
+      if (notification) {
+        await prisma.notificationActor.delete({
+          where: {
+            notificationId_actorId: {
+              notificationId: notification.id,
+              actorId,
+            },
+          },
+        });
+
+        const remainingActors = await prisma.notificationActor.count({
+          where: {
+            notificationId: notification.id,
+          },
+        });
+
+        if (remainingActors === 0) {
+          await prisma.notification.delete({
+            where: {
+              id: notification.id,
+            },
+          });
+        }
+      }
+    }
+  },
+
   markAsRead: async (userId: string, notificationId: string) => {
     const notification = await prisma.notification.findUnique({
       where: {
