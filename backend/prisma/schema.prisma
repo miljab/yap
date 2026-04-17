@@ -8,23 +8,23 @@ datasource db {
 }
 
 model User {
-  id                     String         @id @default(uuid())
-  username               String?        @unique @db.VarChar(32)
-  email                  String?        @unique
-  password               String?
-  createdAt              DateTime       @default(now())
-  avatar                 Avatar?
-  bio                    String?
-  following              Follow[]       @relation("UserFollowing")
-  followers              Follow[]       @relation("UserFollowers")
-  posts                  Post[]
-  comments               Comment[]
-  postLikes              PostLike[]
-  commentLikes           CommentLike[]
-  refreshToken           RefreshToken[]
-  account                Account[]
-  notificationsReceived  Notification[] @relation("NotificationRecipient")
-  notificationsTriggered Notification[] @relation("NotificationActor")
+  id                String              @id @default(uuid())
+  username          String?             @unique @db.VarChar(32)
+  email             String?             @unique
+  password          String?
+  createdAt         DateTime            @default(now())
+  avatar            Avatar?
+  bio               String?
+  following         Follow[]            @relation("UserFollowing")
+  followers         Follow[]            @relation("UserFollowers")
+  posts             Post[]
+  comments          Comment[]
+  postLikes         PostLike[]
+  commentLikes      CommentLike[]
+  refreshToken      RefreshToken[]
+  account           Account[]
+  notifications     Notification[]      @relation("NotificationRecipient")
+  NotificationActor NotificationActor[]
 }
 
 model Follow {
@@ -137,24 +137,32 @@ enum NotificationType {
 }
 
 model Notification {
-  id         String           @id @default(uuid())
-  userId     String
-  user       User             @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  actorId    String?
-  actor      User?            @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  postId     String?
-  post       Post?            @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  commentId  String?
-  comment    Comment?         @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  type       NotificationType
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  isRead     Boolean          @default(false)
-  actorCount Int              @default(0)
+  id                String              @id @default(uuid())
+  userId            String
+  user              User                @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId            String?
+  post              Post?               @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  commentId         String?
+  comment           Comment?            @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  type              NotificationType
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  isRead            Boolean             @default(false)
+  NotificationActor NotificationActor[]
 
   @@index([userId])
   @@index([userId, isRead])
   @@index([createdAt])
+}
+
+model NotificationActor {
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  actorId        String
+  actor          User         @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@id([notificationId, actorId])
 }
 
 model Image {
