@@ -51,7 +51,7 @@ function getAggregationWhereClause(
       if (!commentId) return null;
       return { userId: recipientId, type, commentId, isRead: false };
     case "FOLLOW":
-      return { userId: recipientId, type, actorId, isRead: false };
+      return { userId: recipientId, type, isRead: false };
     default:
       return null;
   }
