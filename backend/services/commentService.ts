@@ -202,6 +202,14 @@ const commentService = {
           },
         },
       });
+
+      await notificationService.removeActorFromNotification(
+        comment.userId,
+        userId,
+        "LIKE_COMMENT",
+        undefined,
+        comment.id,
+      );
     } else {
       await prisma.commentLike.create({
         data: {
@@ -209,19 +217,19 @@ const commentService = {
           commentId,
         },
       });
+
+      await notificationService.createNotification(
+        comment.userId,
+        userId,
+        "LIKE_COMMENT",
+        undefined,
+        commentId,
+      );
     }
 
     const likeCount = await prisma.commentLike.count({
       where: { commentId },
     });
-
-    await notificationService.createNotification(
-      comment.userId,
-      userId,
-      "LIKE_COMMENT",
-      undefined,
-      commentId,
-    );
 
     return likeCount;
   },

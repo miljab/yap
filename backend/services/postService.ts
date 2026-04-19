@@ -128,6 +128,13 @@ export const postService = {
           },
         },
       });
+
+      await notificationService.removeActorFromNotification(
+        post.userId,
+        userId,
+        "LIKE_POST",
+        post.id,
+      );
     } else {
       await prisma.postLike.create({
         data: {
@@ -135,6 +142,13 @@ export const postService = {
           userId,
         },
       });
+
+      await notificationService.createNotification(
+        post.userId,
+        userId,
+        "LIKE_POST",
+        postId,
+      );
     }
 
     const likeCount = await prisma.postLike.count({
@@ -142,13 +156,6 @@ export const postService = {
         postId,
       },
     });
-
-    await notificationService.createNotification(
-      post.userId,
-      userId,
-      "LIKE_POST",
-      postId,
-    );
 
     return likeCount;
   },
