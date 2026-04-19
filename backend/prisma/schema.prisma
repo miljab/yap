@@ -24,7 +24,7 @@ model User {
   refreshToken      RefreshToken[]
   account           Account[]
   notifications     Notification[]      @relation("NotificationRecipient")
-  NotificationActor NotificationActor[]
+  notificationActor NotificationActor[]
 }
 
 model Follow {
@@ -148,7 +148,7 @@ model Notification {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   isRead            Boolean             @default(false)
-  NotificationActor NotificationActor[]
+  notificationActor NotificationActor[]
 
   @@index([userId])
   @@index([userId, isRead])
