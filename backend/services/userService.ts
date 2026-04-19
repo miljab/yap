@@ -179,6 +179,12 @@ export const userService = {
         },
       });
 
+      await notificationService.removeActorFromNotification(
+        userId,
+        requesterId,
+        "FOLLOW",
+      );
+
       return { isFollowed: false };
     } else {
       await prisma.follow.create({
