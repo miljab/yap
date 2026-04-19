@@ -2,25 +2,33 @@ import { Prisma } from "@prisma/client";
 
 type NotificationPayload = Prisma.NotificationGetPayload<{
   include: {
-    actor: {
-      select: {
-        id: true;
-        username: true;
-        avatar: {
-          select: {
-            url: true;
+    notificationActor: {
+      include: {
+        actor: {
+          include: {
+            avatar: true;
           };
         };
       };
     };
+
     post: {
       select: {
         id: true;
+        content: true;
       };
     };
+
     comment: {
       select: {
         id: true;
+        content: true;
+      };
+    };
+
+    _count: {
+      select: {
+        notificationActor: true;
       };
     };
   };
@@ -34,16 +42,18 @@ export const notificationPresenter = {
       id: notification.id,
       type: notification.type,
       isRead: notification.isRead,
-      actorCount: notification.actorCount,
-      actor: notification.actor
-        ? {
-            id: notification.actor.id,
-            username: notification.actor.username,
-            avatarUrl: notification.actor.avatar?.url || DEFAULT_AVATAR,
-          }
+      actorCount: notification._count.notificationActor,
+      actors: notification.notificationActor
+        ? notification.notificationActor.map((na) => {
+            return {
+              id: na.actor.id,
+              username: na.actor.username,
+              avatarUrl: na.actor.avatar?.url || DEFAULT_AVATAR,
+            };
+          })
         : null,
-      postId: notification.postId,
-      commentId: notification.commentId,
+      postId: notification.postId ?? null,
+      commentId: notification.commentId ?? null,
       createdAt: notification.createdAt,
     };
   },
