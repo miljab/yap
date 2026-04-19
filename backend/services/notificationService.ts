@@ -3,6 +3,7 @@ import { prisma } from "../prisma/prismaClient.js";
 import AppError from "../utils/appError.js";
 import { paginate } from "../utils/pagination.js";
 import { sseManager } from "./sseManager.js";
+import { Prisma } from "@prisma/client";
 
 type NotificationType =
   | "LIKE_POST"
@@ -10,6 +11,30 @@ type NotificationType =
   | "COMMENT_ON_POST"
   | "REPLY_TO_COMMENT"
   | "FOLLOW";
+
+const notificationInclude = {
+  notificationActor: {
+    include: {
+      actor: {
+        include: { avatar: true },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  },
+  post: {
+    select: { id: true, content: true },
+  },
+  comment: {
+    select: { id: true, content: true },
+  },
+  _count: {
+    select: {
+      notificationActor: true,
+    },
+  },
+} satisfies Prisma.NotificationInclude;
 
 function getAggregationWhereClause(
   recipientId: string,
@@ -51,35 +76,50 @@ export const notificationService = {
     );
 
     if (whereClause) {
-      const existing = await prisma.notification.findFirst({
+      const existingNotification = await prisma.notification.findFirst({
         where: whereClause,
+        include: notificationInclude,
       });
 
-      if (existing) {
-        const updated = await prisma.notification.update({
+      if (existingNotification) {
+        const existingActor = await prisma.notificationActor.findUnique({
           where: {
-            id: existing.id,
-          },
-          data: {
-            actorCount: existing.actorCount + 1,
-          },
-          include: {
-            actor: {
-              select: {
-                id: true,
-                username: true,
-                avatar: true,
-              },
+            notificationId_actorId: {
+              notificationId: existingNotification.id,
+              actorId: actorId,
             },
-            post: { select: { id: true } },
-            comment: { select: { id: true } },
           },
         });
 
-        sseManager.broadcastToUser(
-          recipientId,
-          notificationPresenter.single(updated),
-        );
+        if (existingActor) return;
+
+        await prisma.notificationActor.create({
+          data: {
+            notificationId: existingNotification.id,
+            actorId: actorId,
+          },
+          include: {
+            actor: {
+              include: {
+                avatar: true,
+              },
+            },
+          },
+        });
+
+        const updated = await prisma.notification.findUnique({
+          where: {
+            id: existingNotification.id,
+          },
+          include: notificationInclude,
+        });
+
+        if (updated)
+          sseManager.broadcastToUser(
+            recipientId,
+            notificationPresenter.single(updated),
+          );
+
         return updated;
       }
     }
@@ -87,17 +127,16 @@ export const notificationService = {
     const notification = await prisma.notification.create({
       data: {
         userId: recipientId,
-        actorId: actorId ?? null,
-        type,
+        type: type,
         postId: postId ?? null,
         commentId: commentId ?? null,
-        actorCount: 1,
+        notificationActor: {
+          create: {
+            actorId: actorId,
+          },
+        },
       },
-      include: {
-        actor: { select: { id: true, username: true, avatar: true } },
-        post: { select: { id: true } },
-        comment: { select: { id: true } },
-      },
+      include: notificationInclude,
     });
 
     sseManager.broadcastToUser(
@@ -121,11 +160,7 @@ export const notificationService = {
       orderBy: {
         updatedAt: "desc",
       },
-      include: {
-        actor: { select: { id: true, username: true, avatar: true } },
-        post: { select: { id: true } },
-        comment: { select: { id: true } },
-      },
+      include: notificationInclude,
     });
 
     const { result, nextCursor } = paginate(notifications, limit);
@@ -151,6 +186,7 @@ export const notificationService = {
     if (whereClause) {
       const notification = await prisma.notification.findFirst({
         where: whereClause,
+        select: { id: true },
       });
 
       if (notification) {
