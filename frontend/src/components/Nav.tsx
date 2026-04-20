@@ -40,7 +40,7 @@ function Nav({ hidden = false }: NavProps) {
           </Link>
 
           <Link
-            to="/search"
+            to="/notifications"
             className="hover:bg-accent flex items-center justify-center gap-2 rounded-full p-2 md:w-full md:justify-start"
           >
             <Bell />
