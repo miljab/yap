@@ -8,7 +8,7 @@ export type Notification = {
     | "FOLLOW";
   isRead: boolean;
   actorCount: number;
-  actor: { id: string; username: string; avatarUrl: string } | null;
+  actors: { id: string; username: string; avatarUrl: string }[] | null;
   postId?: string;
   commentId?: string;
   createdAt: Date;
